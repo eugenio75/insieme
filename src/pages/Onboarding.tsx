@@ -217,6 +217,18 @@ const Onboarding = () => {
   const currentStep = steps[step];
   const isMultiSelect = currentStep?.multiSelect;
   const hasCustomInput = (currentStep as any)?.hasCustomInput;
+  const isWeightInput = (currentStep as any)?.isWeightInput;
+
+  const handleWeightSubmit = async () => {
+    setUser({ weight: weightInput || undefined });
+    if (step < steps.length - 1) {
+      setStep(step + 1);
+    } else {
+      completeOnboarding();
+      await saveProfile();
+      navigate('/home');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col px-6 py-8 max-w-lg mx-auto">

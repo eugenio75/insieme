@@ -77,8 +77,10 @@ const ProgressPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10 flex items-center justify-center">
-        <motion.span 
+      <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
+        <AppHeader />
+        <div className="flex items-center justify-center pt-20">
+        <motion.span
           className="text-4xl"
           animate={{ y: [0, -8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}

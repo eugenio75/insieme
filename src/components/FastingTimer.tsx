@@ -35,11 +35,11 @@ const FastingTimer = () => {
       transition={{ delay: 0.2, duration: 0.5 }}
       className="mt-5"
     >
-      <div className="p-5 rounded-2xl glass glass-border">
-        <div className="flex items-center gap-2 mb-4">
-          <Timer className="w-4 h-4 text-primary" />
-          <span className="text-[10px] text-muted-foreground btn-text">DIGIUNO INTERMITTENTE</span>
-          <span className="ml-auto text-xs text-muted-foreground">{config.protocol}</span>
+      <div className="p-6 rounded-2xl glass glass-border">
+        <div className="flex items-center gap-2 mb-5">
+          <Timer className="w-5 h-5 text-primary" />
+          <span className="text-xs text-muted-foreground btn-text">DIGIUNO INTERMITTENTE</span>
+          <span className="ml-auto text-xs font-medium text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full">{config.protocol}</span>
         </div>
 
         {!status.isActive ? (

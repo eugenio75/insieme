@@ -169,14 +169,14 @@ const HomePage = () => {
           </motion.div>
         )}
 
-        {/* Weekly Habits */}
+        {/* Daily Steps */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.35 }}
         >
           <div className="flex items-baseline justify-between mb-4">
-            <h2 className="font-display text-lg text-foreground">I tuoi 3 passi</h2>
+            <h2 className="font-display text-lg text-foreground">I tuoi passi di oggi</h2>
             <span className="text-xs text-muted-foreground font-medium">
               {weekLabel || `Settimana ${weekNumber}`} {weekNumber <= totalWeeks ? '' : '🔄'}
             </span>

@@ -110,13 +110,17 @@ const Onboarding = () => {
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
   const [showName, setShowName] = useState(true);
-  const [selectedIntolerances, setSelectedIntolerances] = useState<string[]>([]);
+  const [multiSelections, setMultiSelections] = useState<Record<string, string[]>>({});
   const [customIntolerances, setCustomIntolerances] = useState<string[]>([]);
   const [customInput, setCustomInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const { setUser, completeOnboarding } = useAppStore();
   const { saveProfile } = useProfile();
   const navigate = useNavigate();
+
+  const getSelections = (key: string) => multiSelections[key] || [];
+  const setSelections = (key: string, values: string[]) =>
+    setMultiSelections((prev) => ({ ...prev, [key]: values }));
 
   const handleNameSubmit = () => {
     if (name.trim()) {

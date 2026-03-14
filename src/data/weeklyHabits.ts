@@ -172,17 +172,72 @@ const wellnessHabits: WeekLevel[] = [
   },
 ];
 
+// ── Perdere peso ──
+const weightLossHabits: WeekLevel[] = [
+  {
+    week: 1, label: 'Settimana 1 – Consapevolezza',
+    habits: [
+      { id: 'p1-1', title: 'Camminare 15 minuti', icon: '🚶‍♀️' },
+      { id: 'p1-2', title: 'Bere 1 litro di acqua', icon: '💧' },
+      { id: 'p1-3', title: 'Niente spuntini dopo cena', icon: '🌙' },
+    ],
+  },
+  {
+    week: 2, label: 'Settimana 2 – Porzioni',
+    habits: [
+      { id: 'p2-1', title: 'Camminare 20 minuti', icon: '🚶‍♀️' },
+      { id: 'p2-2', title: 'Bere 1.5 litri di acqua', icon: '💧' },
+      { id: 'p2-3', title: 'Porzioni moderate a pranzo e cena', icon: '🍽️' },
+    ],
+  },
+  {
+    week: 3, label: 'Settimana 3 – Sostituzione',
+    habits: [
+      { id: 'p3-1', title: 'Camminare 25 minuti', icon: '🚶‍♀️' },
+      { id: 'p3-2', title: 'Bere 1.5 litri di acqua', icon: '💧' },
+      { id: 'p3-3', title: 'Sostituire un dolce con frutta', icon: '🍎' },
+    ],
+  },
+  {
+    week: 4, label: 'Settimana 4 – Movimento',
+    habits: [
+      { id: 'p4-1', title: 'Camminare 30 minuti', icon: '🚶‍♀️' },
+      { id: 'p4-2', title: 'Bere 2 litri di acqua', icon: '💧' },
+      { id: 'p4-3', title: 'Niente bibite zuccherate', icon: '🚫' },
+    ],
+  },
+  {
+    week: 5, label: 'Settimana 5 – Equilibrio',
+    habits: [
+      { id: 'p5-1', title: '30 minuti di attività', icon: '💪' },
+      { id: 'p5-2', title: 'Bere 2 litri di acqua', icon: '💧' },
+      { id: 'p5-3', title: 'Verdure a ogni pasto principale', icon: '🥬' },
+    ],
+  },
+  {
+    week: 6, label: 'Settimana 6 – Nuova te',
+    habits: [
+      { id: 'p6-1', title: '30 minuti di attività + stretching', icon: '🧘‍♀️' },
+      { id: 'p6-2', title: 'Bere 2 litri di acqua', icon: '💧' },
+      { id: 'p6-3', title: 'Pasto bilanciato e leggero la sera', icon: '🌙' },
+    ],
+  },
+];
+
 const habitsByObjective: Record<string, WeekLevel[]> = {
   light: lightHabits,
   energy: energyHabits,
+  weightloss: weightLossHabits,
   wellness: wellnessHabits,
 };
 
 /**
- * Maps the user's objective string to a habit track key.
+ * Maps the user's objective string (possibly comma-separated) to the best habit track.
+ * Priority: weightloss > light > energy > wellness
  */
 const resolveTrack = (objective: string): string => {
   const lower = objective.toLowerCase();
+  if (lower.includes('peso') || lower.includes('dimagri')) return 'weightloss';
   if (lower.includes('sgonfi') || lower.includes('legger') || lower.includes('gonfi') || lower.includes('pancia')) return 'light';
   if (lower.includes('energi') || lower.includes('stanche') || lower.includes('stanca') || lower.includes('vitalit')) return 'energy';
   return 'wellness';

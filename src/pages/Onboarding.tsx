@@ -7,12 +7,14 @@ import { useProfile } from '@/hooks/useProfile';
 
 const steps = [
   {
-    question: 'Qual è il tuo obiettivo principale?',
+    question: 'Quali sono i tuoi obiettivi?',
+    subtitle: 'Puoi sceglierne più di uno.',
     key: 'objective',
-    multiSelect: false,
+    multiSelect: true,
     options: [
       { label: 'Sentirmi più leggera', icon: '🌿' },
       { label: 'Avere più energia', icon: '⚡' },
+      { label: 'Perdere peso', icon: '⚖️' },
       { label: 'Ridurre il gonfiore', icon: '🫧' },
       { label: 'Essere più costante', icon: '🎯' },
       { label: 'Stare meglio nel mio corpo', icon: '💛' },
@@ -108,13 +110,17 @@ const Onboarding = () => {
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
   const [showName, setShowName] = useState(true);
-  const [selectedIntolerances, setSelectedIntolerances] = useState<string[]>([]);
+  const [multiSelections, setMultiSelections] = useState<Record<string, string[]>>({});
   const [customIntolerances, setCustomIntolerances] = useState<string[]>([]);
   const [customInput, setCustomInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const { setUser, completeOnboarding } = useAppStore();
   const { saveProfile } = useProfile();
   const navigate = useNavigate();
+
+  const getSelections = (key: string) => multiSelections[key] || [];
+  const setSelections = (key: string, values: string[]) =>
+    setMultiSelections((prev) => ({ ...prev, [key]: values }));
 
   const handleNameSubmit = () => {
     if (name.trim()) {
@@ -125,9 +131,10 @@ const Onboarding = () => {
 
   const handleAddCustomIntolerance = () => {
     const trimmed = customInput.trim();
-    if (trimmed && !customIntolerances.includes(trimmed) && !selectedIntolerances.includes(trimmed)) {
+    const selected = getSelections('intolerances');
+    if (trimmed && !customIntolerances.includes(trimmed) && !selected.includes(trimmed)) {
       setCustomIntolerances((prev) => [...prev, trimmed]);
-      setSelectedIntolerances((prev) => [...prev.filter((v) => v !== 'Nessuna'), trimmed]);
+      setSelections('intolerances', [...selected.filter((v) => v !== 'Nessuna'), trimmed]);
       setCustomInput('');
       setShowCustomInput(false);
     }
@@ -135,23 +142,26 @@ const Onboarding = () => {
 
   const handleRemoveCustomIntolerance = (intolerance: string) => {
     setCustomIntolerances((prev) => prev.filter((i) => i !== intolerance));
-    setSelectedIntolerances((prev) => prev.filter((i) => i !== intolerance));
+    setSelections('intolerances', getSelections('intolerances').filter((i) => i !== intolerance));
   };
 
   const handleSelect = async (value: string) => {
     const currentStep = steps[step];
 
     if (currentStep.multiSelect) {
+      const key = currentStep.key;
+      const selected = getSelections(key);
       if (value === 'Nessuna') {
-        setSelectedIntolerances(['Nessuna']);
-        setCustomIntolerances([]);
+        setSelections(key, ['Nessuna']);
+        if (key === 'intolerances') setCustomIntolerances([]);
       } else {
-        setSelectedIntolerances((prev) => {
-          const without = prev.filter((v) => v !== 'Nessuna');
-          return without.includes(value)
+        const without = selected.filter((v) => v !== 'Nessuna');
+        setSelections(
+          key,
+          without.includes(value)
             ? without.filter((v) => v !== value)
-            : [...without, value];
-        });
+            : [...without, value]
+        );
       }
       return;
     }
@@ -170,12 +180,20 @@ const Onboarding = () => {
   };
 
   const handleMultiSelectConfirm = async () => {
-    const standardIntolerances = selectedIntolerances.includes('Nessuna')
-      ? []
-      : selectedIntolerances.filter((i) => !customIntolerances.includes(i));
-    const customs = selectedIntolerances.includes('Nessuna') ? [] : customIntolerances;
+    const currentStep = steps[step];
+    const key = currentStep.key;
+    const selected = getSelections(key);
 
-    setUser({ intolerances: standardIntolerances, customIntolerances: customs });
+    if (key === 'intolerances') {
+      const standardIntolerances = selected.includes('Nessuna')
+        ? []
+        : selected.filter((i) => !customIntolerances.includes(i));
+      const customs = selected.includes('Nessuna') ? [] : customIntolerances;
+      setUser({ intolerances: standardIntolerances, customIntolerances: customs });
+    } else if (key === 'objective') {
+      // Store multiple objectives as comma-separated string
+      setUser({ objective: selected.join(', ') });
+    }
 
     if (step < steps.length - 1) {
       setStep(step + 1);
@@ -261,7 +279,7 @@ const Onboarding = () => {
             {!currentStep.subtitle && <div className="mb-6" />}
             <div className="flex flex-col gap-3">
               {currentStep.options.map((option, i) => {
-                const isSelected = isMultiSelect && selectedIntolerances.includes(option.label);
+                const isSelected = isMultiSelect && getSelections(currentStep.key).includes(option.label);
                 return (
                   <motion.button
                     key={option.label}
@@ -293,7 +311,7 @@ const Onboarding = () => {
               {hasCustomInput && (
                 <>
                   {customIntolerances.map((ci) => {
-                    const isSelected = selectedIntolerances.includes(ci);
+                    const isSelected = getSelections('intolerances').includes(ci);
                     return (
                       <motion.div
                         key={ci}
@@ -376,7 +394,7 @@ const Onboarding = () => {
                 transition={{ delay: 0.4 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleMultiSelectConfirm}
-                disabled={selectedIntolerances.length === 0}
+                disabled={getSelections(currentStep.key).length === 0}
                 className="w-full mt-6 py-4 rounded-2xl bg-primary text-primary-foreground btn-text text-sm
                   disabled:opacity-40 transition-opacity duration-300 shadow-soft"
               >

@@ -15,7 +15,7 @@ const BottomNav = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50">
+    <nav className="fixed bottom-0 left-0 right-0 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div className="glass glass-border border-t-0 rounded-t-3xl mx-2 mb-0">
         <div className="flex items-center justify-around h-20 max-w-lg mx-auto px-2">
           {tabs.map((tab) => {

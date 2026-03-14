@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, PenLine, Heart, Utensils, BarChart3 } from 'lucide-react';
+import { Home, Heart, Utensils, BarChart3 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,7 +8,6 @@ import { useAuth } from '@/hooks/useAuth';
 const tabs = [
   { path: '/home', icon: Home, label: 'Home' },
   { path: '/nutrition', icon: Utensils, label: 'Cibo' },
-  { path: '/checkin', icon: PenLine, label: 'Check-in' },
   { path: '/progress', icon: BarChart3, label: 'Risultati' },
   { path: '/together', icon: Heart, label: 'Insieme' },
 ];
@@ -19,7 +18,6 @@ const BottomNav = () => {
   const { user } = useAuth();
   const [badgeCount, setBadgeCount] = useState(0);
 
-  // Check for recent unread badges (last 24h)
   useEffect(() => {
     if (!user) return;
     const checkBadges = async () => {
@@ -33,7 +31,6 @@ const BottomNav = () => {
     };
     checkBadges();
 
-    // Subscribe to new badges in realtime
     const channel = supabase
       .channel('badge-notifications')
       .on('postgres_changes', {
@@ -49,7 +46,6 @@ const BottomNav = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user]);
 
-  // Reset count when visiting together page
   useEffect(() => {
     if (location.pathname === '/together') {
       setBadgeCount(0);
@@ -59,35 +55,17 @@ const BottomNav = () => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div className="glass glass-border border-t-0 rounded-t-3xl mx-2 mb-0">
-        <div className="flex items-center justify-around h-20 max-w-lg mx-auto px-2">
+        <div className="flex items-center justify-around h-18 max-w-lg mx-auto px-4">
           {tabs.map((tab) => {
             const isActive = location.pathname === tab.path;
             const Icon = tab.icon;
-
-            if (tab.path === '/checkin') {
-              return (
-                <button
-                  key={tab.path}
-                  onClick={() => navigate(tab.path)}
-                  className="relative flex flex-col items-center justify-center -mt-6"
-                >
-                  <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center shadow-glow">
-                    <Icon className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <span className="text-[10px] mt-1.5 font-semibold text-primary">
-                    {tab.label}
-                  </span>
-                </button>
-              );
-            }
-
             const showBadge = tab.path === '/together' && badgeCount > 0 && !isActive;
 
             return (
               <button
                 key={tab.path}
                 onClick={() => navigate(tab.path)}
-                className="flex flex-col items-center justify-center gap-1 py-2 px-3 relative"
+                className="flex flex-col items-center justify-center gap-1 py-3 px-4 relative"
               >
                 <div className="relative">
                   <Icon

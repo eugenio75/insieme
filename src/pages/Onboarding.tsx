@@ -279,7 +279,7 @@ const Onboarding = () => {
             {!currentStep.subtitle && <div className="mb-6" />}
             <div className="flex flex-col gap-3">
               {currentStep.options.map((option, i) => {
-                const isSelected = isMultiSelect && selectedIntolerances.includes(option.label);
+                const isSelected = isMultiSelect && getSelections(currentStep.key).includes(option.label);
                 return (
                   <motion.button
                     key={option.label}

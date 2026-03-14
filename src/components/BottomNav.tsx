@@ -1,13 +1,13 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, CalendarDays, PenLine, Heart, User } from 'lucide-react';
+import { Home, CalendarDays, PenLine, Heart, Utensils } from 'lucide-react';
 
 const tabs = [
   { path: '/home', icon: Home, label: 'Home' },
   { path: '/week', icon: CalendarDays, label: 'Settimana' },
   { path: '/checkin', icon: PenLine, label: 'Check-in' },
+  { path: '/nutrition', icon: Utensils, label: 'Cibo' },
   { path: '/together', icon: Heart, label: 'Insieme' },
-  { path: '/profile', icon: User, label: 'Profilo' },
 ];
 
 const BottomNav = () => {

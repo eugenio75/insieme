@@ -3,6 +3,8 @@ import { useAppStore } from '../store/useAppStore';
 import HabitCard from '../components/HabitCard';
 import ProgressRing from '../components/ProgressRing';
 import BottomNav from '../components/BottomNav';
+import { getDailyTip } from '../data/foodTips';
+import { Link } from 'react-router-dom';
 
 const encouragements = [
   'Un passo alla volta, con la gentilezza che meriti.',
@@ -25,6 +27,7 @@ const HomePage = () => {
   };
 
   const todayMessage = encouragements[new Date().getDay() % encouragements.length];
+  const dailyTip = getDailyTip(user.objective, user.difficulty, user.intolerances);
 
   return (
     <div className="min-h-screen bg-background pb-24 max-w-lg mx-auto">
@@ -104,6 +107,25 @@ const HomePage = () => {
               <p className="text-sm mt-1 opacity-80">Meno di 1 minuto ⏱️</p>
             </motion.a>
           )}
+        </motion.div>
+
+        {/* Daily Food Tip */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.4 }}
+          className="mt-6"
+        >
+          <Link to="/nutrition" className="block p-5 rounded-[24px] bg-card border border-border shadow-card hover:shadow-soft transition-shadow duration-300">
+            <p className="text-[10px] text-muted-foreground btn-text mb-2">💡 CONSIGLIO DEL GIORNO</p>
+            <div className="flex items-start gap-3">
+              <span className="text-xl">{dailyTip.icon}</span>
+              <div>
+                <p className="text-sm font-medium text-foreground">{dailyTip.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{dailyTip.description}</p>
+              </div>
+            </div>
+          </Link>
         </motion.div>
 
         {/* Together Card */}

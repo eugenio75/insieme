@@ -1,10 +1,14 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
 import BottomNav from '../components/BottomNav';
 
+const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
+
 const ProfilePage = () => {
-  const { user, checkIns, weeklyHabits } = useAppStore();
+  const { user, checkIns, weeklyHabits, toggleIntolerance } = useAppStore();
   const completedHabits = weeklyHabits.filter((h) => h.completed).length;
+  const [editingIntolerances, setEditingIntolerances] = useState(false);
 
   return (
     <div className="min-h-screen bg-background pb-24 max-w-lg mx-auto px-6 pt-10">
@@ -51,6 +55,71 @@ const ProfilePage = () => {
               <span className="text-sm font-medium text-foreground">{item.value}</span>
             </div>
           ))}
+        </div>
+
+        {/* Intolerances */}
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-lg font-medium text-foreground">
+              Intolleranze alimentari
+            </h2>
+            <button
+              onClick={() => setEditingIntolerances(!editingIntolerances)}
+              className="text-sm text-primary font-medium"
+            >
+              {editingIntolerances ? 'Fatto' : 'Modifica'}
+            </button>
+          </div>
+
+          {user.intolerances.length > 0 && !editingIntolerances ? (
+            <div className="flex gap-2 flex-wrap">
+              {user.intolerances.map((intolerance) => (
+                <span
+                  key={intolerance}
+                  className="px-4 py-2 rounded-full bg-accent text-accent-foreground text-sm font-medium"
+                >
+                  {intolerance}
+                </span>
+              ))}
+            </div>
+          ) : !editingIntolerances ? (
+            <p className="text-sm text-muted-foreground">
+              Nessuna intolleranza indicata. Tocca "Modifica" per aggiungerne.
+            </p>
+          ) : null}
+
+          <AnimatePresence>
+            {editingIntolerances && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-2 overflow-hidden"
+              >
+                {allIntolerances.map((intolerance) => {
+                  const isSelected = user.intolerances.includes(intolerance);
+                  return (
+                    <motion.button
+                      key={intolerance}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => toggleIntolerance(intolerance)}
+                      className={`w-full flex items-center justify-between p-4 rounded-[20px] border transition-all duration-300
+                        ${isSelected
+                          ? 'bg-accent border-primary/40'
+                          : 'bg-card border-border'
+                        }`}
+                    >
+                      <span className="text-sm font-medium text-foreground">{intolerance}</span>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all
+                        ${isSelected ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                        {isSelected && <span className="text-primary-foreground text-xs">✓</span>}
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Privacy mode */}

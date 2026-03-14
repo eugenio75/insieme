@@ -7,6 +7,17 @@ import { useProfile } from '@/hooks/useProfile';
 
 const steps = [
   {
+    question: 'Come ti identifichi?',
+    subtitle: 'Ci aiuta a personalizzare il piano alimentare.',
+    key: 'sex',
+    multiSelect: false,
+    options: [
+      { label: 'Donna', icon: '👩' },
+      { label: 'Uomo', icon: '👨' },
+      { label: 'Preferisco non dirlo', icon: '🤍' },
+    ],
+  },
+  {
     question: 'Quali sono i tuoi obiettivi?',
     subtitle: 'Puoi sceglierne più di uno.',
     key: 'objective',
@@ -27,17 +38,6 @@ const steps = [
     options: [
       { label: 'Da sola', icon: '🧘‍♀️', value: 'solo' },
       { label: 'Con un partner o una persona di supporto', icon: '🤝', value: 'together' },
-    ],
-  },
-  {
-    question: 'Come ti identifichi?',
-    subtitle: 'Ci aiuta a personalizzare il piano alimentare.',
-    key: 'sex',
-    multiSelect: false,
-    options: [
-      { label: 'Donna', icon: '👩' },
-      { label: 'Uomo', icon: '👨' },
-      { label: 'Preferisco non dirlo', icon: '🤍' },
     ],
   },
   {
@@ -74,8 +74,9 @@ const steps = [
   },
   {
     question: 'Qual è la difficoltà più grande per te?',
+    subtitle: 'Puoi sceglierne più di una, ci aiuta a tarare obiettivi e dieta.',
     key: 'difficulty',
-    multiSelect: false,
+    multiSelect: true,
     options: [
       { label: 'Fame nervosa', icon: '😰' },
       { label: 'Voglia di dolci', icon: '🍫' },

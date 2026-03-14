@@ -31,9 +31,9 @@ export const useProfile = () => {
           age: data.age || '',
           sex: data.sex || '',
           partnerName: data.partner_name || '',
+          weight: (data as any).weight ? String((data as any).weight) : '',
           onboarded: !!(data.objective && data.name),
         });
-        // Refresh habits based on loaded objective and profile creation date
         setTimeout(() => refreshWeeklyHabits(), 0);
       }
     };

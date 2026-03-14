@@ -63,11 +63,11 @@ const FastingTimer = () => {
           </div>
         ) : (
           // Active session
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-6">
             {/* Circular progress */}
-            <div className="relative w-24 h-24 flex-shrink-0">
+            <div className="relative w-28 h-28 flex-shrink-0">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 96 96">
-                <circle cx="48" cy="48" r="42" fill="none" stroke="hsl(var(--muted))" strokeWidth="4" />
+                <circle cx="48" cy="48" r="42" fill="none" stroke="hsl(var(--muted))" strokeWidth="3.5" />
                 <circle
                   cx="48" cy="48" r="42" fill="none"
                   stroke={status.isFasting ? 'hsl(var(--primary))' : 'hsl(var(--secondary))'}
@@ -79,12 +79,12 @@ const FastingTimer = () => {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-lg font-bold text-foreground">
+                <span className="text-xl font-bold text-foreground">
                   {status.isFasting
                     ? formatTime(status.remainingMinutes)
                     : '✅'}
                 </span>
-                <span className="text-[9px] text-muted-foreground">
+                <span className="text-[10px] text-muted-foreground mt-0.5">
                   {status.isFasting ? 'rimasti' : 'completato!'}
                 </span>
               </div>

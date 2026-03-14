@@ -180,4 +180,5 @@ export const useAppStore = create<AppState>((set, get) => {
         customIntolerances: s.user.customIntolerances.filter((i) => i !== intolerance),
       },
     })),
-}));
+  };
+});

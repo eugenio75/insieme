@@ -35,39 +35,39 @@ const FastingTimer = () => {
       transition={{ delay: 0.2, duration: 0.5 }}
       className="mt-5"
     >
-      <div className="p-5 rounded-2xl glass glass-border">
-        <div className="flex items-center gap-2 mb-4">
-          <Timer className="w-4 h-4 text-primary" />
-          <span className="text-[10px] text-muted-foreground btn-text">DIGIUNO INTERMITTENTE</span>
-          <span className="ml-auto text-xs text-muted-foreground">{config.protocol}</span>
+      <div className="p-6 rounded-2xl glass glass-border">
+        <div className="flex items-center gap-2 mb-5">
+          <Timer className="w-5 h-5 text-primary" />
+          <span className="text-xs text-muted-foreground btn-text">DIGIUNO INTERMITTENTE</span>
+          <span className="ml-auto text-xs font-medium text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full">{config.protocol}</span>
         </div>
 
         {!status.isActive ? (
           // Not active — show start button
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             <div className="flex-1">
-              <p className="text-sm text-foreground font-medium mb-1">
+              <p className="text-base text-foreground font-medium mb-2">
                 Pronta per iniziare?
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Finestra alimentare: {formatHour(status.eatingWindowStart)} — {formatHour(status.eatingWindowEnd)}
               </p>
             </div>
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={startSession}
-              className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shadow-glow"
+              className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center shadow-glow"
             >
-              <Play className="w-5 h-5 text-primary-foreground ml-0.5" />
+              <Play className="w-6 h-6 text-primary-foreground ml-0.5" />
             </motion.button>
           </div>
         ) : (
           // Active session
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-6">
             {/* Circular progress */}
-            <div className="relative w-24 h-24 flex-shrink-0">
+            <div className="relative w-28 h-28 flex-shrink-0">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 96 96">
-                <circle cx="48" cy="48" r="42" fill="none" stroke="hsl(var(--muted))" strokeWidth="4" />
+                <circle cx="48" cy="48" r="42" fill="none" stroke="hsl(var(--muted))" strokeWidth="3.5" />
                 <circle
                   cx="48" cy="48" r="42" fill="none"
                   stroke={status.isFasting ? 'hsl(var(--primary))' : 'hsl(var(--secondary))'}
@@ -79,12 +79,12 @@ const FastingTimer = () => {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-lg font-bold text-foreground">
+                <span className="text-xl font-bold text-foreground">
                   {status.isFasting
                     ? formatTime(status.remainingMinutes)
                     : '✅'}
                 </span>
-                <span className="text-[9px] text-muted-foreground">
+                <span className="text-[10px] text-muted-foreground mt-0.5">
                   {status.isFasting ? 'rimasti' : 'completato!'}
                 </span>
               </div>

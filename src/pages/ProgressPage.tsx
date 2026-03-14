@@ -46,6 +46,7 @@ const ProgressPage = () => {
   const [findingsMessage, setFindingsMessage] = useState<string>('');
   const { user: authUser } = useAuth();
   const { user } = useAppStore();
+  const { config: fastingConfig, getStats: getFastingStats } = useFasting();
   const navigate = useNavigate();
 
   useEffect(() => {

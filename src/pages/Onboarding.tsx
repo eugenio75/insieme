@@ -202,6 +202,8 @@ const Onboarding = () => {
       setUser({ intolerances: standardIntolerances, customIntolerances: customs });
     } else if (key === 'objective') {
       setUser({ objective: selected.join(', ') });
+    } else if (key === 'difficulty') {
+      setUser({ difficulty: selected.join(', ') });
     }
 
     if (step < steps.length - 1) {

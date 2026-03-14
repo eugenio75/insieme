@@ -15,7 +15,7 @@ const encouragements = [
 ];
 
 const HomePage = () => {
-  const { user, weeklyHabits, toggleHabit, todayCheckedIn, badges, currentStreak, getStreakMilestone } = useAppStore();
+  const { user, weeklyHabits, toggleHabit, todayCheckedIn, badges, currentStreak, getStreakMilestone, weekLabel, weekNumber, totalWeeks } = useAppStore();
   const completedCount = weeklyHabits.filter((h) => h.completed).length;
   const progress = completedCount / weeklyHabits.length;
   const milestone = getStreakMilestone();

@@ -13,35 +13,39 @@ const HabitCard = ({ title, icon, completed, onToggle }: HabitCardProps) => {
       whileTap={{ scale: 0.97 }}
       onClick={onToggle}
       className={`
-        w-full flex items-center justify-between p-6 rounded-[32px] 
-        transition-colors duration-500 border-[1.5px] shadow-card text-left
+        w-full flex items-center justify-between p-5 rounded-2xl 
+        transition-all duration-500 border text-left group
         ${completed 
-          ? 'bg-accent border-transparent' 
-          : 'bg-card border-border'}
+          ? 'glass glass-border border-primary/20 shadow-glow' 
+          : 'glass glass-border hover:border-primary/20'}
       `}
     >
       <div className="flex items-center gap-4">
-        <span className="text-2xl">{icon}</span>
-        <span className={`text-base font-medium text-foreground ${completed ? 'line-through opacity-60' : ''}`}>
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 ${
+          completed ? 'bg-primary/20' : 'bg-muted'
+        }`}>
+          <span className="text-xl">{icon}</span>
+        </div>
+        <span className={`text-sm font-medium text-foreground transition-opacity duration-500 ${completed ? 'opacity-50 line-through' : ''}`}>
           {title}
         </span>
       </div>
       <div
         className={`
-          w-8 h-8 rounded-full border-2 flex items-center justify-center
+          w-7 h-7 rounded-lg border-2 flex items-center justify-center
           transition-all duration-500
           ${completed 
-            ? 'bg-primary border-primary' 
-            : 'border-muted-foreground/30'}
+            ? 'gradient-primary border-transparent shadow-glow' 
+            : 'border-muted-foreground/20 group-hover:border-primary/40'}
         `}
       >
         {completed && (
           <motion.svg
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            width="16" height="16" viewBox="0 0 16 16" fill="none"
+            width="14" height="14" viewBox="0 0 16 16" fill="none"
           >
-            <path d="M3 8L7 12L13 4" stroke="hsl(0 0% 100%)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M3 8L7 12L13 4" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </motion.svg>
         )}
       </div>

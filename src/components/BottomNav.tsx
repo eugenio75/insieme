@@ -22,12 +22,13 @@ const BottomNav = () => {
     if (!user) return;
     const checkBadges = async () => {
       const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-      const { count } = await supabase
+      const { data } = await supabase
         .from('badges')
-        .select('*', { count: 'exact', head: true })
+        .select('badge_type, created_at')
         .eq('to_user_id', user.id)
         .gte('created_at', since);
-      setBadgeCount(count || 0);
+      setBadgeCount(data?.length || 0);
+      setHasSOS(data?.some(b => b.badge_type?.startsWith('SOS:')) || false);
     };
     checkBadges();
 

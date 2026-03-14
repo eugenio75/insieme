@@ -8,6 +8,9 @@ const AuthPage = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
   useEffect(() => {
     if (user && !loading) {
       navigate('/');
@@ -15,11 +18,20 @@ const AuthPage = () => {
   }, [user, loading, navigate]);
 
   const handleGoogleLogin = async () => {
+    setAuthError(null);
+    setIsLoggingIn(true);
+
     const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: `${window.location.origin}/auth`,
+      extraParams: {
+        prompt: 'select_account',
+      },
     });
+
     if (error) {
+      setAuthError('Accesso non riuscito. Riprova aprendo il link in Safari.');
       console.error('Login error:', error);
+      setIsLoggingIn(false);
     }
   };
 

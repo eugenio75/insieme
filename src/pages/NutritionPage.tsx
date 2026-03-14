@@ -206,6 +206,7 @@ const NutritionPage = () => {
   const { user } = useAppStore();
   const [activeTab, setActiveTab] = useState<Tab>('piano');
   const { checkMeal } = useFoodFindings();
+  const { config: fastingConfig, getStatus } = useFasting();
 
   const today = new Date().getDay();
   const todayIdx = today === 0 ? 6 : today - 1;
@@ -216,6 +217,31 @@ const NutritionPage = () => {
   const allRecipes = getAllRecipes();
   const weekPlan = getWeeklyPlan(user.objective, user.activity, user.sex, user.age);
   const selectedDayPlan = weekPlan[selectedDay];
+
+  // Determine which meals are outside the eating window
+  const fastingStatus = getStatus();
+  const isMealOutsideWindow = (mealType: string): boolean => {
+    if (!fastingConfig.enabled) return false;
+    const eatingStart = fastingStatus.eatingWindowStart;
+    const eatingEnd = fastingStatus.eatingWindowEnd;
+    
+    const mealHours: Record<string, number> = {
+      'colazione': 8,
+      'spuntino_mattina': 10,
+      'pranzo': 13,
+      'spuntino_pomeriggio': 16,
+      'cena': 20,
+    };
+    const mealHour = mealHours[mealType] ?? 12;
+    
+    // Check if meal hour is within eating window
+    if (eatingStart < eatingEnd) {
+      return mealHour < eatingStart || mealHour >= eatingEnd;
+    } else {
+      // Window wraps around midnight
+      return mealHour >= eatingEnd && mealHour < eatingStart;
+    }
+  };
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'piano', label: '📋 Piano' },

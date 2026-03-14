@@ -5,6 +5,7 @@ import ProgressRing from '../components/ProgressRing';
 import BottomNav from '../components/BottomNav';
 import { getDailyTip } from '../data/foodTips';
 import { Link } from 'react-router-dom';
+import AppHeader from '../components/AppHeader';
 
 const encouragements = [
   'Un passo alla volta, con la gentilezza che meriti.',

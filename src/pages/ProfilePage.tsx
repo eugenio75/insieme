@@ -6,6 +6,7 @@ import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { Plus, X, LogOut } from 'lucide-react';
+import FastingSettings from '@/components/FastingSettings';
 
 const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
 
@@ -251,6 +252,9 @@ const ProfilePage = () => {
             )}
           </AnimatePresence>
         </div>
+
+        {/* Fasting Settings */}
+        <FastingSettings />
 
         {/* Privacy mode */}
         <div className="mt-8 p-6 rounded-2xl bg-accent glass-border">

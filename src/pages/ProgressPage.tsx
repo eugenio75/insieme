@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useAppStore } from '@/store/useAppStore';
 import { analyzeProgress, Adjustment } from '@/data/adaptationLogic';
+import { useFasting } from '@/hooks/useFasting';
 import BottomNav from '@/components/BottomNav';
 import AppHeader from '@/components/AppHeader';
 import {
@@ -37,7 +38,7 @@ const ProgressPage = () => {
   const [data, setData] = useState<WeeklyData[]>([]);
   const [adjustments, setAdjustments] = useState<Adjustment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'charts' | 'adjustments' | 'scoperte'>('charts');
+  const [activeTab, setActiveTab] = useState<'charts' | 'adjustments' | 'scoperte' | 'digiuno'>('charts');
   const [findings, setFindings] = useState<FoodFinding[]>([]);
   const [findingsLoading, setFindingsLoading] = useState(false);
   const [findingsConfidence, setFindingsConfidence] = useState<string>('');
@@ -45,6 +46,7 @@ const ProgressPage = () => {
   const [findingsMessage, setFindingsMessage] = useState<string>('');
   const { user: authUser } = useAuth();
   const { user } = useAppStore();
+  const { config: fastingConfig, getStats: getFastingStats } = useFasting();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -177,6 +179,7 @@ const ProgressPage = () => {
             { key: 'charts' as const, label: '📈 Andamento' },
             { key: 'adjustments' as const, label: '🔧 Adattamenti', badge: appliedAdjustments.length },
             { key: 'scoperte' as const, label: '🔍 Scoperte' },
+            ...(fastingConfig.enabled ? [{ key: 'digiuno' as const, label: '⏱️ Digiuno' }] : []),
           ]).map((tab) => (
             <button
               key={tab.key}
@@ -358,6 +361,12 @@ const ProgressPage = () => {
               )}
             </motion.div>
           )}
+
+          {activeTab === 'digiuno' && (
+            <motion.div key="digiuno" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <FastingReport getStats={getFastingStats} />
+            </motion.div>
+          )}
         </AnimatePresence>
       </motion.div>
 
@@ -403,5 +412,73 @@ const AdjustmentCard = ({ adjustment }: { adjustment: Adjustment }) => (
     </div>
   </motion.div>
 );
+
+const FastingReport = ({ getStats }: { getStats: () => any }) => {
+  const stats = getStats();
+
+  return (
+    <>
+      <div className="p-4 rounded-2xl bg-accent glass-border">
+        <p className="text-sm text-accent-foreground/80 italic font-display">
+          "Il digiuno intermittente è un alleato, non un obbligo. Ascolta il tuo corpo." ⏱️
+        </p>
+      </div>
+
+      {stats.totalSessions === 0 ? (
+        <div className="flex flex-col items-center py-12">
+          <span className="text-4xl mb-4">⏱️</span>
+          <p className="text-sm text-muted-foreground text-center px-4">
+            Non hai ancora completato sessioni di digiuno. Avvia il timer dalla Home!
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-5 rounded-2xl glass glass-border text-center">
+              <p className="text-3xl font-bold text-gradient font-body">{stats.completedSessions}</p>
+              <p className="text-xs text-muted-foreground mt-1">Sessioni completate</p>
+            </div>
+            <div className="p-5 rounded-2xl glass glass-border text-center">
+              <p className="text-3xl font-bold text-gradient font-body">{Math.round(stats.completionRate * 100)}%</p>
+              <p className="text-xs text-muted-foreground mt-1">Tasso di completamento</p>
+            </div>
+            <div className="p-5 rounded-2xl glass glass-border text-center">
+              <p className="text-3xl font-bold text-gradient font-body">{stats.avgFastingHours}h</p>
+              <p className="text-xs text-muted-foreground mt-1">Media ore digiuno</p>
+            </div>
+            <div className="p-5 rounded-2xl glass glass-border text-center">
+              <p className="text-3xl font-bold text-gradient font-body">{stats.currentStreak}</p>
+              <p className="text-xs text-muted-foreground mt-1">Giorni consecutivi</p>
+            </div>
+          </div>
+
+          {/* Recent sessions */}
+          <h3 className="font-display text-sm text-foreground mt-4 mb-2">Ultime sessioni</h3>
+          {stats.sessions.slice(0, 7).map((s: any) => {
+            const date = new Date(s.started_at);
+            const hours = s.ended_at
+              ? Math.round((new Date(s.ended_at).getTime() - date.getTime()) / 3600000 * 10) / 10
+              : null;
+            return (
+              <div key={s.id} className="flex items-center justify-between p-4 rounded-2xl glass glass-border">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">{s.completed ? '✅' : '⚪'}</span>
+                  <div>
+                    <p className="text-sm text-foreground">{date.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' })}</p>
+                    <p className="text-xs text-muted-foreground">{s.protocol}</p>
+                  </div>
+                </div>
+                <span className="text-sm font-medium text-foreground">
+                  {hours ? `${hours}h` : 'In corso...'}
+                </span>
+              </div>
+            );
+          })}
+        </>
+      )}
+    </>
+  );
+};
 
 export default ProgressPage;

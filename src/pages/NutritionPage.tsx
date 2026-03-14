@@ -4,9 +4,10 @@ import { useAppStore } from '../store/useAppStore';
 import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } from '../data/foodTips';
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
-import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
 import { useFoodFindings } from '@/hooks/useFoodFindings';
+import { useFasting } from '@/hooks/useFasting';
 
 type Tab = 'piano' | 'consigli' | 'ricette' | 'gonfiore';
 
@@ -129,12 +130,12 @@ const TipCard = ({ tip, delay = 0 }: { tip: FoodTip; delay?: number }) => (
   </motion.div>
 );
 
-const MealCard = ({ meal, delay = 0, warning }: { meal: Meal; delay?: number; warning?: string | null }) => (
+const MealCard = ({ meal, delay = 0, warning, dimmed }: { meal: Meal; delay?: number; warning?: string | null; dimmed?: boolean }) => (
   <motion.div
     initial={{ opacity: 0, y: 12 }}
-    animate={{ opacity: 1, y: 0 }}
+    animate={{ opacity: dimmed ? 0.5 : 1, y: 0 }}
     transition={{ delay }}
-    className={`p-5 rounded-2xl glass glass-border ${warning ? 'border-secondary/30' : ''}`}
+    className={`p-5 rounded-2xl glass glass-border ${warning ? 'border-secondary/30' : ''} ${dimmed ? 'opacity-50' : ''}`}
   >
     {warning && (
       <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-xl bg-secondary/10">
@@ -205,6 +206,7 @@ const NutritionPage = () => {
   const { user } = useAppStore();
   const [activeTab, setActiveTab] = useState<Tab>('piano');
   const { checkMeal } = useFoodFindings();
+  const { config: fastingConfig, getStatus } = useFasting();
 
   const today = new Date().getDay();
   const todayIdx = today === 0 ? 6 : today - 1;
@@ -215,6 +217,31 @@ const NutritionPage = () => {
   const allRecipes = getAllRecipes();
   const weekPlan = getWeeklyPlan(user.objective, user.activity, user.sex, user.age);
   const selectedDayPlan = weekPlan[selectedDay];
+
+  // Determine which meals are outside the eating window
+  const fastingStatus = getStatus();
+  const isMealOutsideWindow = (mealType: string): boolean => {
+    if (!fastingConfig.enabled) return false;
+    const eatingStart = fastingStatus.eatingWindowStart;
+    const eatingEnd = fastingStatus.eatingWindowEnd;
+    
+    const mealHours: Record<string, number> = {
+      'colazione': 8,
+      'spuntino_mattina': 10,
+      'pranzo': 13,
+      'spuntino_pomeriggio': 16,
+      'cena': 20,
+    };
+    const mealHour = mealHours[mealType] ?? 12;
+    
+    // Check if meal hour is within eating window
+    if (eatingStart < eatingEnd) {
+      return mealHour < eatingStart || mealHour >= eatingEnd;
+    } else {
+      // Window wraps around midnight
+      return mealHour >= eatingEnd && mealHour < eatingStart;
+    }
+  };
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'piano', label: '📋 Piano' },
@@ -268,6 +295,17 @@ const NutritionPage = () => {
               </p>
             </div>
 
+            {/* Fasting window info */}
+            {fastingConfig.enabled && (
+              <div className="flex items-center gap-2 mb-4 px-4 py-3 rounded-xl bg-primary/5 border border-primary/10">
+                <Timer className="w-4 h-4 text-primary flex-shrink-0" />
+                <p className="text-xs text-foreground">
+                  Finestra alimentare: <span className="font-medium">{fastingStatus.eatingWindowStart.toString().padStart(2, '0')}:00 — {fastingStatus.eatingWindowEnd.toString().padStart(2, '0')}:00</span>
+                  <span className="text-muted-foreground ml-1">• I pasti fuori finestra sono segnalati</span>
+                </p>
+              </div>
+            )}
+
             <DaySelector
               weekPlan={weekPlan}
               selectedDay={selectedDay}
@@ -282,13 +320,17 @@ const NutritionPage = () => {
                     <span className="ml-2 text-xs text-primary font-normal">• oggi</span>
                   )}
                 </h3>
-                {selectedDayPlan.meals.map((meal, i) => {
-                  const finding = checkMeal(meal.title, meal.description);
-                  const warning = finding
-                    ? `${finding.food} potrebbe causare ${finding.issue === 'gonfiore' ? 'gonfiore' : finding.issue === 'energia_bassa' ? 'calo di energia' : 'disagio'}. Prova la versione alternativa!`
-                    : null;
-                  return <MealCard key={meal.type} meal={meal} delay={i * 0.06} warning={warning} />;
-                })}
+                {selectedDayPlan.meals
+                  .map((meal, i) => {
+                    const finding = checkMeal(meal.title, meal.description);
+                    const outsideWindow = isMealOutsideWindow(meal.type);
+                    const warning = outsideWindow
+                      ? `⏱️ Questo pasto è fuori dalla tua finestra alimentare (${fastingConfig.protocol})`
+                      : finding
+                        ? `${finding.food} potrebbe causare ${finding.issue === 'gonfiore' ? 'gonfiore' : finding.issue === 'energia_bassa' ? 'calo di energia' : 'disagio'}. Prova la versione alternativa!`
+                        : null;
+                    return <MealCard key={meal.type} meal={meal} delay={i * 0.06} warning={warning} dimmed={outsideWindow} />;
+                  })}
               </div>
             )}
 

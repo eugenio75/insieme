@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { getDailyTip } from '@/data/foodTips';
 import { PenLine } from 'lucide-react';
+import FastingTimer from '@/components/FastingTimer';
 
 const fallbackMessages = [
   'Un passo alla volta, con la gentilezza che meriti. 🌿',
@@ -133,6 +134,9 @@ const HomePage = () => {
             </div>
           </div>
         </motion.div>
+
+        {/* Fasting Timer */}
+        <FastingTimer />
 
         {/* Progress Ring */}
         <motion.div

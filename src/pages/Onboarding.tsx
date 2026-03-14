@@ -85,6 +85,14 @@ const steps = [
     ],
   },
   {
+    question: 'Qual è il tuo peso attuale?',
+    subtitle: 'Opzionale. Ci aiuta a monitorare i tuoi progressi.',
+    key: 'weight',
+    multiSelect: false,
+    isWeightInput: true,
+    options: [],
+  },
+  {
     question: 'Hai intolleranze o sensibilità alimentari?',
     subtitle: 'Puoi selezionarne più di una. Aggiungi le tue se non le trovi in lista.',
     key: 'intolerances',
@@ -114,6 +122,7 @@ const Onboarding = () => {
   const [customIntolerances, setCustomIntolerances] = useState<string[]>([]);
   const [customInput, setCustomInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
+  const [weightInput, setWeightInput] = useState('');
   const { setUser, completeOnboarding } = useAppStore();
   const { saveProfile } = useProfile();
   const navigate = useNavigate();
@@ -208,6 +217,18 @@ const Onboarding = () => {
   const currentStep = steps[step];
   const isMultiSelect = currentStep?.multiSelect;
   const hasCustomInput = (currentStep as any)?.hasCustomInput;
+  const isWeightInput = (currentStep as any)?.isWeightInput;
+
+  const handleWeightSubmit = async () => {
+    setUser({ weight: weightInput || undefined });
+    if (step < steps.length - 1) {
+      setStep(step + 1);
+    } else {
+      completeOnboarding();
+      await saveProfile();
+      navigate('/home');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col px-6 py-8 max-w-lg mx-auto">
@@ -277,6 +298,36 @@ const Onboarding = () => {
               <p className="text-muted-foreground text-sm mb-6">{currentStep.subtitle}</p>
             )}
             {!currentStep.subtitle && <div className="mb-6" />}
+
+            {isWeightInput ? (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={weightInput}
+                    onChange={(e) => setWeightInput(e.target.value)}
+                    placeholder="Es: 65.5"
+                    className="flex-1 px-6 py-4 rounded-2xl bg-card border border-border text-foreground text-lg
+                      focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                      transition-all duration-300 placeholder:text-muted-foreground/50"
+                    autoFocus
+                  />
+                  <span className="text-muted-foreground font-medium text-lg">kg</span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-8">
+                  Non è obbligatorio. Puoi sempre modificarlo dal profilo.
+                </p>
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleWeightSubmit}
+                  className="w-full py-4 rounded-2xl bg-primary text-primary-foreground btn-text text-sm
+                    shadow-soft"
+                >
+                  {weightInput ? 'CONTINUA' : 'SALTA E CONTINUA'}
+                </motion.button>
+              </div>
+            ) : (
             <div className="flex flex-col gap-3">
               {currentStep.options.map((option, i) => {
                 const isSelected = isMultiSelect && getSelections(currentStep.key).includes(option.label);
@@ -386,6 +437,7 @@ const Onboarding = () => {
                 </>
               )}
             </div>
+            )}
 
             {isMultiSelect && (
               <motion.button

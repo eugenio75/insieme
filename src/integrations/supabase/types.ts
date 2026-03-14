@@ -102,6 +102,7 @@ export type Database = {
           sex: string | null
           updated_at: string
           user_id: string
+          weight: number | null
         }
         Insert: {
           activity?: string | null
@@ -121,6 +122,7 @@ export type Database = {
           sex?: string | null
           updated_at?: string
           user_id: string
+          weight?: number | null
         }
         Update: {
           activity?: string | null
@@ -140,6 +142,7 @@ export type Database = {
           sex?: string | null
           updated_at?: string
           user_id?: string
+          weight?: number | null
         }
         Relationships: []
       }

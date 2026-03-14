@@ -14,6 +14,7 @@ interface UserProfile {
   customIntolerances: string[];
   age?: string;
   sex?: string;
+  weight?: string;
 }
 
 interface Habit {

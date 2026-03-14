@@ -4,7 +4,7 @@ import { Home, CalendarDays, PenLine, Heart, Utensils, BarChart3 } from 'lucide-
 
 const tabs = [
   { path: '/home', icon: Home, label: 'Home' },
-  { path: '/week', icon: CalendarDays, label: 'Settimana' },
+  { path: '/nutrition', icon: Utensils, label: 'Cibo' },
   { path: '/checkin', icon: PenLine, label: 'Check-in' },
   { path: '/progress', icon: BarChart3, label: 'Risultati' },
   { path: '/together', icon: Heart, label: 'Insieme' },

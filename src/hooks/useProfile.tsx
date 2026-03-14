@@ -5,7 +5,7 @@ import { useAppStore } from '@/store/useAppStore';
 
 export const useProfile = () => {
   const { user } = useAuth();
-  const { setUser } = useAppStore();
+  const { setUser, refreshWeeklyHabits } = useAppStore();
 
   // Load profile from DB on auth
   useEffect(() => {
@@ -33,6 +33,8 @@ export const useProfile = () => {
           partnerName: data.partner_name || '',
           onboarded: !!(data.objective && data.name),
         });
+        // Refresh habits based on loaded objective and profile creation date
+        setTimeout(() => refreshWeeklyHabits(), 0);
       }
     };
 

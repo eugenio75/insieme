@@ -15,7 +15,7 @@ const encouragements = [
 ];
 
 const HomePage = () => {
-  const { user, weeklyHabits, toggleHabit, todayCheckedIn, badges, currentStreak, getStreakMilestone } = useAppStore();
+  const { user, weeklyHabits, toggleHabit, todayCheckedIn, badges, currentStreak, getStreakMilestone, weekLabel, weekNumber, totalWeeks } = useAppStore();
   const completedCount = weeklyHabits.filter((h) => h.completed).length;
   const progress = completedCount / weeklyHabits.length;
   const milestone = getStreakMilestone();
@@ -88,9 +88,14 @@ const HomePage = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <h2 className="font-display text-lg font-medium text-foreground mb-4">
-            I tuoi 3 passi di questa settimana
-          </h2>
+          <div className="flex items-baseline justify-between mb-4">
+            <h2 className="font-display text-lg font-medium text-foreground">
+              I tuoi 3 passi
+            </h2>
+            <span className="text-xs text-muted-foreground font-medium">
+              {weekLabel || `Settimana ${weekNumber}`} {weekNumber <= totalWeeks ? '' : '🔄'}
+            </span>
+          </div>
           <div className="flex flex-col gap-3">
             {weeklyHabits.map((habit, i) => (
               <motion.div

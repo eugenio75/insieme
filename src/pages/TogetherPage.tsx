@@ -336,6 +336,39 @@ const TogetherPage = () => {
                           </motion.button>
                         ))}
                       </div>
+                      {/* Custom message */}
+                      <div className="flex gap-2 mt-2">
+                        <input
+                          type="text"
+                          value={customMessages[s.user_id] || ''}
+                          onChange={(e) => setCustomMessages(prev => ({ ...prev, [s.user_id]: e.target.value }))}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && customMessages[s.user_id]?.trim()) {
+                              handleSendBadge(s.user_id, customMessages[s.user_id].trim());
+                              setCustomMessages(prev => ({ ...prev, [s.user_id]: '' }));
+                            }
+                          }}
+                          placeholder="Scrivi un messaggio..."
+                          maxLength={100}
+                          className="flex-1 px-3 py-2.5 rounded-xl bg-muted border border-border text-foreground text-xs
+                            focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                            transition-all duration-300 placeholder:text-muted-foreground/40"
+                        />
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => {
+                            if (customMessages[s.user_id]?.trim()) {
+                              handleSendBadge(s.user_id, customMessages[s.user_id].trim());
+                              setCustomMessages(prev => ({ ...prev, [s.user_id]: '' }));
+                            }
+                          }}
+                          disabled={!customMessages[s.user_id]?.trim() || sendingBadge === s.user_id}
+                          className="px-3 py-2.5 rounded-xl gradient-primary text-primary-foreground
+                            disabled:opacity-40 transition-opacity"
+                        >
+                          <Send className="w-4 h-4" />
+                        </motion.button>
+                      </div>
                     </div>
                   ))}
                 </div>

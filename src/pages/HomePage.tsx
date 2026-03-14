@@ -140,6 +140,31 @@ const HomePage = () => {
           )}
         </motion.div>
 
+        {/* Weekly Check-in Prompt (show on weekends or after 7+ days) */}
+        {new Date().getDay() === 0 || new Date().getDay() === 6 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.75, duration: 0.4 }}
+            className="mt-6"
+          >
+            <Link
+              to="/weekly-checkin"
+              className="block p-5 rounded-[24px] bg-accent border border-primary/20 shadow-card hover:shadow-soft transition-shadow duration-300"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">📊</span>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Check-in settimanale</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Com'è andata questa settimana? Peso, energia, gonfiore.
+                  </p>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        ) : null}
+
         {/* Daily Food Tip */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

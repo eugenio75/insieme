@@ -143,6 +143,39 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_checkins: {
+        Row: {
+          bloating: number
+          created_at: string
+          energy: number
+          id: string
+          notes: string | null
+          user_id: string
+          week_number: number
+          weight: number | null
+        }
+        Insert: {
+          bloating: number
+          created_at?: string
+          energy: number
+          id?: string
+          notes?: string | null
+          user_id: string
+          week_number: number
+          weight?: number | null
+        }
+        Update: {
+          bloating?: number
+          created_at?: string
+          energy?: number
+          id?: string
+          notes?: string | null
+          user_id?: string
+          week_number?: number
+          weight?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

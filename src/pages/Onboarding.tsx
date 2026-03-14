@@ -311,7 +311,7 @@ const Onboarding = () => {
               {hasCustomInput && (
                 <>
                   {customIntolerances.map((ci) => {
-                    const isSelected = selectedIntolerances.includes(ci);
+                    const isSelected = getSelections('intolerances').includes(ci);
                     return (
                       <motion.div
                         key={ci}

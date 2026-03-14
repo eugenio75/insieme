@@ -169,7 +169,7 @@ const Onboarding = () => {
     }
   };
 
-  const handleMultiSelectConfirm = () => {
+  const handleMultiSelectConfirm = async () => {
     const standardIntolerances = selectedIntolerances.includes('Nessuna')
       ? []
       : selectedIntolerances.filter((i) => !customIntolerances.includes(i));

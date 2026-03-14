@@ -4,8 +4,9 @@ import { useAppStore } from '../store/useAppStore';
 import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } from '../data/foodTips';
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
-import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
+import { useFoodFindings } from '@/hooks/useFoodFindings';
 
 type Tab = 'piano' | 'consigli' | 'ricette' | 'gonfiore';
 

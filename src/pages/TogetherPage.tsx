@@ -387,6 +387,34 @@ const TogetherPage = () => {
                 </div>
               </div>
 
+              {/* SOS alerts from people I support */}
+              {receivedBadges.filter(b => b.badge_type?.startsWith('SOS:')).length > 0 && (
+                <div>
+                  <p className="text-xs btn-text text-destructive mb-3">🆘 RICHIESTE DI SUPPORTO</p>
+                  <div className="space-y-2 mb-4">
+                    {receivedBadges.filter(b => b.badge_type?.startsWith('SOS:')).slice(0, 3).map((badge, i) => (
+                      <motion.div
+                        key={badge.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="p-4 rounded-2xl border-2 border-destructive/20 bg-destructive/5 flex items-center gap-3"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
+                          <span className="text-lg">🆘</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-foreground">{badge.badge_type.replace('SOS:', '')}</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {new Date(badge.created_at).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* People I support */}
               {supporting.length > 0 ? (
                 <div>

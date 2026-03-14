@@ -2,17 +2,41 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
+import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 
 const Index = () => {
-  const { user } = useAppStore();
+  const { user: profile } = useAppStore();
+  const { user: authUser, loading } = useAuth();
   const navigate = useNavigate();
 
+  // Load profile from DB when authenticated
+  useProfile();
+
   useEffect(() => {
-    if (user.onboarded) {
+    if (loading) return;
+
+    // Not logged in → auth page
+    if (!authUser) {
+      navigate('/auth');
+      return;
+    }
+
+    // Logged in + onboarded → home
+    if (profile.onboarded) {
       navigate('/home');
     }
-  }, [user.onboarded, navigate]);
+  }, [authUser, profile.onboarded, loading, navigate]);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <span className="text-4xl animate-pulse">🌿</span>
+      </div>
+    );
+  }
+
+  // Logged in but not onboarded → show welcome
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-8 max-w-lg mx-auto text-center">
       <motion.div

@@ -27,7 +27,7 @@ const lightHabits: WeekLevel[] = [
     ],
   },
   {
-    week: 2, label: 'Settimana 2 – Un po' di più',
+    week: 2, label: 'Settimana 2 – Un po\' di più',
     habits: [
       { id: 'l2-1', title: 'Camminare 15 minuti', icon: '🚶‍♀️' },
       { id: 'l2-2', title: 'Bere 1.5 litri di acqua', icon: '💧' },

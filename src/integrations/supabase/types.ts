@@ -38,6 +38,33 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_checkins: {
+        Row: {
+          bloating: number
+          created_at: string
+          energy: number
+          id: string
+          mood: number
+          user_id: string
+        }
+        Insert: {
+          bloating: number
+          created_at?: string
+          energy: number
+          id?: string
+          mood: number
+          user_id: string
+        }
+        Update: {
+          bloating?: number
+          created_at?: string
+          energy?: number
+          id?: string
+          mood?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       invites: {
         Row: {
           accepted_by: string | null

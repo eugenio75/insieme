@@ -43,6 +43,8 @@ interface AppState {
   setWeeklyHabits: (habits: Habit[]) => void;
   addBadge: (badge: { from: string; type: string; date: string }) => void;
   toggleIntolerance: (intolerance: string) => void;
+  addCustomIntolerance: (intolerance: string) => void;
+  removeCustomIntolerance: (intolerance: string) => void;
 }
 
 const defaultHabits: Habit[] = [

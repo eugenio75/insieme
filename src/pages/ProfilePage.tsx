@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
+import { useProfile } from '@/hooks/useProfile';
 import BottomNav from '../components/BottomNav';
 import { Plus, X } from 'lucide-react';
 
 const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
 
 const ProfilePage = () => {
-  const { user, checkIns, weeklyHabits, toggleIntolerance, addCustomIntolerance, removeCustomIntolerance } = useAppStore();
+  const { user, checkIns, weeklyHabits, toggleIntolerance, addCustomIntolerance, removeCustomIntolerance, setUser } = useAppStore();
+  const { saveProfile } = useProfile();
   const completedHabits = weeklyHabits.filter((h) => h.completed).length;
   const [editingIntolerances, setEditingIntolerances] = useState(false);
   const [customInput, setCustomInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
+  const [editingWeight, setEditingWeight] = useState(false);
+  const [weightInput, setWeightInput] = useState(user.weight || '');
 
   const allUserIntolerances = [...user.intolerances, ...user.customIntolerances];
 

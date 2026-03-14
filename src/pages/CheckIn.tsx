@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import BottomNav from '../components/BottomNav';
+import AppHeader from '../components/AppHeader';
 
 const moods = [
   { label: 'Serena', icon: '😊', value: 5 },

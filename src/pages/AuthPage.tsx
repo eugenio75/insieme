@@ -21,16 +21,21 @@ const AuthPage = () => {
     setAuthError(null);
     setIsLoggingIn(true);
 
-    const { error } = await lovable.auth.signInWithOAuth("google", {
+    const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: `${window.location.origin}/auth`,
       extraParams: {
         prompt: 'select_account',
       },
     });
 
-    if (error) {
+    if (result.error) {
       setAuthError('Accesso non riuscito. Riprova aprendo il link in Safari.');
-      console.error('Login error:', error);
+      console.error('Login error:', result.error);
+      setIsLoggingIn(false);
+      return;
+    }
+
+    if (!result.redirected) {
       setIsLoggingIn(false);
     }
   };

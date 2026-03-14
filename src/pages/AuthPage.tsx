@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { lovable } from '@/integrations/lovable/index';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const AuthPage = () => {
   const { user, loading } = useAuth();

@@ -16,6 +16,45 @@ const tabs = [
 const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [badgeCount, setBadgeCount] = useState(0);
+
+  // Check for recent unread badges (last 24h)
+  useEffect(() => {
+    if (!user) return;
+    const checkBadges = async () => {
+      const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { count } = await supabase
+        .from('badges')
+        .select('*', { count: 'exact', head: true })
+        .eq('to_user_id', user.id)
+        .gte('created_at', since);
+      setBadgeCount(count || 0);
+    };
+    checkBadges();
+
+    // Subscribe to new badges in realtime
+    const channel = supabase
+      .channel('badge-notifications')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'badges',
+        filter: `to_user_id=eq.${user.id}`,
+      }, () => {
+        checkBadges();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
+
+  // Reset count when visiting together page
+  useEffect(() => {
+    if (location.pathname === '/together') {
+      setBadgeCount(0);
+    }
+  }, [location.pathname]);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>

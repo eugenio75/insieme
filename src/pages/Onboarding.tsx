@@ -437,6 +437,7 @@ const Onboarding = () => {
                 </>
               )}
             </div>
+            )}
 
             {isMultiSelect && (
               <motion.button

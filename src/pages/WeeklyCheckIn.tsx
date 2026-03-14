@@ -58,7 +58,8 @@ const WeeklyCheckIn = () => {
 
   if (done) {
     return (
-      <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
+      <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
+        <AppHeader />
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}

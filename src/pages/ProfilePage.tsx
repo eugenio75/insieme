@@ -5,7 +5,7 @@ import { useProfile } from '@/hooks/useProfile';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import { useAuth } from '@/hooks/useAuth';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, LogOut } from 'lucide-react';
 
 const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
 

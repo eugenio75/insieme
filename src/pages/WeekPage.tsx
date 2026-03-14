@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
 import BottomNav from '../components/BottomNav';
+import AppHeader from '../components/AppHeader';
 
 const days = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 

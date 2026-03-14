@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useAppStore } from '@/store/useAppStore';
 import BottomNav from '@/components/BottomNav';
+import AppHeader from '@/components/AppHeader';
 
 const bloatingOptions = [
   { label: 'Nessuno', icon: '🌿', value: 1 },

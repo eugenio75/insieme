@@ -38,7 +38,7 @@ const ProgressPage = () => {
   const [data, setData] = useState<WeeklyData[]>([]);
   const [adjustments, setAdjustments] = useState<Adjustment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'charts' | 'adjustments' | 'scoperte'>('charts');
+  const [activeTab, setActiveTab] = useState<'charts' | 'adjustments' | 'scoperte' | 'digiuno'>('charts');
   const [findings, setFindings] = useState<FoodFinding[]>([]);
   const [findingsLoading, setFindingsLoading] = useState(false);
   const [findingsConfidence, setFindingsConfidence] = useState<string>('');

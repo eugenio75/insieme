@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
 import { useProfile } from '@/hooks/useProfile';
 import BottomNav from '../components/BottomNav';
+import AppHeader from '../components/AppHeader';
+import { useAuth } from '@/hooks/useAuth';
 import { Plus, X } from 'lucide-react';
 
 const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];

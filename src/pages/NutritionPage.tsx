@@ -5,6 +5,7 @@ import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } f
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
 import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import AppHeader from '../components/AppHeader';
 
 type Tab = 'piano' | 'consigli' | 'ricette' | 'gonfiore';
 

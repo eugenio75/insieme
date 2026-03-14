@@ -131,9 +131,10 @@ const Onboarding = () => {
 
   const handleAddCustomIntolerance = () => {
     const trimmed = customInput.trim();
-    if (trimmed && !customIntolerances.includes(trimmed) && !selectedIntolerances.includes(trimmed)) {
+    const selected = getSelections('intolerances');
+    if (trimmed && !customIntolerances.includes(trimmed) && !selected.includes(trimmed)) {
       setCustomIntolerances((prev) => [...prev, trimmed]);
-      setSelectedIntolerances((prev) => [...prev.filter((v) => v !== 'Nessuna'), trimmed]);
+      setSelections('intolerances', [...selected.filter((v) => v !== 'Nessuna'), trimmed]);
       setCustomInput('');
       setShowCustomInput(false);
     }
@@ -141,23 +142,26 @@ const Onboarding = () => {
 
   const handleRemoveCustomIntolerance = (intolerance: string) => {
     setCustomIntolerances((prev) => prev.filter((i) => i !== intolerance));
-    setSelectedIntolerances((prev) => prev.filter((i) => i !== intolerance));
+    setSelections('intolerances', getSelections('intolerances').filter((i) => i !== intolerance));
   };
 
   const handleSelect = async (value: string) => {
     const currentStep = steps[step];
 
     if (currentStep.multiSelect) {
+      const key = currentStep.key;
+      const selected = getSelections(key);
       if (value === 'Nessuna') {
-        setSelectedIntolerances(['Nessuna']);
-        setCustomIntolerances([]);
+        setSelections(key, ['Nessuna']);
+        if (key === 'intolerances') setCustomIntolerances([]);
       } else {
-        setSelectedIntolerances((prev) => {
-          const without = prev.filter((v) => v !== 'Nessuna');
-          return without.includes(value)
+        const without = selected.filter((v) => v !== 'Nessuna');
+        setSelections(
+          key,
+          without.includes(value)
             ? without.filter((v) => v !== value)
-            : [...without, value];
-        });
+            : [...without, value]
+        );
       }
       return;
     }
@@ -176,12 +180,20 @@ const Onboarding = () => {
   };
 
   const handleMultiSelectConfirm = async () => {
-    const standardIntolerances = selectedIntolerances.includes('Nessuna')
-      ? []
-      : selectedIntolerances.filter((i) => !customIntolerances.includes(i));
-    const customs = selectedIntolerances.includes('Nessuna') ? [] : customIntolerances;
+    const currentStep = steps[step];
+    const key = currentStep.key;
+    const selected = getSelections(key);
 
-    setUser({ intolerances: standardIntolerances, customIntolerances: customs });
+    if (key === 'intolerances') {
+      const standardIntolerances = selected.includes('Nessuna')
+        ? []
+        : selected.filter((i) => !customIntolerances.includes(i));
+      const customs = selected.includes('Nessuna') ? [] : customIntolerances;
+      setUser({ intolerances: standardIntolerances, customIntolerances: customs });
+    } else if (key === 'objective') {
+      // Store multiple objectives as comma-separated string
+      setUser({ objective: selected.join(', ') });
+    }
 
     if (step < steps.length - 1) {
       setStep(step + 1);

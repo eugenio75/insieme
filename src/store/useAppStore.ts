@@ -54,7 +54,7 @@ interface AppState {
   toggleHabit: (id: string) => void;
   addCheckIn: (data: CheckInData) => void;
   setWeeklyHabits: (habits: Habit[]) => void;
-  refreshWeeklyHabits: () => void;
+  refreshWeeklyHabits: (signals?: { avgMood?: number; avgEnergy?: number; avgBloating?: number }) => void;
   addBadge: (badge: { from: string; type: string; date: string }) => void;
   toggleIntolerance: (intolerance: string) => void;
   addCustomIntolerance: (intolerance: string) => void;
@@ -62,8 +62,8 @@ interface AppState {
   getStreakMilestone: () => StreakMilestone | null;
 }
 
-const getInitialHabits = (objective: string, startDate?: string) => {
-  const { weekLevel, weekNumber, totalWeeks } = getWeeklyHabitsForUser(objective, startDate);
+const getInitialHabits = (objective: string, startDate?: string, signals?: { avgMood?: number; avgEnergy?: number; avgBloating?: number }) => {
+  const { weekLevel, weekNumber, totalWeeks } = getWeeklyHabitsForUser(objective, startDate, signals);
   return {
     habits: weekLevel.habits.map(h => ({ ...h, completed: false })),
     weekLabel: weekLevel.label,
@@ -143,11 +143,10 @@ export const useAppStore = create<AppState>((set, get) => {
       return milestone || null;
     },
     setWeeklyHabits: (habits) => set({ weeklyHabits: habits }),
-    refreshWeeklyHabits: () => {
+    refreshWeeklyHabits: (signals) => {
       const { user } = get();
-      // Use profile created_at as start date (falls back to now)
-      const startDate = undefined; // Will be set from profile load
-      const result = getInitialHabits(user.objective, startDate);
+      const startDate = undefined;
+      const result = getInitialHabits(user.objective, startDate, signals);
       set({
         weeklyHabits: result.habits,
         weekLabel: result.weekLabel,

@@ -20,7 +20,7 @@ const fallbackMessages = [
 ];
 
 const HomePage = () => {
-  const { user, weeklyHabits, toggleHabit, currentStreak, getStreakMilestone, weekLabel, weekNumber, totalWeeks } = useAppStore();
+  const { user, weeklyHabits, toggleHabit, currentStreak, getStreakMilestone, weekLabel, weekNumber, totalWeeks, refreshWeeklyHabits } = useAppStore();
   const { user: authUser } = useAuth();
   const navigate = useNavigate();
   const completedCount = weeklyHabits.filter((h) => h.completed).length;
@@ -39,6 +39,30 @@ const HomePage = () => {
     return 'Buonasera';
   };
 
+  // Fetch check-in signals and refresh habits accordingly
+  useEffect(() => {
+    if (!authUser) return;
+    const fetchSignals = async () => {
+      const since = new Date(Date.now() - 3 * 86400000).toISOString(); // last 3 days
+      const { data: checkins } = await supabase
+        .from('daily_checkins')
+        .select('mood, energy, bloating')
+        .eq('user_id', authUser.id)
+        .gte('created_at', since);
+      
+      if (checkins && checkins.length > 0) {
+        const signals = {
+          avgMood: checkins.reduce((s, c) => s + c.mood, 0) / checkins.length,
+          avgEnergy: checkins.reduce((s, c) => s + c.energy, 0) / checkins.length,
+          avgBloating: checkins.reduce((s, c) => s + c.bloating, 0) / checkins.length,
+        };
+        refreshWeeklyHabits(signals);
+      }
+    };
+    fetchSignals();
+  }, [authUser, refreshWeeklyHabits]);
+
+  // Fetch AI motivational message
   useEffect(() => {
     const fetchMessage = async () => {
       if (!authUser) { setLoadingMessage(false); return; }
@@ -221,30 +245,6 @@ const HomePage = () => {
           </Link>
         </motion.div>
 
-        {/* Weekly Check-in Prompt */}
-        {(new Date().getDay() === 0 || new Date().getDay() === 6) && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.4 }}
-            className="mt-5"
-          >
-            <Link
-              to="/weekly-checkin"
-              className="block p-5 rounded-2xl glass glass-border border-primary/10 hover:border-primary/30 transition-all duration-300"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">📊</span>
-                <div>
-                  <p className="text-sm font-medium text-foreground">Check-in settimanale</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Com'è andata questa settimana? Peso, energia, gonfiore.
-                  </p>
-                </div>
-              </div>
-            </Link>
-          </motion.div>
-        )}
 
         {/* Together Card */}
         {user.mode === 'together' && (

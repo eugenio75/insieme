@@ -135,6 +135,9 @@ const HomePage = () => {
           </div>
         </motion.div>
 
+        {/* Fasting Timer */}
+        <FastingTimer />
+
         {/* Progress Ring */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}

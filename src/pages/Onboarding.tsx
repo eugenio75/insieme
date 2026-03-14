@@ -200,6 +200,8 @@ const Onboarding = () => {
         : selected.filter((i) => !customIntolerances.includes(i));
       const customs = selected.includes('Nessuna') ? [] : customIntolerances;
       setUser({ intolerances: standardIntolerances, customIntolerances: customs });
+      // Also ensure custom intolerances are in selections for the check
+      if (standardIntolerances.length === 0 && customs.length === 0 && selected.length === 0) return;
     } else if (key === 'objective') {
       setUser({ objective: selected.join(', ') });
     } else if (key === 'difficulty') {
@@ -452,7 +454,7 @@ const Onboarding = () => {
                   transition={{ delay: 0.4 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleMultiSelectConfirm}
-                  disabled={getSelections(currentStep.key).length === 0}
+                  disabled={getSelections(currentStep.key).length === 0 && !(currentStep.key === 'intolerances' && customIntolerances.length > 0)}
                   className="w-full py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm
                     disabled:opacity-40 transition-opacity duration-300 shadow-glow"
                 >

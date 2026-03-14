@@ -394,7 +394,7 @@ const Onboarding = () => {
                 transition={{ delay: 0.4 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleMultiSelectConfirm}
-                disabled={selectedIntolerances.length === 0}
+                disabled={getSelections(currentStep.key).length === 0}
                 className="w-full mt-6 py-4 rounded-2xl bg-primary text-primary-foreground btn-text text-sm
                   disabled:opacity-40 transition-opacity duration-300 shadow-soft"
               >

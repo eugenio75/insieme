@@ -14,7 +14,135 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      badges: {
+        Row: {
+          badge_type: string
+          created_at: string
+          from_user_id: string
+          id: string
+          to_user_id: string
+        }
+        Insert: {
+          badge_type: string
+          created_at?: string
+          from_user_id: string
+          id?: string
+          to_user_id: string
+        }
+        Update: {
+          badge_type?: string
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          to_user_id?: string
+        }
+        Relationships: []
+      }
+      invites: {
+        Row: {
+          accepted_by: string | null
+          created_at: string
+          from_user_id: string
+          id: string
+          invite_code: string
+        }
+        Insert: {
+          accepted_by?: string | null
+          created_at?: string
+          from_user_id: string
+          id?: string
+          invite_code?: string
+        }
+        Update: {
+          accepted_by?: string | null
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          invite_code?: string
+        }
+        Relationships: []
+      }
+      partnerships: {
+        Row: {
+          created_at: string
+          id: string
+          partner_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          partner_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          partner_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          activity: string | null
+          age: string | null
+          created_at: string
+          current_streak: number | null
+          custom_intolerances: string[] | null
+          difficulty: string | null
+          id: string
+          intolerances: string[] | null
+          last_check_in_date: string | null
+          mode: string | null
+          name: string
+          objective: string | null
+          pace: string | null
+          partner_name: string | null
+          sex: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity?: string | null
+          age?: string | null
+          created_at?: string
+          current_streak?: number | null
+          custom_intolerances?: string[] | null
+          difficulty?: string | null
+          id?: string
+          intolerances?: string[] | null
+          last_check_in_date?: string | null
+          mode?: string | null
+          name?: string
+          objective?: string | null
+          pace?: string | null
+          partner_name?: string | null
+          sex?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity?: string | null
+          age?: string | null
+          created_at?: string
+          current_streak?: number | null
+          custom_intolerances?: string[] | null
+          difficulty?: string | null
+          id?: string
+          intolerances?: string[] | null
+          last_check_in_date?: string | null
+          mode?: string | null
+          name?: string
+          objective?: string | null
+          pace?: string | null
+          partner_name?: string | null
+          sex?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

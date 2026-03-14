@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { Plus, X } from 'lucide-react';
+import { useProfile } from '@/hooks/useProfile';
 
 const steps = [
   {
@@ -112,6 +113,7 @@ const Onboarding = () => {
   const [customInput, setCustomInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const { setUser, completeOnboarding } = useAppStore();
+  const { saveProfile } = useProfile();
   const navigate = useNavigate();
 
   const handleNameSubmit = () => {
@@ -136,7 +138,7 @@ const Onboarding = () => {
     setSelectedIntolerances((prev) => prev.filter((i) => i !== intolerance));
   };
 
-  const handleSelect = (value: string) => {
+  const handleSelect = async (value: string) => {
     const currentStep = steps[step];
 
     if (currentStep.multiSelect) {
@@ -162,11 +164,12 @@ const Onboarding = () => {
       setStep(step + 1);
     } else {
       completeOnboarding();
+      await saveProfile();
       navigate('/home');
     }
   };
 
-  const handleMultiSelectConfirm = () => {
+  const handleMultiSelectConfirm = async () => {
     const standardIntolerances = selectedIntolerances.includes('Nessuna')
       ? []
       : selectedIntolerances.filter((i) => !customIntolerances.includes(i));
@@ -178,6 +181,7 @@ const Onboarding = () => {
       setStep(step + 1);
     } else {
       completeOnboarding();
+      await saveProfile();
       navigate('/home');
     }
   };

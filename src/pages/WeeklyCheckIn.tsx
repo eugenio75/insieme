@@ -198,7 +198,7 @@ const WeeklyCheckIn = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.06, duration: 0.3 }}
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => { setEnergy(opt.value); handleSave(); }}
+                  onClick={() => { setEnergy(opt.value); handleSave(opt.value); }}
                   className="w-full flex items-center gap-4 px-6 py-5 rounded-[24px] bg-card 
                     border border-border text-left transition-all duration-300
                     hover:border-primary/30 active:bg-accent"

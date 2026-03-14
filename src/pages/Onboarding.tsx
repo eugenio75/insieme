@@ -294,7 +294,7 @@ const Onboarding = () => {
             animate="center"
             exit="exit"
             transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
-            className="flex-1 flex flex-col relative z-10"
+            className="flex-1 flex flex-col relative z-10 overflow-y-auto min-h-0"
           >
             <h1 className="font-display text-2xl text-foreground mb-2 leading-tight">
               {currentStep.question}
@@ -445,21 +445,31 @@ const Onboarding = () => {
             )}
 
             {isMultiSelect && (
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleMultiSelectConfirm}
-                disabled={getSelections(currentStep.key).length === 0}
-                className="w-full mt-6 py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm
-                  disabled:opacity-40 transition-opacity duration-300 shadow-glow"
-              >
-                CONTINUA
-              </motion.button>
+              <div className="sticky bottom-0 pt-4 pb-2 bg-background/90 backdrop-blur-sm -mx-6 px-6 mt-auto">
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleMultiSelectConfirm}
+                  disabled={getSelections(currentStep.key).length === 0}
+                  className="w-full py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm
+                    disabled:opacity-40 transition-opacity duration-300 shadow-glow"
+                >
+                  CONTINUA
+                </motion.button>
+                {step > 0 && (
+                  <button
+                    onClick={() => setStep(step - 1)}
+                    className="mt-3 w-full text-muted-foreground text-sm btn-text"
+                  >
+                    INDIETRO
+                  </button>
+                )}
+              </div>
             )}
 
-            {step > 0 && (
+            {!isMultiSelect && step > 0 && (
               <button
                 onClick={() => setStep(step - 1)}
                 className="mt-4 text-muted-foreground text-sm btn-text self-center"

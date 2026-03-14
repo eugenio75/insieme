@@ -17,6 +17,7 @@ const BottomNav = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [badgeCount, setBadgeCount] = useState(0);
+  const [hasSOS, setHasSOS] = useState(false);
 
   useEffect(() => {
     if (!user) return;

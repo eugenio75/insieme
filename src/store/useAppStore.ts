@@ -92,4 +92,20 @@ export const useAppStore = create<AppState>((set) => ({
           : [...s.user.intolerances, intolerance],
       },
     })),
+  addCustomIntolerance: (intolerance) =>
+    set((s) => ({
+      user: {
+        ...s.user,
+        customIntolerances: s.user.customIntolerances.includes(intolerance)
+          ? s.user.customIntolerances
+          : [...s.user.customIntolerances, intolerance],
+      },
+    })),
+  removeCustomIntolerance: (intolerance) =>
+    set((s) => ({
+      user: {
+        ...s.user,
+        customIntolerances: s.user.customIntolerances.filter((i) => i !== intolerance),
+      },
+    })),
 }));

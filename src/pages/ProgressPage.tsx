@@ -179,6 +179,7 @@ const ProgressPage = () => {
             { key: 'charts' as const, label: '📈 Andamento' },
             { key: 'adjustments' as const, label: '🔧 Adattamenti', badge: appliedAdjustments.length },
             { key: 'scoperte' as const, label: '🔍 Scoperte' },
+            ...(fastingConfig.enabled ? [{ key: 'digiuno' as const, label: '⏱️ Digiuno' }] : []),
           ]).map((tab) => (
             <button
               key={tab.key}

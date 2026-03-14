@@ -26,31 +26,42 @@ const AuthPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <span className="text-4xl animate-pulse">🌿</span>
+        <span className="text-4xl animate-float">🌿</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-8 max-w-lg mx-auto text-center">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-8 max-w-lg mx-auto text-center relative overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-primary/10 blur-[100px]" />
+      
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
+        className="relative z-10"
       >
-        <span className="text-6xl mb-6 block">🌿</span>
-        <h1 className="font-display text-4xl font-semibold text-foreground mb-4 leading-tight">
+        <motion.span 
+          className="text-7xl mb-8 block"
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        >
+          🌿
+        </motion.span>
+        <h1 className="font-display text-5xl text-foreground mb-4 leading-tight">
           Insieme
         </h1>
-        <p className="font-display text-lg text-muted-foreground italic mb-10 leading-relaxed">
+        <p className="font-display text-lg text-muted-foreground italic mb-12 leading-relaxed">
           Un passo alla volta,<br />
           con la gentilezza che meriti.
         </p>
 
         <motion.button
           whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.02 }}
           onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-card border border-border text-foreground font-medium shadow-soft hover:border-primary/30 transition-all duration-300"
+          className="w-full flex items-center justify-center gap-3 px-8 py-4 rounded-2xl glass glass-border text-foreground font-medium shadow-card hover:border-primary/30 transition-all duration-300"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />

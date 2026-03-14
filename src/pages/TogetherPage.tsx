@@ -21,32 +21,32 @@ const TogetherPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24 max-w-lg mx-auto px-6 pt-10">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
       >
-        <h1 className="font-display text-2xl font-semibold text-foreground mb-2">
+        <h1 className="font-display text-2xl text-foreground mb-2">
           Insieme
         </h1>
-        <p className="text-muted-foreground mb-8">
+        <p className="text-muted-foreground text-sm mb-8">
           Ti accompagno, non ti giudico.
         </p>
 
         {/* Shared message card */}
-        <div className="p-8 rounded-[32px] bg-accent border border-transparent text-center mb-8">
-          <span className="text-4xl mb-4 block animate-pulse-gentle">❤️</span>
-          <p className="font-display text-lg text-accent-foreground italic">
+        <div className="p-8 rounded-2xl bg-accent glass-border text-center mb-8 relative overflow-hidden">
+          <div className="absolute inset-0 bg-primary/5 blur-[60px] rounded-full" />
+          <span className="text-4xl mb-4 block animate-pulse-gentle relative">❤️</span>
+          <p className="font-display text-lg text-accent-foreground italic relative">
             "Ti accompagno, non ti giudico."
           </p>
         </div>
 
         {user.mode === 'together' ? (
           <>
-            {/* Partner status */}
-            <div className="p-6 rounded-[24px] bg-card border border-border shadow-card mb-6">
-              <h3 className="font-display text-base font-medium text-foreground mb-1">
+            <div className="p-6 rounded-2xl glass glass-border mb-6">
+              <h3 className="font-display text-base text-foreground mb-1">
                 Il tuo percorso condiviso
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
@@ -57,8 +57,7 @@ const TogetherPage = () => {
               </p>
             </div>
 
-            {/* Send encouragement */}
-            <h3 className="font-display text-base font-medium text-foreground mb-3">
+            <h3 className="font-display text-base text-foreground mb-3">
               Manda un pensiero
             </h3>
             <div className="grid grid-cols-2 gap-3 mb-6">
@@ -67,7 +66,7 @@ const TogetherPage = () => {
                   key={badge.type}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => sendBadge(badge.type)}
-                  className="p-4 rounded-[20px] bg-card border border-border text-center 
+                  className="p-4 rounded-2xl glass glass-border text-center 
                     transition-all duration-300 hover:border-primary/30 active:bg-accent"
                 >
                   <span className="text-sm font-medium text-foreground">{badge.label}</span>
@@ -85,18 +84,17 @@ const TogetherPage = () => {
               </motion.p>
             )}
 
-            {/* Recent badges */}
-            <h3 className="font-display text-base font-medium text-foreground mb-3">
+            <h3 className="font-display text-base text-foreground mb-3">
               Messaggi recenti
             </h3>
             <div className="space-y-2">
               {badges.slice(-5).reverse().map((badge, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-4 rounded-[20px] bg-card border border-border"
+                  className="flex items-center gap-3 p-4 rounded-2xl glass glass-border"
                 >
                   <span className="text-sm text-muted-foreground">{badge.from}</span>
-                  <span className="px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-medium">
+                  <span className="px-3 py-1 rounded-xl bg-accent text-accent-foreground text-xs font-medium">
                     {badge.type}
                   </span>
                 </div>
@@ -105,13 +103,13 @@ const TogetherPage = () => {
           </>
         ) : (
           <div className="text-center py-8">
-            <p className="text-muted-foreground mb-6">
+            <p className="text-muted-foreground text-sm mb-6">
               Stai facendo il percorso da sola, ma puoi sempre invitare qualcuno.
             </p>
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={() => useAppStore.getState().setUser({ mode: 'together' })}
-              className="px-8 py-4 rounded-2xl bg-secondary text-secondary-foreground btn-text text-sm shadow-soft"
+              className="px-8 py-4 rounded-2xl gradient-warm text-secondary-foreground btn-text text-sm shadow-soft"
             >
               INVITA UNA PERSONA CARA
             </motion.button>

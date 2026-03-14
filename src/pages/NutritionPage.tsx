@@ -28,7 +28,7 @@ const SubstitutionPanel = ({ ingredients }: { ingredients: Ingredient[] }) => {
         <div key={ing.name}>
           <button
             onClick={() => setExpandedIdx(expandedIdx === idx ? null : idx)}
-            className="w-full flex items-center justify-between px-3 py-2 rounded-2xl bg-muted/50 text-xs transition-colors hover:bg-muted"
+            className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-muted/50 text-xs transition-colors hover:bg-muted"
           >
             <span className="text-muted-foreground">
               Non hai <span className="font-medium text-foreground">{ing.name}</span>?
@@ -71,7 +71,7 @@ const SimpleVariantBadge = ({ variant }: { variant: { title: string; description
     <div className="mt-3">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/60 text-[11px] font-medium text-accent-foreground transition-colors hover:bg-accent"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent/60 text-[11px] font-medium text-accent-foreground transition-colors hover:bg-accent"
       >
         <RefreshCw className="w-3 h-3" />
         {variant.title}
@@ -100,17 +100,19 @@ const TipCard = ({ tip, delay = 0 }: { tip: FoodTip; delay?: number }) => (
     initial={{ opacity: 0, y: 16 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay }}
-    className="p-5 rounded-[24px] bg-card border border-border"
+    className="p-5 rounded-2xl glass glass-border"
   >
     <div className="flex items-start gap-4">
-      <span className="text-2xl">{tip.icon}</span>
+      <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
+        <span className="text-xl">{tip.icon}</span>
+      </div>
       <div className="flex-1 min-w-0">
         <h4 className="text-sm font-medium text-foreground mb-1">{tip.title}</h4>
         <p className="text-sm text-muted-foreground">{tip.description}</p>
         {tip.tags && (
           <div className="flex gap-1.5 mt-2 flex-wrap">
             {tip.tags.map((tag) => (
-              <span key={tag} className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px]">
+              <span key={tag} className="px-2 py-0.5 rounded-lg bg-muted text-muted-foreground text-[10px]">
                 {tag}
               </span>
             ))}
@@ -130,11 +132,13 @@ const MealCard = ({ meal, delay = 0 }: { meal: Meal; delay?: number }) => (
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay }}
-    className="p-5 rounded-[24px] bg-card border border-border"
+    className="p-5 rounded-2xl glass glass-border"
   >
     <div className="flex items-start gap-4">
       <div className="flex flex-col items-center gap-1">
-        <span className="text-2xl">{meal.icon}</span>
+        <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+          <span className="text-xl">{meal.icon}</span>
+        </div>
         <span className="text-[10px] text-muted-foreground font-medium">{meal.typeLabel}</span>
       </div>
       <div className="flex-1 min-w-0">
@@ -170,9 +174,9 @@ const DaySelector = ({
           <button
             key={day.day}
             onClick={() => onSelectDay(idx)}
-            className={`flex flex-col items-center px-3 py-2.5 rounded-2xl min-w-[52px] transition-all duration-300
+            className={`flex flex-col items-center px-3 py-2.5 rounded-xl min-w-[52px] transition-all duration-300
               ${isSelected
-                ? 'bg-primary text-primary-foreground'
+                ? 'gradient-primary text-primary-foreground shadow-glow'
                 : isToday
                   ? 'bg-accent text-accent-foreground'
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted'
@@ -211,16 +215,16 @@ const NutritionPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24 max-w-lg mx-auto px-6 pt-10">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
       >
-        <h1 className="font-display text-2xl font-semibold text-foreground mb-2">
+        <h1 className="font-display text-2xl text-foreground mb-2">
           Alimentazione 🥗
         </h1>
-        <p className="text-muted-foreground mb-6">
+        <p className="text-muted-foreground text-sm mb-6">
           Consigli gentili, mai imposizioni. Adattali a quello che hai.
         </p>
 
@@ -230,10 +234,10 @@ const NutritionPage = () => {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap
+              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 whitespace-nowrap
                 ${activeTab === tab.key
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground'
+                  ? 'gradient-primary text-primary-foreground shadow-glow'
+                  : 'glass glass-border text-muted-foreground hover:text-foreground'
                 }`}
             >
               {tab.label}
@@ -248,8 +252,7 @@ const NutritionPage = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Info banner */}
-            <div className="p-4 rounded-[20px] bg-accent border border-transparent mb-5">
+            <div className="p-4 rounded-2xl bg-accent glass-border mb-5">
               <p className="text-sm text-accent-foreground/80 italic font-display">
                 "Non è una dieta. Sono idee per mangiare bene, con quello che hai. Cambia tutto quello che vuoi." 💛
               </p>
@@ -263,7 +266,7 @@ const NutritionPage = () => {
 
             {selectedDayPlan && (
               <div className="space-y-3">
-                <h3 className="font-display text-base font-medium text-foreground">
+                <h3 className="font-display text-base text-foreground">
                   {selectedDayPlan.day}
                   {selectedDay === todayIdx && (
                     <span className="ml-2 text-xs text-primary font-normal">• oggi</span>
@@ -275,19 +278,18 @@ const NutritionPage = () => {
               </div>
             )}
 
-            {/* Navigation arrows */}
             <div className="flex justify-between mt-6">
               <button
                 onClick={() => setSelectedDay(Math.max(0, selectedDay - 1))}
                 disabled={selectedDay === 0}
-                className="flex items-center gap-1 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm disabled:opacity-30 transition-opacity"
+                className="flex items-center gap-1 px-4 py-2 rounded-xl glass glass-border text-muted-foreground text-sm disabled:opacity-30 transition-opacity"
               >
                 <ChevronLeft className="w-4 h-4" /> Giorno prima
               </button>
               <button
                 onClick={() => setSelectedDay(Math.min(6, selectedDay + 1))}
                 disabled={selectedDay === 6}
-                className="flex items-center gap-1 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm disabled:opacity-30 transition-opacity"
+                className="flex items-center gap-1 px-4 py-2 rounded-xl glass glass-border text-muted-foreground text-sm disabled:opacity-30 transition-opacity"
               >
                 Giorno dopo <ChevronRight className="w-4 h-4" />
               </button>
@@ -302,13 +304,12 @@ const NutritionPage = () => {
             transition={{ duration: 0.3 }}
             className="space-y-4"
           >
-            {/* Daily tip highlight */}
-            <div className="p-6 rounded-[32px] bg-accent border border-transparent">
+            <div className="p-6 rounded-2xl bg-accent glass-border">
               <p className="text-xs text-accent-foreground/60 btn-text mb-3">CONSIGLIO DEL GIORNO</p>
               <div className="flex items-start gap-4">
                 <span className="text-3xl">{dailyTip.icon}</span>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-display text-base font-medium text-accent-foreground mb-1">
+                  <h3 className="font-display text-base text-accent-foreground mb-1">
                     {dailyTip.title}
                   </h3>
                   <p className="text-sm text-accent-foreground/80">{dailyTip.description}</p>
@@ -320,17 +321,15 @@ const NutritionPage = () => {
               </div>
             </div>
 
-            {/* Info card */}
-            <div className="p-4 rounded-[20px] bg-muted/50 border border-border">
+            <div className="p-4 rounded-2xl glass glass-border">
               <p className="text-xs text-muted-foreground text-center italic">
                 💡 Ogni consiglio ha una versione semplice e le sostituzioni per ogni ingrediente. Usa quello che hai in casa!
               </p>
             </div>
 
-            {/* Intolerance-specific tips */}
             {intoleranceTips.length > 0 && (
               <>
-                <h3 className="font-display text-base font-medium text-foreground mt-6 mb-3">
+                <h3 className="font-display text-base text-foreground mt-6 mb-3">
                   Per le tue sensibilità
                 </h3>
                 {intoleranceTips.map((tip, i) => (
@@ -340,7 +339,7 @@ const NutritionPage = () => {
             )}
 
             {user.intolerances.length === 0 && (
-              <div className="p-5 rounded-[24px] bg-card border border-border text-center">
+              <div className="p-5 rounded-2xl glass glass-border text-center">
                 <p className="text-sm text-muted-foreground">
                   Non hai indicato intolleranze. Puoi aggiungerle dal tuo profilo in qualsiasi momento 💛
                 </p>
@@ -372,7 +371,7 @@ const NutritionPage = () => {
             transition={{ duration: 0.3 }}
             className="space-y-3"
           >
-            <div className="p-5 rounded-[24px] bg-accent border border-transparent mb-4">
+            <div className="p-5 rounded-2xl bg-accent glass-border mb-4">
               <p className="text-sm text-accent-foreground/80 italic font-display">
                 "Il gonfiore non è una colpa. È un segnale del corpo. Ascoltalo con gentilezza."
               </p>
@@ -383,10 +382,12 @@ const NutritionPage = () => {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.06 }}
-                className="p-5 rounded-[24px] bg-card border border-border"
+                className="p-5 rounded-2xl glass glass-border"
               >
                 <div className="flex items-start gap-4">
-                  <span className="text-2xl">{item.icon}</span>
+                  <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">{item.icon}</span>
+                  </div>
                   <div>
                     <h4 className="text-sm font-medium text-foreground mb-1">{item.title}</h4>
                     <p className="text-sm text-muted-foreground">{item.description}</p>

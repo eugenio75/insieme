@@ -29,36 +29,36 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24 max-w-lg mx-auto px-6 pt-10">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
       >
-        <h1 className="font-display text-2xl font-semibold text-foreground mb-2">
+        <h1 className="font-display text-2xl text-foreground mb-2">
           Profilo
         </h1>
-        <p className="text-muted-foreground mb-8">
+        <p className="text-muted-foreground text-sm mb-8">
           Ciao, {user.name || 'cara'} 💛
         </p>
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 mb-8">
-          <div className="p-5 rounded-[24px] bg-card border border-border text-center">
-            <p className="font-display text-3xl font-semibold text-foreground">{checkIns.length}</p>
+          <div className="p-5 rounded-2xl glass glass-border text-center">
+            <p className="text-3xl font-bold text-gradient font-body">{checkIns.length}</p>
             <p className="text-xs text-muted-foreground mt-1">Momenti di cura</p>
           </div>
-          <div className="p-5 rounded-[24px] bg-card border border-border text-center">
-            <p className="font-display text-3xl font-semibold text-foreground">{completedHabits}</p>
+          <div className="p-5 rounded-2xl glass glass-border text-center">
+            <p className="text-3xl font-bold text-gradient font-body">{completedHabits}</p>
             <p className="text-xs text-muted-foreground mt-1">Abitudini completate</p>
           </div>
         </div>
 
         {/* Settings */}
-        <h2 className="font-display text-lg font-medium text-foreground mb-4">
+        <h2 className="font-display text-lg text-foreground mb-4">
           Il tuo percorso
         </h2>
-        <div className="space-y-3">
+        <div className="space-y-2">
           {[
             { label: 'Obiettivo', value: user.objective || '—' },
             { label: 'Modalità', value: user.mode === 'together' ? 'Insieme' : 'Da sola' },
@@ -71,7 +71,7 @@ const ProfilePage = () => {
           ].map((item) => (
             <div
               key={item.label}
-              className="flex items-center justify-between p-5 rounded-[24px] bg-card border border-border"
+              className="flex items-center justify-between p-4 rounded-2xl glass glass-border cursor-default"
               onClick={() => {
                 if ((item as any).editable && item.label === 'Peso') {
                   setEditingWeight(true);
@@ -82,7 +82,7 @@ const ProfilePage = () => {
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-foreground">{item.value}</span>
                 {(item as any).editable && (
-                  <span className="text-xs text-primary">✏️</span>
+                  <span className="text-xs text-primary cursor-pointer">✏️</span>
                 )}
               </div>
             </div>
@@ -96,7 +96,7 @@ const ProfilePage = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="mt-4 p-5 rounded-[24px] bg-card border border-primary/30 shadow-card"
+              className="mt-4 p-5 rounded-2xl glass glass-border border-primary/20"
             >
               <p className="text-sm font-medium text-foreground mb-3">Aggiorna il tuo peso</p>
               <div className="flex items-center gap-3 mb-3">
@@ -106,7 +106,7 @@ const ProfilePage = () => {
                   value={weightInput}
                   onChange={(e) => setWeightInput(e.target.value)}
                   placeholder="Es: 65.5"
-                  className="flex-1 px-5 py-3 rounded-2xl bg-background border border-border text-foreground
+                  className="flex-1 px-5 py-3 rounded-xl bg-muted border border-border text-foreground
                     focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
                     transition-all duration-300 placeholder:text-muted-foreground/50"
                   autoFocus
@@ -120,13 +120,13 @@ const ProfilePage = () => {
                     saveProfile();
                     setEditingWeight(false);
                   }}
-                  className="flex-1 py-3 rounded-2xl bg-primary text-primary-foreground text-sm font-medium"
+                  className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium"
                 >
                   Salva
                 </button>
                 <button
                   onClick={() => setEditingWeight(false)}
-                  className="px-4 py-3 rounded-2xl bg-muted text-muted-foreground text-sm font-medium"
+                  className="px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
                 >
                   Annulla
                 </button>
@@ -137,7 +137,7 @@ const ProfilePage = () => {
 
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-lg font-medium text-foreground">
+            <h2 className="font-display text-lg text-foreground">
               Intolleranze alimentari
             </h2>
             <button
@@ -153,7 +153,7 @@ const ProfilePage = () => {
               {allUserIntolerances.map((intolerance) => (
                 <span
                   key={intolerance}
-                  className="px-4 py-2 rounded-full bg-accent text-accent-foreground text-sm font-medium"
+                  className="px-4 py-2 rounded-xl bg-accent text-accent-foreground text-sm font-medium"
                 >
                   {intolerance}
                 </span>
@@ -180,38 +180,36 @@ const ProfilePage = () => {
                       key={intolerance}
                       whileTap={{ scale: 0.97 }}
                       onClick={() => toggleIntolerance(intolerance)}
-                      className={`w-full flex items-center justify-between p-4 rounded-[20px] border transition-all duration-300
+                      className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300
                         ${isSelected
-                          ? 'bg-accent border-primary/40'
-                          : 'bg-card border-border'
+                          ? 'glass glass-border border-primary/30'
+                          : 'glass glass-border'
                         }`}
                     >
                       <span className="text-sm font-medium text-foreground">{intolerance}</span>
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all
-                        ${isSelected ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                      <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all
+                        ${isSelected ? 'gradient-primary border-transparent' : 'border-muted-foreground/20'}`}>
                         {isSelected && <span className="text-primary-foreground text-xs">✓</span>}
                       </div>
                     </motion.button>
                   );
                 })}
 
-                {/* Custom intolerances */}
                 {user.customIntolerances.map((ci) => (
                   <div
                     key={ci}
-                    className="w-full flex items-center justify-between p-4 rounded-[20px] border bg-accent border-primary/40"
+                    className="w-full flex items-center justify-between p-4 rounded-2xl glass glass-border border-primary/30"
                   >
                     <span className="text-sm font-medium text-foreground">⚠️ {ci}</span>
                     <button
                       onClick={() => removeCustomIntolerance(ci)}
-                      className="w-6 h-6 rounded-full bg-muted flex items-center justify-center"
+                      className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center"
                     >
                       <X className="w-3 h-3 text-muted-foreground" />
                     </button>
                   </div>
                 ))}
 
-                {/* Add custom */}
                 {showCustomInput ? (
                   <div className="flex gap-2">
                     <input
@@ -220,7 +218,7 @@ const ProfilePage = () => {
                       onChange={(e) => setCustomInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleAddCustom()}
                       placeholder="Es: Soia, Uova..."
-                      className="flex-1 px-4 py-3 rounded-[16px] bg-card border border-border text-foreground text-sm
+                      className="flex-1 px-4 py-3 rounded-xl bg-muted border border-border text-foreground text-sm
                         focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
                         transition-all duration-300 placeholder:text-muted-foreground/50"
                       autoFocus
@@ -228,7 +226,7 @@ const ProfilePage = () => {
                     <button
                       onClick={handleAddCustom}
                       disabled={!customInput.trim()}
-                      className="px-4 py-3 rounded-[16px] bg-primary text-primary-foreground text-sm font-medium
+                      className="px-4 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium
                         disabled:opacity-40 transition-opacity"
                     >
                       Aggiungi
@@ -237,9 +235,9 @@ const ProfilePage = () => {
                 ) : (
                   <button
                     onClick={() => setShowCustomInput(true)}
-                    className="w-full flex items-center justify-center gap-2 p-4 rounded-[20px] 
-                      border border-dashed border-muted-foreground/30 text-muted-foreground
-                      hover:border-primary/40 hover:text-foreground transition-all duration-300"
+                    className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl 
+                      border border-dashed border-muted-foreground/20 text-muted-foreground
+                      hover:border-primary/30 hover:text-foreground transition-all duration-300"
                   >
                     <Plus className="w-4 h-4" />
                     <span className="text-sm font-medium">Aggiungi altra sensibilità</span>
@@ -251,8 +249,8 @@ const ProfilePage = () => {
         </div>
 
         {/* Privacy mode */}
-        <div className="mt-8 p-6 rounded-[32px] bg-accent border border-transparent">
-          <h3 className="font-display text-base font-medium text-accent-foreground mb-2">
+        <div className="mt-8 p-6 rounded-2xl bg-accent glass-border">
+          <h3 className="font-display text-base text-accent-foreground mb-2">
             🔒 Supporto Gentile
           </h3>
           <p className="text-sm text-accent-foreground/80">

@@ -200,7 +200,6 @@ const Onboarding = () => {
       const customs = selected.includes('Nessuna') ? [] : customIntolerances;
       setUser({ intolerances: standardIntolerances, customIntolerances: customs });
     } else if (key === 'objective') {
-      // Store multiple objectives as comma-separated string
       setUser({ objective: selected.join(', ') });
     }
 
@@ -231,11 +230,14 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col px-6 py-8 max-w-lg mx-auto">
+    <div className="min-h-screen bg-background flex flex-col px-6 py-8 max-w-lg mx-auto relative overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-primary/5 blur-[100px]" />
+      
       {/* Progress bar */}
-      <div className="w-full h-1 bg-muted rounded-full overflow-hidden mb-12">
+      <div className="w-full h-1 bg-muted rounded-full overflow-hidden mb-12 relative z-10">
         <motion.div
-          className="h-full bg-primary rounded-full"
+          className="h-full gradient-primary rounded-full"
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
         />
@@ -250,9 +252,9 @@ const Onboarding = () => {
             animate="center"
             exit="exit"
             transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
-            className="flex-1 flex flex-col"
+            className="flex-1 flex flex-col relative z-10"
           >
-            <h1 className="font-display text-3xl font-semibold text-foreground mb-3">
+            <h1 className="font-display text-3xl text-foreground mb-3">
               Ciao! 👋
             </h1>
             <p className="text-muted-foreground text-lg mb-10">
@@ -264,7 +266,7 @@ const Onboarding = () => {
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleNameSubmit()}
               placeholder="Il tuo nome..."
-              className="w-full px-6 py-4 rounded-2xl bg-card border border-border text-foreground text-lg
+              className="w-full px-6 py-4 rounded-xl bg-muted border border-border text-foreground text-lg
                 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
                 transition-all duration-300 placeholder:text-muted-foreground/50"
               autoFocus
@@ -274,8 +276,8 @@ const Onboarding = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleNameSubmit}
                 disabled={!name.trim()}
-                className="w-full py-4 rounded-2xl bg-primary text-primary-foreground btn-text text-sm
-                  disabled:opacity-40 transition-opacity duration-300 shadow-soft"
+                className="w-full py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm
+                  disabled:opacity-40 transition-opacity duration-300 shadow-glow"
               >
                 CONTINUA
               </motion.button>
@@ -289,9 +291,9 @@ const Onboarding = () => {
             animate="center"
             exit="exit"
             transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
-            className="flex-1 flex flex-col"
+            className="flex-1 flex flex-col relative z-10"
           >
-            <h1 className="font-display text-2xl font-semibold text-foreground mb-2 leading-tight">
+            <h1 className="font-display text-2xl text-foreground mb-2 leading-tight">
               {currentStep.question}
             </h1>
             {currentStep.subtitle && (
@@ -308,7 +310,7 @@ const Onboarding = () => {
                     value={weightInput}
                     onChange={(e) => setWeightInput(e.target.value)}
                     placeholder="Es: 65.5"
-                    className="flex-1 px-6 py-4 rounded-2xl bg-card border border-border text-foreground text-lg
+                    className="flex-1 px-6 py-4 rounded-xl bg-muted border border-border text-foreground text-lg
                       focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
                       transition-all duration-300 placeholder:text-muted-foreground/50"
                     autoFocus
@@ -321,8 +323,8 @@ const Onboarding = () => {
                 <motion.button
                   whileTap={{ scale: 0.98 }}
                   onClick={handleWeightSubmit}
-                  className="w-full py-4 rounded-2xl bg-primary text-primary-foreground btn-text text-sm
-                    shadow-soft"
+                  className="w-full py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm
+                    shadow-glow"
                 >
                   {weightInput ? 'CONTINUA' : 'SALTA E CONTINUA'}
                 </motion.button>
@@ -339,18 +341,18 @@ const Onboarding = () => {
                     transition={{ delay: i * 0.08, duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => handleSelect(option.label)}
-                    className={`w-full flex items-center gap-4 px-6 py-5 rounded-[24px] 
+                    className={`w-full flex items-center gap-4 px-6 py-5 rounded-2xl 
                       border text-left transition-all duration-300
                       ${isSelected 
-                        ? 'bg-accent border-primary/40 shadow-card' 
-                        : 'bg-card border-border hover:border-primary/30 hover:shadow-card active:bg-accent'
+                        ? 'glass glass-border border-primary/30 shadow-glow' 
+                        : 'glass glass-border hover:border-primary/20'
                       }`}
                   >
                     <span className="text-2xl">{option.icon}</span>
                     <span className="text-base text-foreground font-medium flex-1">{option.label}</span>
                     {isMultiSelect && (
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300
-                        ${isSelected ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                      <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-300
+                        ${isSelected ? 'gradient-primary border-transparent' : 'border-muted-foreground/20'}`}>
                         {isSelected && <span className="text-primary-foreground text-xs">✓</span>}
                       </div>
                     )}
@@ -368,11 +370,11 @@ const Onboarding = () => {
                         key={ci}
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className={`w-full flex items-center gap-4 px-6 py-5 rounded-[24px] 
+                        className={`w-full flex items-center gap-4 px-6 py-5 rounded-2xl 
                           border transition-all duration-300
                           ${isSelected
-                            ? 'bg-accent border-primary/40 shadow-card'
-                            : 'bg-card border-border'
+                            ? 'glass glass-border border-primary/30'
+                            : 'glass glass-border'
                           }`}
                       >
                         <span className="text-2xl">⚠️</span>
@@ -384,7 +386,7 @@ const Onboarding = () => {
                         </button>
                         <button
                           onClick={() => handleRemoveCustomIntolerance(ci)}
-                          className="w-6 h-6 rounded-full bg-muted flex items-center justify-center"
+                          className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center"
                         >
                           <X className="w-3 h-3 text-muted-foreground" />
                         </button>
@@ -404,7 +406,7 @@ const Onboarding = () => {
                         onChange={(e) => setCustomInput(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleAddCustomIntolerance()}
                         placeholder="Es: Soia, Uova, Pesce..."
-                        className="flex-1 px-5 py-4 rounded-[20px] bg-card border border-border text-foreground text-sm
+                        className="flex-1 px-5 py-4 rounded-xl bg-muted border border-border text-foreground text-sm
                           focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
                           transition-all duration-300 placeholder:text-muted-foreground/50"
                         autoFocus
@@ -413,7 +415,7 @@ const Onboarding = () => {
                         whileTap={{ scale: 0.95 }}
                         onClick={handleAddCustomIntolerance}
                         disabled={!customInput.trim()}
-                        className="px-5 py-4 rounded-[20px] bg-primary text-primary-foreground text-sm font-medium
+                        className="px-5 py-4 rounded-xl gradient-primary text-primary-foreground text-sm font-medium
                           disabled:opacity-40 transition-opacity"
                       >
                         Aggiungi
@@ -426,9 +428,9 @@ const Onboarding = () => {
                       transition={{ delay: 0.4 }}
                       whileTap={{ scale: 0.97 }}
                       onClick={() => setShowCustomInput(true)}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-[24px] 
-                        border border-dashed border-muted-foreground/30 text-muted-foreground
-                        hover:border-primary/40 hover:text-foreground transition-all duration-300"
+                      className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl 
+                        border border-dashed border-muted-foreground/20 text-muted-foreground
+                        hover:border-primary/30 hover:text-foreground transition-all duration-300"
                     >
                       <Plus className="w-4 h-4" />
                       <span className="text-sm font-medium">Aggiungi altra sensibilità</span>
@@ -447,8 +449,8 @@ const Onboarding = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleMultiSelectConfirm}
                 disabled={getSelections(currentStep.key).length === 0}
-                className="w-full mt-6 py-4 rounded-2xl bg-primary text-primary-foreground btn-text text-sm
-                  disabled:opacity-40 transition-opacity duration-300 shadow-soft"
+                className="w-full mt-6 py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm
+                  disabled:opacity-40 transition-opacity duration-300 shadow-glow"
               >
                 CONTINUA
               </motion.button>

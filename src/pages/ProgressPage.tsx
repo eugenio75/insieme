@@ -76,8 +76,14 @@ const ProgressPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pb-24 max-w-lg mx-auto px-6 pt-10 flex items-center justify-center">
-        <p className="text-muted-foreground">Caricamento...</p>
+      <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10 flex items-center justify-center">
+        <motion.span 
+          className="text-4xl"
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          📊
+        </motion.span>
         <BottomNav />
       </div>
     );
@@ -85,23 +91,29 @@ const ProgressPage = () => {
 
   if (data.length === 0) {
     return (
-      <div className="min-h-screen bg-background pb-24 max-w-lg mx-auto px-6 pt-10">
+      <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center text-center pt-20"
         >
-          <span className="text-6xl mb-6">📊</span>
-          <h1 className="font-display text-2xl font-semibold text-foreground mb-3">
+          <motion.span 
+            className="text-6xl mb-6"
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            📊
+          </motion.span>
+          <h1 className="font-display text-2xl text-foreground mb-3">
             Nessun dato ancora
           </h1>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-muted-foreground text-sm mb-8">
             Completa il tuo primo check-in settimanale per vedere i risultati.
           </p>
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate('/weekly-checkin')}
-            className="px-8 py-4 rounded-2xl bg-primary text-primary-foreground btn-text text-sm shadow-soft"
+            className="px-8 py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm shadow-glow"
           >
             PRIMO CHECK-IN SETTIMANALE
           </motion.button>
@@ -112,13 +124,13 @@ const ProgressPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24 max-w-lg mx-auto px-6 pt-10">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="font-display text-2xl font-semibold text-foreground mb-1">
+        <h1 className="font-display text-2xl text-foreground mb-1">
           I tuoi risultati
         </h1>
         <p className="text-muted-foreground text-sm mb-6">
@@ -129,25 +141,25 @@ const ProgressPage = () => {
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setActiveTab('charts')}
-            className={`flex-1 py-3 rounded-2xl text-sm font-medium transition-all duration-300
+            className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all duration-300
               ${activeTab === 'charts'
-                ? 'bg-primary text-primary-foreground shadow-soft'
-                : 'bg-card border border-border text-muted-foreground'
+                ? 'gradient-primary text-primary-foreground shadow-glow'
+                : 'glass glass-border text-muted-foreground'
               }`}
           >
             📈 Andamento
           </button>
           <button
             onClick={() => setActiveTab('adjustments')}
-            className={`flex-1 py-3 rounded-2xl text-sm font-medium transition-all duration-300 relative
+            className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all duration-300 relative
               ${activeTab === 'adjustments'
-                ? 'bg-primary text-primary-foreground shadow-soft'
-                : 'bg-card border border-border text-muted-foreground'
+                ? 'gradient-primary text-primary-foreground shadow-glow'
+                : 'glass glass-border text-muted-foreground'
               }`}
           >
             🔧 Adattamenti
             {appliedAdjustments.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-secondary text-secondary-foreground text-xs flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full gradient-warm text-secondary-foreground text-xs flex items-center justify-center">
                 {appliedAdjustments.length}
               </span>
             )}
@@ -155,31 +167,32 @@ const ProgressPage = () => {
         </div>
 
         {activeTab === 'charts' && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Energy chart */}
-            <div className="p-5 rounded-[24px] bg-card border border-border shadow-card">
-              <h3 className="font-display text-sm font-medium text-foreground mb-4">
+            <div className="p-5 rounded-2xl glass glass-border">
+              <h3 className="font-display text-sm text-foreground mb-4">
                 ⚡ Energia nel tempo
               </h3>
               <ResponsiveContainer width="100%" height={180}>
                 <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
-                  <YAxis domain={[1, 5]} tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(20 10% 16%)" />
+                  <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'hsl(25 15% 55%)' }} stroke="hsl(20 10% 16%)" />
+                  <YAxis domain={[1, 5]} tick={{ fontSize: 12, fill: 'hsl(25 15% 55%)' }} stroke="hsl(20 10% 16%)" />
                   <Tooltip
                     contentStyle={{
-                      background: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
+                      background: 'hsl(20 12% 9%)',
+                      border: '1px solid hsl(20 10% 16%)',
                       borderRadius: '12px',
                       fontSize: '12px',
+                      color: 'hsl(35 30% 92%)',
                     }}
                   />
                   <Line
                     type="monotone"
                     dataKey="energia"
-                    stroke="hsl(var(--primary))"
+                    stroke="hsl(158 60% 52%)"
                     strokeWidth={2.5}
-                    dot={{ fill: 'hsl(var(--primary))', r: 4 }}
+                    dot={{ fill: 'hsl(158 60% 52%)', r: 4 }}
                     activeDot={{ r: 6 }}
                   />
                 </LineChart>
@@ -187,29 +200,30 @@ const ProgressPage = () => {
             </div>
 
             {/* Bloating chart */}
-            <div className="p-5 rounded-[24px] bg-card border border-border shadow-card">
-              <h3 className="font-display text-sm font-medium text-foreground mb-4">
+            <div className="p-5 rounded-2xl glass glass-border">
+              <h3 className="font-display text-sm text-foreground mb-4">
                 🫧 Gonfiore nel tempo
               </h3>
               <ResponsiveContainer width="100%" height={180}>
                 <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
-                  <YAxis domain={[1, 5]} tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(20 10% 16%)" />
+                  <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'hsl(25 15% 55%)' }} stroke="hsl(20 10% 16%)" />
+                  <YAxis domain={[1, 5]} tick={{ fontSize: 12, fill: 'hsl(25 15% 55%)' }} stroke="hsl(20 10% 16%)" />
                   <Tooltip
                     contentStyle={{
-                      background: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
+                      background: 'hsl(20 12% 9%)',
+                      border: '1px solid hsl(20 10% 16%)',
                       borderRadius: '12px',
                       fontSize: '12px',
+                      color: 'hsl(35 30% 92%)',
                     }}
                   />
                   <Line
                     type="monotone"
                     dataKey="gonfiore"
-                    stroke="hsl(var(--secondary))"
+                    stroke="hsl(25 80% 60%)"
                     strokeWidth={2.5}
-                    dot={{ fill: 'hsl(var(--secondary))', r: 4 }}
+                    dot={{ fill: 'hsl(25 80% 60%)', r: 4 }}
                     activeDot={{ r: 6 }}
                   />
                 </LineChart>
@@ -217,32 +231,33 @@ const ProgressPage = () => {
               <p className="text-xs text-muted-foreground mt-2">Più basso = meglio</p>
             </div>
 
-            {/* Weight chart (only if data exists) */}
+            {/* Weight chart */}
             {hasWeight && (
-              <div className="p-5 rounded-[24px] bg-card border border-border shadow-card">
-                <h3 className="font-display text-sm font-medium text-foreground mb-4">
+              <div className="p-5 rounded-2xl glass glass-border">
+                <h3 className="font-display text-sm text-foreground mb-4">
                   ⚖️ Peso nel tempo
                 </h3>
                 <ResponsiveContainer width="100%" height={180}>
                   <LineChart data={chartData.filter((d) => d.peso !== null)}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
-                    <YAxis tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" domain={['auto', 'auto']} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(20 10% 16%)" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'hsl(25 15% 55%)' }} stroke="hsl(20 10% 16%)" />
+                    <YAxis tick={{ fontSize: 12, fill: 'hsl(25 15% 55%)' }} stroke="hsl(20 10% 16%)" domain={['auto', 'auto']} />
                     <Tooltip
                       contentStyle={{
-                        background: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
+                        background: 'hsl(20 12% 9%)',
+                        border: '1px solid hsl(20 10% 16%)',
                         borderRadius: '12px',
                         fontSize: '12px',
+                        color: 'hsl(35 30% 92%)',
                       }}
                       formatter={(value: number) => [`${value} kg`, 'Peso']}
                     />
                     <Line
                       type="monotone"
                       dataKey="peso"
-                      stroke="hsl(var(--foreground))"
+                      stroke="hsl(35 30% 92%)"
                       strokeWidth={2.5}
-                      dot={{ fill: 'hsl(var(--foreground))', r: 4 }}
+                      dot={{ fill: 'hsl(35 30% 92%)', r: 4 }}
                       activeDot={{ r: 6 }}
                     />
                   </LineChart>
@@ -252,8 +267,8 @@ const ProgressPage = () => {
 
             {/* Quick summary */}
             {data.length >= 2 && (
-              <div className="p-5 rounded-[24px] bg-accent border border-transparent">
-                <h3 className="font-display text-sm font-medium text-accent-foreground mb-3">
+              <div className="p-5 rounded-2xl bg-accent glass-border">
+                <h3 className="font-display text-sm text-accent-foreground mb-3">
                   Questa settimana vs la scorsa
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
@@ -289,7 +304,7 @@ const ProgressPage = () => {
             {adjustments.length === 0 ? (
               <div className="text-center py-12">
                 <span className="text-4xl mb-4 block">📋</span>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Servono almeno 2 settimane di dati per generare suggerimenti.
                 </p>
               </div>
@@ -361,21 +376,23 @@ const AdjustmentCard = ({ adjustment }: { adjustment: Adjustment }) => (
   <motion.div
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
-    className={`p-5 rounded-[24px] border shadow-card ${
+    className={`p-5 rounded-2xl ${
       adjustment.applied
-        ? 'bg-accent border-primary/20'
-        : 'bg-card border-border'
+        ? 'bg-accent glass-border border-primary/20'
+        : 'glass glass-border'
     }`}
   >
     <div className="flex items-start gap-3">
-      <span className="text-2xl">{adjustment.icon}</span>
+      <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
+        <span className="text-xl">{adjustment.icon}</span>
+      </div>
       <div className="flex-1">
         <p className="text-sm font-medium text-foreground">{adjustment.title}</p>
         <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
           {adjustment.description}
         </p>
         {adjustment.applied && (
-          <span className="inline-block mt-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+          <span className="inline-block mt-2 px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">
             Applicato al tuo percorso
           </span>
         )}

@@ -39,6 +39,30 @@ const HomePage = () => {
     return 'Buonasera';
   };
 
+  // Fetch check-in signals and refresh habits accordingly
+  useEffect(() => {
+    if (!authUser) return;
+    const fetchSignals = async () => {
+      const since = new Date(Date.now() - 3 * 86400000).toISOString(); // last 3 days
+      const { data: checkins } = await supabase
+        .from('daily_checkins')
+        .select('mood, energy, bloating')
+        .eq('user_id', authUser.id)
+        .gte('created_at', since);
+      
+      if (checkins && checkins.length > 0) {
+        const signals = {
+          avgMood: checkins.reduce((s, c) => s + c.mood, 0) / checkins.length,
+          avgEnergy: checkins.reduce((s, c) => s + c.energy, 0) / checkins.length,
+          avgBloating: checkins.reduce((s, c) => s + c.bloating, 0) / checkins.length,
+        };
+        refreshWeeklyHabits(signals);
+      }
+    };
+    fetchSignals();
+  }, [authUser, refreshWeeklyHabits]);
+
+  // Fetch AI motivational message
   useEffect(() => {
     const fetchMessage = async () => {
       if (!authUser) { setLoadingMessage(false); return; }

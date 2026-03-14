@@ -159,6 +159,74 @@ const TogetherPage = () => {
               transition={{ duration: 0.3 }}
               className="space-y-4"
             >
+              {/* SOS Button */}
+              {supporters.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                >
+                  {!showSOS ? (
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => setShowSOS(true)}
+                      className="w-full p-5 rounded-2xl border-2 border-destructive/20 bg-destructive/5 flex items-center justify-center gap-3 text-destructive font-medium text-sm hover:border-destructive/40 transition-all"
+                    >
+                      <Heart className="w-5 h-5" />
+                      Ho bisogno di supporto
+                    </motion.button>
+                  ) : (
+                    <div className="p-5 rounded-2xl border-2 border-destructive/20 bg-destructive/5 space-y-3">
+                      <p className="text-sm font-medium text-foreground">Come ti senti?</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {['Giornata difficile 😔', 'Tentazione forte 🍫', 'Mi sento sola 💭', 'Poca energia 😴'].map((opt) => (
+                          <button
+                            key={opt}
+                            onClick={() => setSosMessage(opt)}
+                            className={`p-2.5 rounded-xl text-xs font-medium transition-all ${
+                              sosMessage === opt
+                                ? 'bg-destructive/20 text-destructive border border-destructive/30'
+                                : 'bg-background glass-border text-muted-foreground hover:text-foreground'
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                      <input
+                        type="text"
+                        value={sosMessage.startsWith('Giornata') || sosMessage.startsWith('Tentazione') || sosMessage.startsWith('Mi sento') || sosMessage.startsWith('Poca') ? '' : sosMessage}
+                        onChange={(e) => setSosMessage(e.target.value)}
+                        placeholder="Oppure scrivi un messaggio..."
+                        maxLength={80}
+                        className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground text-sm
+                          focus:outline-none focus:ring-2 focus:ring-destructive/30 focus:border-destructive
+                          transition-all placeholder:text-muted-foreground/40"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => { setShowSOS(false); setSosMessage(''); }}
+                          className="flex-1 py-3 rounded-xl glass glass-border text-muted-foreground text-sm font-medium"
+                        >
+                          Annulla
+                        </button>
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
+                          onClick={handleSendSOS}
+                          disabled={sendingSOS}
+                          className="flex-1 py-3 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium
+                            disabled:opacity-50 transition-opacity"
+                        >
+                          {sendingSOS ? '...' : '🆘 Invia'}
+                        </motion.button>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground text-center">
+                        Puoi inviare 1 richiesta ogni 4 ore
+                      </p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
               {/* Intro card */}
               <div className="p-5 rounded-2xl bg-accent glass-border text-center">
                 <p className="text-sm text-accent-foreground/80 italic font-display">
@@ -174,25 +242,33 @@ const TogetherPage = () => {
                 <div>
                   <p className="text-xs btn-text text-primary mb-3">💌 MESSAGGI RICEVUTI</p>
                   <div className="space-y-2">
-                    {receivedBadges.slice(0, 5).map((badge, i) => (
-                      <motion.div
-                        key={badge.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="p-4 rounded-2xl glass glass-border flex items-center gap-3"
-                      >
-                        <div className="w-8 h-8 rounded-xl bg-accent flex items-center justify-center">
-                          <Heart className="w-4 h-4 text-secondary" />
-                        </div>
-                        <div className="flex-1">
-                          <span className="text-sm font-medium text-foreground">{badge.badge_type}</span>
-                          <p className="text-[10px] text-muted-foreground">
-                            {new Date(badge.created_at).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}
-                          </p>
-                        </div>
-                      </motion.div>
-                    ))}
+                    {receivedBadges.slice(0, 5).map((badge, i) => {
+                      const isSOS = badge.badge_type?.startsWith('SOS:');
+                      const displayText = isSOS ? badge.badge_type.replace('SOS:', '') : badge.badge_type;
+                      return (
+                        <motion.div
+                          key={badge.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className={`p-4 rounded-2xl glass glass-border flex items-center gap-3 ${
+                            isSOS ? 'border-destructive/20 bg-destructive/5' : ''
+                          }`}
+                        >
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                            isSOS ? 'bg-destructive/10' : 'bg-accent'
+                          }`}>
+                            {isSOS ? <span className="text-sm">🆘</span> : <Heart className="w-4 h-4 text-secondary" />}
+                          </div>
+                          <div className="flex-1">
+                            <span className="text-sm font-medium text-foreground">{displayText}</span>
+                            <p className="text-[10px] text-muted-foreground">
+                              {new Date(badge.created_at).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}
+                            </p>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

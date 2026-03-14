@@ -10,6 +10,9 @@ interface UserProfile {
   onboarded: boolean;
   partnerName?: string;
   intolerances: string[];
+  customIntolerances: string[];
+  age?: string;
+  sex?: string;
 }
 
 interface Habit {
@@ -40,6 +43,8 @@ interface AppState {
   setWeeklyHabits: (habits: Habit[]) => void;
   addBadge: (badge: { from: string; type: string; date: string }) => void;
   toggleIntolerance: (intolerance: string) => void;
+  addCustomIntolerance: (intolerance: string) => void;
+  removeCustomIntolerance: (intolerance: string) => void;
 }
 
 const defaultHabits: Habit[] = [
@@ -58,6 +63,7 @@ export const useAppStore = create<AppState>((set) => ({
     difficulty: '',
     onboarded: false,
     intolerances: [],
+    customIntolerances: [],
   },
   weeklyHabits: defaultHabits,
   checkIns: [],
@@ -84,6 +90,22 @@ export const useAppStore = create<AppState>((set) => ({
         intolerances: s.user.intolerances.includes(intolerance)
           ? s.user.intolerances.filter((i) => i !== intolerance)
           : [...s.user.intolerances, intolerance],
+      },
+    })),
+  addCustomIntolerance: (intolerance) =>
+    set((s) => ({
+      user: {
+        ...s.user,
+        customIntolerances: s.user.customIntolerances.includes(intolerance)
+          ? s.user.customIntolerances
+          : [...s.user.customIntolerances, intolerance],
+      },
+    })),
+  removeCustomIntolerance: (intolerance) =>
+    set((s) => ({
+      user: {
+        ...s.user,
+        customIntolerances: s.user.customIntolerances.filter((i) => i !== intolerance),
       },
     })),
 }));

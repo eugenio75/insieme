@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
+import { Plus, X } from 'lucide-react';
 
 const steps = [
   {
@@ -23,6 +24,29 @@ const steps = [
     options: [
       { label: 'Da sola', icon: '🧘‍♀️', value: 'solo' },
       { label: 'Con un partner o una persona di supporto', icon: '🤝', value: 'together' },
+    ],
+  },
+  {
+    question: 'Come ti identifichi?',
+    subtitle: 'Ci aiuta a personalizzare il piano alimentare.',
+    key: 'sex',
+    multiSelect: false,
+    options: [
+      { label: 'Donna', icon: '👩' },
+      { label: 'Uomo', icon: '👨' },
+      { label: 'Preferisco non dirlo', icon: '🤍' },
+    ],
+  },
+  {
+    question: 'Qual è la tua fascia d\'età?',
+    subtitle: 'Per adattare i consigli alle tue esigenze.',
+    key: 'age',
+    multiSelect: false,
+    options: [
+      { label: '18-25', icon: '🌱' },
+      { label: '26-35', icon: '🌿' },
+      { label: '36-45', icon: '🌳' },
+      { label: '46+', icon: '🌻' },
     ],
   },
   {
@@ -59,9 +83,10 @@ const steps = [
   },
   {
     question: 'Hai intolleranze o sensibilità alimentari?',
-    subtitle: 'Puoi selezionarne più di una. Questo ci aiuta a personalizzare i consigli.',
+    subtitle: 'Puoi selezionarne più di una. Aggiungi le tue se non le trovi in lista.',
     key: 'intolerances',
     multiSelect: true,
+    hasCustomInput: true,
     options: [
       { label: 'Lattosio', icon: '🥛' },
       { label: 'Glutine', icon: '🌾' },
@@ -83,6 +108,9 @@ const Onboarding = () => {
   const [name, setName] = useState('');
   const [showName, setShowName] = useState(true);
   const [selectedIntolerances, setSelectedIntolerances] = useState<string[]>([]);
+  const [customIntolerances, setCustomIntolerances] = useState<string[]>([]);
+  const [customInput, setCustomInput] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
   const { setUser, completeOnboarding } = useAppStore();
   const navigate = useNavigate();
 
@@ -93,13 +121,28 @@ const Onboarding = () => {
     }
   };
 
+  const handleAddCustomIntolerance = () => {
+    const trimmed = customInput.trim();
+    if (trimmed && !customIntolerances.includes(trimmed) && !selectedIntolerances.includes(trimmed)) {
+      setCustomIntolerances((prev) => [...prev, trimmed]);
+      setSelectedIntolerances((prev) => [...prev.filter((v) => v !== 'Nessuna'), trimmed]);
+      setCustomInput('');
+      setShowCustomInput(false);
+    }
+  };
+
+  const handleRemoveCustomIntolerance = (intolerance: string) => {
+    setCustomIntolerances((prev) => prev.filter((i) => i !== intolerance));
+    setSelectedIntolerances((prev) => prev.filter((i) => i !== intolerance));
+  };
+
   const handleSelect = (value: string) => {
     const currentStep = steps[step];
 
     if (currentStep.multiSelect) {
-      // For multi-select (intolerances), toggle selection
       if (value === 'Nessuna') {
         setSelectedIntolerances(['Nessuna']);
+        setCustomIntolerances([]);
       } else {
         setSelectedIntolerances((prev) => {
           const without = prev.filter((v) => v !== 'Nessuna');
@@ -124,8 +167,12 @@ const Onboarding = () => {
   };
 
   const handleMultiSelectConfirm = () => {
-    const intolerances = selectedIntolerances.includes('Nessuna') ? [] : selectedIntolerances;
-    setUser({ intolerances });
+    const standardIntolerances = selectedIntolerances.includes('Nessuna')
+      ? []
+      : selectedIntolerances.filter((i) => !customIntolerances.includes(i));
+    const customs = selectedIntolerances.includes('Nessuna') ? [] : customIntolerances;
+
+    setUser({ intolerances: standardIntolerances, customIntolerances: customs });
 
     if (step < steps.length - 1) {
       setStep(step + 1);
@@ -138,6 +185,7 @@ const Onboarding = () => {
   const progress = showName ? 0 : ((step + 1) / (steps.length + 1)) * 100;
   const currentStep = steps[step];
   const isMultiSelect = currentStep?.multiSelect;
+  const hasCustomInput = (currentStep as any)?.hasCustomInput;
 
   return (
     <div className="min-h-screen bg-background flex flex-col px-6 py-8 max-w-lg mx-auto">
@@ -236,6 +284,85 @@ const Onboarding = () => {
                   </motion.button>
                 );
               })}
+
+              {/* Custom intolerances */}
+              {hasCustomInput && (
+                <>
+                  {customIntolerances.map((ci) => {
+                    const isSelected = selectedIntolerances.includes(ci);
+                    return (
+                      <motion.div
+                        key={ci}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className={`w-full flex items-center gap-4 px-6 py-5 rounded-[24px] 
+                          border transition-all duration-300
+                          ${isSelected
+                            ? 'bg-accent border-primary/40 shadow-card'
+                            : 'bg-card border-border'
+                          }`}
+                      >
+                        <span className="text-2xl">⚠️</span>
+                        <button
+                          onClick={() => handleSelect(ci)}
+                          className="text-base text-foreground font-medium flex-1 text-left"
+                        >
+                          {ci}
+                        </button>
+                        <button
+                          onClick={() => handleRemoveCustomIntolerance(ci)}
+                          className="w-6 h-6 rounded-full bg-muted flex items-center justify-center"
+                        >
+                          <X className="w-3 h-3 text-muted-foreground" />
+                        </button>
+                      </motion.div>
+                    );
+                  })}
+
+                  {showCustomInput ? (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="flex gap-2"
+                    >
+                      <input
+                        type="text"
+                        value={customInput}
+                        onChange={(e) => setCustomInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddCustomIntolerance()}
+                        placeholder="Es: Soia, Uova, Pesce..."
+                        className="flex-1 px-5 py-4 rounded-[20px] bg-card border border-border text-foreground text-sm
+                          focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                          transition-all duration-300 placeholder:text-muted-foreground/50"
+                        autoFocus
+                      />
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleAddCustomIntolerance}
+                        disabled={!customInput.trim()}
+                        className="px-5 py-4 rounded-[20px] bg-primary text-primary-foreground text-sm font-medium
+                          disabled:opacity-40 transition-opacity"
+                      >
+                        Aggiungi
+                      </motion.button>
+                    </motion.div>
+                  ) : (
+                    <motion.button
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => setShowCustomInput(true)}
+                      className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-[24px] 
+                        border border-dashed border-muted-foreground/30 text-muted-foreground
+                        hover:border-primary/40 hover:text-foreground transition-all duration-300"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span className="text-sm font-medium">Aggiungi altra sensibilità</span>
+                    </motion.button>
+                  )}
+                </>
+              )}
             </div>
 
             {isMultiSelect && (

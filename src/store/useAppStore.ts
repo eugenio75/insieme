@@ -30,11 +30,19 @@ interface CheckInData {
   habitsCompleted: string[];
 }
 
+interface StreakMilestone {
+  days: number;
+  message: string;
+  icon: string;
+}
+
 interface AppState {
   user: UserProfile;
   weeklyHabits: Habit[];
   checkIns: CheckInData[];
   todayCheckedIn: boolean;
+  currentStreak: number;
+  lastCheckInDate: string | null;
   badges: { from: string; type: string; date: string }[];
   setUser: (u: Partial<UserProfile>) => void;
   completeOnboarding: () => void;
@@ -45,6 +53,7 @@ interface AppState {
   toggleIntolerance: (intolerance: string) => void;
   addCustomIntolerance: (intolerance: string) => void;
   removeCustomIntolerance: (intolerance: string) => void;
+  getStreakMilestone: () => StreakMilestone | null;
 }
 
 const defaultHabits: Habit[] = [

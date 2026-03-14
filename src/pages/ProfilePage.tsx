@@ -89,7 +89,52 @@ const ProfilePage = () => {
           ))}
         </div>
 
-        {/* Intolerances */}
+        {/* Weight edit modal */}
+        <AnimatePresence>
+          {editingWeight && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="mt-4 p-5 rounded-[24px] bg-card border border-primary/30 shadow-card"
+            >
+              <p className="text-sm font-medium text-foreground mb-3">Aggiorna il tuo peso</p>
+              <div className="flex items-center gap-3 mb-3">
+                <input
+                  type="number"
+                  step="0.1"
+                  value={weightInput}
+                  onChange={(e) => setWeightInput(e.target.value)}
+                  placeholder="Es: 65.5"
+                  className="flex-1 px-5 py-3 rounded-2xl bg-background border border-border text-foreground
+                    focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                    transition-all duration-300 placeholder:text-muted-foreground/50"
+                  autoFocus
+                />
+                <span className="text-muted-foreground">kg</span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setUser({ weight: weightInput || undefined });
+                    saveProfile();
+                    setEditingWeight(false);
+                  }}
+                  className="flex-1 py-3 rounded-2xl bg-primary text-primary-foreground text-sm font-medium"
+                >
+                  Salva
+                </button>
+                <button
+                  onClick={() => setEditingWeight(false)}
+                  className="px-4 py-3 rounded-2xl bg-muted text-muted-foreground text-sm font-medium"
+                >
+                  Annulla
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg font-medium text-foreground">

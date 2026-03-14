@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { getWeeklyHabitsForUser } from '@/data/weeklyHabits';
 
 interface UserProfile {
   name: string;
@@ -39,6 +40,9 @@ interface StreakMilestone {
 interface AppState {
   user: UserProfile;
   weeklyHabits: Habit[];
+  weekLabel: string;
+  weekNumber: number;
+  totalWeeks: number;
   checkIns: CheckInData[];
   todayCheckedIn: boolean;
   currentStreak: number;
@@ -49,6 +53,7 @@ interface AppState {
   toggleHabit: (id: string) => void;
   addCheckIn: (data: CheckInData) => void;
   setWeeklyHabits: (habits: Habit[]) => void;
+  refreshWeeklyHabits: () => void;
   addBadge: (badge: { from: string; type: string; date: string }) => void;
   toggleIntolerance: (intolerance: string) => void;
   addCustomIntolerance: (intolerance: string) => void;
@@ -56,11 +61,15 @@ interface AppState {
   getStreakMilestone: () => StreakMilestone | null;
 }
 
-const defaultHabits: Habit[] = [
-  { id: '1', title: 'Camminare 20 minuti', completed: false, icon: '🚶‍♀️' },
-  { id: '2', title: 'Bere 1.5 litri di acqua', completed: false, icon: '💧' },
-  { id: '3', title: 'Niente dolci dopo cena', completed: false, icon: '🌙' },
-];
+const getInitialHabits = (objective: string, startDate?: string) => {
+  const { weekLevel, weekNumber, totalWeeks } = getWeeklyHabitsForUser(objective, startDate);
+  return {
+    habits: weekLevel.habits.map(h => ({ ...h, completed: false })),
+    weekLabel: weekLevel.label,
+    weekNumber,
+    totalWeeks,
+  };
+};
 
 const streakMilestones: StreakMilestone[] = [
   { days: 3, message: 'Stai creando un\'abitudine 🌱', icon: '🌱' },

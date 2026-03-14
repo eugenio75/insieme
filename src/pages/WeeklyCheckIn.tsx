@@ -102,7 +102,8 @@ const WeeklyCheckIn = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
+      <AppHeader />
       <AnimatePresence mode="wait">
         {phase === 0 && (
           <motion.div

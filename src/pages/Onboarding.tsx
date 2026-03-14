@@ -164,6 +164,7 @@ const Onboarding = () => {
       setStep(step + 1);
     } else {
       completeOnboarding();
+      await saveProfile();
       navigate('/home');
     }
   };

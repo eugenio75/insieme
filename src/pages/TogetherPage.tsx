@@ -74,6 +74,19 @@ const TogetherPage = () => {
     setTimeout(() => setSendingBadge(null), 1500);
   };
 
+  const handleSendSOS = async () => {
+    setSendingSOS(true);
+    const result = await sendSOS(sosMessage);
+    if (result.success) {
+      toast.success('Richiesta inviata ai tuoi supporter 💛');
+      setSosMessage('');
+      setShowSOS(false);
+    } else {
+      toast.error(result.error || 'Errore');
+    }
+    setSendingSOS(false);
+  };
+
   // Check for invite code in URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

@@ -2,11 +2,14 @@ import { motion } from 'framer-motion';
 import { lovable } from '@/integrations/lovable/index';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const AuthPage = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user && !loading) {
@@ -15,11 +18,25 @@ const AuthPage = () => {
   }, [user, loading, navigate]);
 
   const handleGoogleLogin = async () => {
-    const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    setAuthError(null);
+    setIsLoggingIn(true);
+
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/auth`,
+      extraParams: {
+        prompt: 'select_account',
+      },
     });
-    if (error) {
-      console.error('Login error:', error);
+
+    if (result.error) {
+      setAuthError('Accesso non riuscito. Riprova aprendo il link in Safari.');
+      console.error('Login error:', result.error);
+      setIsLoggingIn(false);
+      return;
+    }
+
+    if (!result.redirected) {
+      setIsLoggingIn(false);
     }
   };
 
@@ -61,7 +78,8 @@ const AuthPage = () => {
           whileTap={{ scale: 0.98 }}
           whileHover={{ scale: 1.02 }}
           onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 px-8 py-4 rounded-2xl glass glass-border text-foreground font-medium shadow-card hover:border-primary/30 transition-all duration-300"
+          disabled={isLoggingIn}
+          className="w-full flex items-center justify-center gap-3 px-8 py-4 rounded-2xl glass glass-border text-foreground font-medium shadow-card hover:border-primary/30 transition-all duration-300 disabled:opacity-70 disabled:pointer-events-none"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -69,8 +87,14 @@ const AuthPage = () => {
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
           </svg>
-          Accedi con Google
+          {isLoggingIn ? 'Connessione in corso…' : 'Accedi con Google'}
         </motion.button>
+
+        {authError && (
+          <p className="text-sm text-destructive mt-4" role="alert">
+            {authError}
+          </p>
+        )}
 
         <p className="text-xs text-muted-foreground mt-8">
           Nessuna dieta. Nessun giudizio. Solo cura.

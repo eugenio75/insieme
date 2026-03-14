@@ -413,4 +413,72 @@ const AdjustmentCard = ({ adjustment }: { adjustment: Adjustment }) => (
   </motion.div>
 );
 
+const FastingReport = ({ getStats }: { getStats: () => any }) => {
+  const stats = getStats();
+
+  return (
+    <>
+      <div className="p-4 rounded-2xl bg-accent glass-border">
+        <p className="text-sm text-accent-foreground/80 italic font-display">
+          "Il digiuno intermittente è un alleato, non un obbligo. Ascolta il tuo corpo." ⏱️
+        </p>
+      </div>
+
+      {stats.totalSessions === 0 ? (
+        <div className="flex flex-col items-center py-12">
+          <span className="text-4xl mb-4">⏱️</span>
+          <p className="text-sm text-muted-foreground text-center px-4">
+            Non hai ancora completato sessioni di digiuno. Avvia il timer dalla Home!
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-5 rounded-2xl glass glass-border text-center">
+              <p className="text-3xl font-bold text-gradient font-body">{stats.completedSessions}</p>
+              <p className="text-xs text-muted-foreground mt-1">Sessioni completate</p>
+            </div>
+            <div className="p-5 rounded-2xl glass glass-border text-center">
+              <p className="text-3xl font-bold text-gradient font-body">{Math.round(stats.completionRate * 100)}%</p>
+              <p className="text-xs text-muted-foreground mt-1">Tasso di completamento</p>
+            </div>
+            <div className="p-5 rounded-2xl glass glass-border text-center">
+              <p className="text-3xl font-bold text-gradient font-body">{stats.avgFastingHours}h</p>
+              <p className="text-xs text-muted-foreground mt-1">Media ore digiuno</p>
+            </div>
+            <div className="p-5 rounded-2xl glass glass-border text-center">
+              <p className="text-3xl font-bold text-gradient font-body">{stats.currentStreak}</p>
+              <p className="text-xs text-muted-foreground mt-1">Giorni consecutivi</p>
+            </div>
+          </div>
+
+          {/* Recent sessions */}
+          <h3 className="font-display text-sm text-foreground mt-4 mb-2">Ultime sessioni</h3>
+          {stats.sessions.slice(0, 7).map((s: any) => {
+            const date = new Date(s.started_at);
+            const hours = s.ended_at
+              ? Math.round((new Date(s.ended_at).getTime() - date.getTime()) / 3600000 * 10) / 10
+              : null;
+            return (
+              <div key={s.id} className="flex items-center justify-between p-4 rounded-2xl glass glass-border">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">{s.completed ? '✅' : '⚪'}</span>
+                  <div>
+                    <p className="text-sm text-foreground">{date.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' })}</p>
+                    <p className="text-xs text-muted-foreground">{s.protocol}</p>
+                  </div>
+                </div>
+                <span className="text-sm font-medium text-foreground">
+                  {hours ? `${hours}h` : 'In corso...'}
+                </span>
+              </div>
+            );
+          })}
+        </>
+      )}
+    </>
+  );
+};
+
 export default ProgressPage;

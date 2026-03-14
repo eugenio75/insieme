@@ -4,12 +4,18 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
+const isInAppBrowser = () => {
+  const ua = navigator.userAgent || '';
+  return /FBAN|FBAV|Instagram|WhatsApp|CriOS|FxiOS|EdgiOS|OPiOS|GSA\//.test(ua);
+};
+
 const AuthPage = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const inApp = isInAppBrowser();
 
   useEffect(() => {
     if (user && !loading) {

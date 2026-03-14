@@ -130,12 +130,12 @@ const TipCard = ({ tip, delay = 0 }: { tip: FoodTip; delay?: number }) => (
   </motion.div>
 );
 
-const MealCard = ({ meal, delay = 0, warning }: { meal: Meal; delay?: number; warning?: string | null }) => (
+const MealCard = ({ meal, delay = 0, warning, dimmed }: { meal: Meal; delay?: number; warning?: string | null; dimmed?: boolean }) => (
   <motion.div
     initial={{ opacity: 0, y: 12 }}
-    animate={{ opacity: 1, y: 0 }}
+    animate={{ opacity: dimmed ? 0.5 : 1, y: 0 }}
     transition={{ delay }}
-    className={`p-5 rounded-2xl glass glass-border ${warning ? 'border-secondary/30' : ''}`}
+    className={`p-5 rounded-2xl glass glass-border ${warning ? 'border-secondary/30' : ''} ${dimmed ? 'opacity-50' : ''}`}
   >
     {warning && (
       <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-xl bg-secondary/10">

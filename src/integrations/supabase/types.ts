@@ -43,6 +43,7 @@ export type Database = {
           bloating: number
           created_at: string
           energy: number
+          foods_eaten: string[] | null
           id: string
           mood: number
           user_id: string
@@ -51,6 +52,7 @@ export type Database = {
           bloating: number
           created_at?: string
           energy: number
+          foods_eaten?: string[] | null
           id?: string
           mood: number
           user_id: string
@@ -59,6 +61,7 @@ export type Database = {
           bloating?: number
           created_at?: string
           energy?: number
+          foods_eaten?: string[] | null
           id?: string
           mood?: number
           user_id?: string

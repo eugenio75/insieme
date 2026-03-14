@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import { toast } from 'sonner';
+import { getTodayPlan } from '@/data/mealPlans';
 
 const moods = [
   { label: 'Serena', icon: '😊', value: 5 },
@@ -31,6 +32,25 @@ const bloatingLevels = [
   { label: 'Forte', icon: '😣', value: 4 },
 ];
 
+const commonFoods = [
+  { label: 'Latticini', icon: '🧀' },
+  { label: 'Pane/pasta', icon: '🍞' },
+  { label: 'Verdure crude', icon: '🥗' },
+  { label: 'Legumi', icon: '🫘' },
+  { label: 'Frutta', icon: '🍎' },
+  { label: 'Carne', icon: '🍗' },
+  { label: 'Pesce', icon: '🐟' },
+  { label: 'Uova', icon: '🥚' },
+  { label: 'Dolci', icon: '🍰' },
+  { label: 'Caffè', icon: '☕' },
+  { label: 'Bevande gassate', icon: '🫧' },
+  { label: 'Alcol', icon: '🍷' },
+  { label: 'Cibi fritti', icon: '🍟' },
+  { label: 'Riso', icon: '🍚' },
+  { label: 'Yogurt', icon: '🥛' },
+  { label: 'Cioccolato', icon: '🍫' },
+];
+
 const timeMessages = [
   { icon: '🌅', label: 'Mattina' },
   { icon: '☀️', label: 'Mezzogiorno' },
@@ -51,27 +71,39 @@ const CheckIn = () => {
   const [mood, setMood] = useState(0);
   const [energy, setEnergy] = useState(0);
   const [bloating, setBloating] = useState(0);
+  const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
-  const { addCheckIn, currentStreak } = useAppStore();
+  const { addCheckIn, currentStreak, user } = useAppStore();
   const { user: authUser } = useAuth();
   const navigate = useNavigate();
   const time = getTimeOfDay();
 
-  const handleComplete = async () => {
+  // Get today's meal plan foods for quick selection
+  const todayPlan = getTodayPlan(user.objective, user.activity, user.sex, user.age);
+  const planFoods = todayPlan?.meals.map(m => ({
+    label: m.title,
+    icon: m.icon,
+  })) || [];
+
+  const toggleFood = (food: string) => {
+    setSelectedFoods(prev =>
+      prev.includes(food) ? prev.filter(f => f !== food) : [...prev, food]
+    );
+  };
+
+  const saveCheckIn = async (foods: string[]) => {
     setSaving(true);
     try {
-      // Save to daily_checkins table
       if (authUser) {
         const { error } = await supabase.from('daily_checkins').insert({
           user_id: authUser.id,
           mood,
           energy,
           bloating,
+          foods_eaten: foods,
         });
         if (error) console.error('Error saving check-in:', error);
       }
-
-      // Update local store (keeps streak logic)
       addCheckIn({
         date: new Date().toISOString(),
         mood,
@@ -79,9 +111,9 @@ const CheckIn = () => {
         bloating,
         habitsCompleted: [],
       });
-      setPhase(3);
+      setPhase(4); // done
     } catch (e) {
-      toast.error('Errore nel salvataggio del check-in');
+      toast.error('Errore nel salvataggio');
       console.error(e);
     } finally {
       setSaving(false);
@@ -105,37 +137,9 @@ const CheckIn = () => {
       title: 'Hai avuto gonfiore?',
       subtitle: 'Non c\'è risposta sbagliata',
       options: bloatingLevels,
-      onSelect: (v: number) => { setBloating(v); handleCompleteWithBloating(v); },
+      onSelect: (v: number) => { setBloating(v); setPhase(3); },
     },
   ];
-
-  const handleCompleteWithBloating = async (bloatingValue: number) => {
-    setSaving(true);
-    try {
-      if (authUser) {
-        const { error } = await supabase.from('daily_checkins').insert({
-          user_id: authUser.id,
-          mood,
-          energy,
-          bloating: bloatingValue,
-        });
-        if (error) console.error('Error saving check-in:', error);
-      }
-      addCheckIn({
-        date: new Date().toISOString(),
-        mood,
-        energy,
-        bloating: bloatingValue,
-        habitsCompleted: [],
-      });
-      setPhase(3);
-    } catch (e) {
-      toast.error('Errore nel salvataggio');
-      console.error(e);
-    } finally {
-      setSaving(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
@@ -173,7 +177,7 @@ const CheckIn = () => {
               ))}
             </div>
             <div className="flex gap-2 justify-center mt-8">
-              {[0, 1, 2].map((i) => (
+              {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -183,7 +187,100 @@ const CheckIn = () => {
               ))}
             </div>
           </motion.div>
+
+        ) : phase === 3 ? (
+          /* Food tracking phase */
+          <motion.div
+            key="foods"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
+          >
+            <p className="text-xs text-muted-foreground mb-1">Ci aiuta a capire cosa funziona per te</p>
+            <h1 className="font-display text-2xl text-foreground mb-2">
+              Cosa hai mangiato oggi?
+            </h1>
+            <p className="text-sm text-muted-foreground mb-6">
+              Tocca i cibi che hai consumato. Puoi saltare se preferisci.
+            </p>
+
+            {/* Plan foods */}
+            {planFoods.length > 0 && (
+              <div className="mb-4">
+                <p className="text-[10px] text-muted-foreground/70 btn-text mb-2">📋 DAL TUO PIANO DI OGGI</p>
+                <div className="flex flex-wrap gap-2">
+                  {planFoods.map((food) => (
+                    <button
+                      key={food.label}
+                      onClick={() => toggleFood(food.label)}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm transition-all duration-200
+                        ${selectedFoods.includes(food.label)
+                          ? 'gradient-primary text-primary-foreground shadow-glow'
+                          : 'glass glass-border text-foreground hover:border-primary/30'
+                        }`}
+                    >
+                      <span>{food.icon}</span>
+                      <span className="text-xs font-medium">{food.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Common foods grid */}
+            <p className="text-[10px] text-muted-foreground/70 btn-text mb-2">🍽️ CIBI COMUNI</p>
+            <div className="flex flex-wrap gap-2 mb-6">
+              {commonFoods.map((food) => (
+                <button
+                  key={food.label}
+                  onClick={() => toggleFood(food.label)}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm transition-all duration-200
+                    ${selectedFoods.includes(food.label)
+                      ? 'gradient-primary text-primary-foreground shadow-glow'
+                      : 'glass glass-border text-foreground hover:border-primary/30'
+                    }`}
+                >
+                  <span>{food.icon}</span>
+                  <span className="text-xs font-medium">{food.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {selectedFoods.length > 0 && (
+              <p className="text-xs text-primary mb-4">
+                {selectedFoods.length} {selectedFoods.length === 1 ? 'cibo selezionato' : 'cibi selezionati'}
+              </p>
+            )}
+
+            <div className="flex gap-3">
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={() => saveCheckIn([])}
+                disabled={saving}
+                className="flex-1 py-4 rounded-2xl glass glass-border text-muted-foreground btn-text text-sm disabled:opacity-50"
+              >
+                SALTA
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={() => saveCheckIn(selectedFoods)}
+                disabled={saving}
+                className="flex-1 py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm shadow-glow disabled:opacity-50"
+              >
+                {saving ? 'SALVO...' : 'COMPLETA'}
+              </motion.button>
+            </div>
+
+            <div className="flex gap-2 justify-center mt-6">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="w-6 h-1.5 rounded-full gradient-primary" />
+              ))}
+            </div>
+          </motion.div>
+
         ) : (
+          /* Done phase */
           <motion.div
             key="done"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -191,7 +288,7 @@ const CheckIn = () => {
             transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
             className="flex-1 flex flex-col items-center justify-center text-center pt-20"
           >
-            <motion.span 
+            <motion.span
               className="text-6xl mb-6"
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -205,7 +302,7 @@ const CheckIn = () => {
               Grazie per aver ascoltato il tuo corpo.
             </p>
             <p className="text-sm text-muted-foreground mb-6">
-              Puoi fare un altro check-in più tardi per tenere traccia dei cambiamenti durante la giornata.
+              Puoi fare un altro check-in più tardi per tenere traccia dei cambiamenti.
             </p>
 
             {currentStreak > 0 && (
@@ -224,7 +321,7 @@ const CheckIn = () => {
             <div className="flex gap-3">
               <motion.button
                 whileTap={{ scale: 0.98 }}
-                onClick={() => { setPhase(0); setMood(0); setEnergy(0); setBloating(0); }}
+                onClick={() => { setPhase(0); setMood(0); setEnergy(0); setBloating(0); setSelectedFoods([]); }}
                 className="px-6 py-4 rounded-2xl glass glass-border text-foreground btn-text text-sm"
               >
                 NUOVO CHECK-IN

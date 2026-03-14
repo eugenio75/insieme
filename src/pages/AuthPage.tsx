@@ -4,12 +4,18 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
+const isInAppBrowser = () => {
+  const ua = navigator.userAgent || '';
+  return /FBAN|FBAV|Instagram|WhatsApp|CriOS|FxiOS|EdgiOS|OPiOS|GSA\//.test(ua);
+};
+
 const AuthPage = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const inApp = isInAppBrowser();
 
   useEffect(() => {
     if (user && !loading) {
@@ -73,6 +79,28 @@ const AuthPage = () => {
           Un passo alla volta,<br />
           con la gentilezza che meriti.
         </p>
+
+        {inApp && (
+          <div className="w-full mb-6 p-4 rounded-2xl bg-accent/50 border border-accent text-sm text-foreground leading-relaxed">
+            <p className="font-semibold mb-1">⚠️ Apri in Safari</p>
+            <p className="text-muted-foreground">
+              Il login con Google non funziona nei browser in-app (WhatsApp, Instagram…).
+            </p>
+            <button
+              onClick={() => {
+                // On iOS, window.open with _system or copying the URL
+                const url = window.location.href;
+                if (navigator.clipboard) {
+                  navigator.clipboard.writeText(url);
+                }
+                window.open(url, '_blank');
+              }}
+              className="mt-3 w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium"
+            >
+              📋 Copia link e apri in Safari
+            </button>
+          </div>
+        )}
 
         <motion.button
           whileTap={{ scale: 0.98 }}

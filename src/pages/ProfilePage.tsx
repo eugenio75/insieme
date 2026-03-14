@@ -6,6 +6,7 @@ import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { Plus, X, LogOut } from 'lucide-react';
+import FastingSettings from '@/components/FastingSettings';
 
 const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
 

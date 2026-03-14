@@ -30,7 +30,8 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
+      <AppHeader showBack />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

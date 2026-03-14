@@ -5,6 +5,7 @@ import ProgressRing from '../components/ProgressRing';
 import BottomNav from '../components/BottomNav';
 import { getDailyTip } from '../data/foodTips';
 import { Link } from 'react-router-dom';
+import AppHeader from '../components/AppHeader';
 
 const encouragements = [
   'Un passo alla volta, con la gentilezza che meriti.',
@@ -32,7 +33,8 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto">
-      <div className="px-6 pt-10">
+      <div className="px-6 pt-6">
+        <AppHeader />
         {/* Greeting */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useAppStore } from '@/store/useAppStore';
 import BottomNav from '@/components/BottomNav';
+import AppHeader from '@/components/AppHeader';
 
 const bloatingOptions = [
   { label: 'Nessuno', icon: '🌿', value: 1 },
@@ -57,7 +58,8 @@ const WeeklyCheckIn = () => {
 
   if (done) {
     return (
-      <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
+      <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
+        <AppHeader />
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -100,7 +102,8 @@ const WeeklyCheckIn = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
+      <AppHeader />
       <AnimatePresence mode="wait">
         {phase === 0 && (
           <motion.div

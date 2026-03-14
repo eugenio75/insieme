@@ -3,13 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
 import { useProfile } from '@/hooks/useProfile';
 import BottomNav from '../components/BottomNav';
-import { Plus, X } from 'lucide-react';
+import AppHeader from '../components/AppHeader';
+import { useAuth } from '@/hooks/useAuth';
+import { Plus, X, LogOut } from 'lucide-react';
 
 const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
 
 const ProfilePage = () => {
   const { user, checkIns, weeklyHabits, toggleIntolerance, addCustomIntolerance, removeCustomIntolerance, setUser } = useAppStore();
   const { saveProfile } = useProfile();
+  const { signOut } = useAuth();
   const completedHabits = weeklyHabits.filter((h) => h.completed).length;
   const [editingIntolerances, setEditingIntolerances] = useState(false);
   const [customInput, setCustomInput] = useState('');
@@ -29,7 +32,8 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
+      <AppHeader showBack />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -258,6 +262,15 @@ const ProfilePage = () => {
             mai i dati personali o le note emotive.
           </p>
         </div>
+
+        {/* Logout */}
+        <button
+          onClick={signOut}
+          className="mt-6 w-full p-4 rounded-2xl glass glass-border text-destructive text-sm font-medium flex items-center justify-center gap-2 hover:bg-destructive/5 transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          Esci dall'account
+        </button>
       </motion.div>
 
       <BottomNav />

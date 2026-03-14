@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import BottomNav from '../components/BottomNav';
+import AppHeader from '../components/AppHeader';
 
 const moods = [
   { label: 'Serena', icon: '😊', value: 5 },
@@ -65,7 +66,8 @@ const CheckIn = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
+      <AppHeader />
       <AnimatePresence mode="wait">
         {phase < 3 ? (
           <motion.div

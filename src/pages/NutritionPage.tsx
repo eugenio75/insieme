@@ -5,6 +5,7 @@ import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } f
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
 import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import AppHeader from '../components/AppHeader';
 
 type Tab = 'piano' | 'consigli' | 'ricette' | 'gonfiore';
 
@@ -215,7 +216,8 @@ const NutritionPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
+      <AppHeader />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

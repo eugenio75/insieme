@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAppStore } from '@/store/useAppStore';
 import { analyzeProgress, Adjustment } from '@/data/adaptationLogic';
 import BottomNav from '@/components/BottomNav';
+import AppHeader from '@/components/AppHeader';
 import {
   LineChart,
   Line,
@@ -76,14 +77,17 @@ const ProgressPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10 flex items-center justify-center">
-        <motion.span 
+      <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
+        <AppHeader />
+        <div className="flex items-center justify-center pt-20">
+        <motion.span
           className="text-4xl"
           animate={{ y: [0, -8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
           📊
         </motion.span>
+        </div>
         <BottomNav />
       </div>
     );
@@ -91,7 +95,8 @@ const ProgressPage = () => {
 
   if (data.length === 0) {
     return (
-      <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
+      <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
+        <AppHeader />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -124,7 +129,8 @@ const ProgressPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
+      <AppHeader />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

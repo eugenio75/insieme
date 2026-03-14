@@ -3,6 +3,8 @@ import { useAppStore } from '../store/useAppStore';
 import HabitCard from '../components/HabitCard';
 import ProgressRing from '../components/ProgressRing';
 import BottomNav from '../components/BottomNav';
+import { getDailyTip } from '../data/foodTips';
+import { Link } from 'react-router-dom';
 
 const encouragements = [
   'Un passo alla volta, con la gentilezza che meriti.',

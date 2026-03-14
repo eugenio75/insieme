@@ -62,6 +62,7 @@ const ProfilePage = () => {
           {[
             { label: 'Obiettivo', value: user.objective || '—' },
             { label: 'Modalità', value: user.mode === 'together' ? 'Insieme' : 'Da sola' },
+            { label: 'Peso', value: user.weight ? `${user.weight} kg` : '—', editable: true },
             { label: 'Ritmo', value: user.pace || '—' },
             { label: 'Attività', value: user.activity || '—' },
             { label: 'Difficoltà principale', value: user.difficulty || '—' },
@@ -71,9 +72,19 @@ const ProfilePage = () => {
             <div
               key={item.label}
               className="flex items-center justify-between p-5 rounded-[24px] bg-card border border-border"
+              onClick={() => {
+                if ((item as any).editable && item.label === 'Peso') {
+                  setEditingWeight(true);
+                }
+              }}
             >
               <span className="text-sm text-muted-foreground">{item.label}</span>
-              <span className="text-sm font-medium text-foreground">{item.value}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-foreground">{item.value}</span>
+                {(item as any).editable && (
+                  <span className="text-xs text-primary">✏️</span>
+                )}
+              </div>
             </div>
           ))}
         </div>

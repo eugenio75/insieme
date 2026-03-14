@@ -33,6 +33,8 @@ export const useProfile = () => {
           partnerName: data.partner_name || '',
           onboarded: !!(data.objective && data.name),
         });
+        // Refresh habits based on loaded objective and profile creation date
+        setTimeout(() => refreshWeeklyHabits(), 0);
       }
     };
 

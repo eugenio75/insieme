@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTogether } from '@/hooks/useTogether';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
-import { Copy, Check, UserPlus, Send, Heart, ArrowRight } from 'lucide-react';
+import { Copy, Check, UserPlus, Send, Heart, ArrowRight, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 const badgeOptions = [

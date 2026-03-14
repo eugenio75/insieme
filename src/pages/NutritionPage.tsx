@@ -204,6 +204,7 @@ const DaySelector = ({
 const NutritionPage = () => {
   const { user } = useAppStore();
   const [activeTab, setActiveTab] = useState<Tab>('piano');
+  const { checkMeal } = useFoodFindings();
 
   const today = new Date().getDay();
   const todayIdx = today === 0 ? 6 : today - 1;

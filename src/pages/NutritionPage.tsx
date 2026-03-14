@@ -282,9 +282,13 @@ const NutritionPage = () => {
                     <span className="ml-2 text-xs text-primary font-normal">• oggi</span>
                   )}
                 </h3>
-                {selectedDayPlan.meals.map((meal, i) => (
-                  <MealCard key={meal.type} meal={meal} delay={i * 0.06} />
-                ))}
+                {selectedDayPlan.meals.map((meal, i) => {
+                  const finding = checkMeal(meal.title, meal.description);
+                  const warning = finding
+                    ? `${finding.food} potrebbe causare ${finding.issue === 'gonfiore' ? 'gonfiore' : finding.issue === 'energia_bassa' ? 'calo di energia' : 'disagio'}. Prova la versione alternativa!`
+                    : null;
+                  return <MealCard key={meal.type} meal={meal} delay={i * 0.06} warning={warning} />;
+                })}
               </div>
             )}
 

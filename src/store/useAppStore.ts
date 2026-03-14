@@ -54,7 +54,7 @@ interface AppState {
   toggleHabit: (id: string) => void;
   addCheckIn: (data: CheckInData) => void;
   setWeeklyHabits: (habits: Habit[]) => void;
-  refreshWeeklyHabits: () => void;
+  refreshWeeklyHabits: (signals?: { avgMood?: number; avgEnergy?: number; avgBloating?: number }) => void;
   addBadge: (badge: { from: string; type: string; date: string }) => void;
   toggleIntolerance: (intolerance: string) => void;
   addCustomIntolerance: (intolerance: string) => void;

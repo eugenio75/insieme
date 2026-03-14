@@ -63,6 +63,7 @@ export const useAppStore = create<AppState>((set) => ({
     difficulty: '',
     onboarded: false,
     intolerances: [],
+    customIntolerances: [],
   },
   weeklyHabits: defaultHabits,
   checkIns: [],

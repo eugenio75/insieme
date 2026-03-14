@@ -122,6 +122,7 @@ const Onboarding = () => {
   const [customIntolerances, setCustomIntolerances] = useState<string[]>([]);
   const [customInput, setCustomInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
+  const [weightInput, setWeightInput] = useState('');
   const { setUser, completeOnboarding } = useAppStore();
   const { saveProfile } = useProfile();
   const navigate = useNavigate();

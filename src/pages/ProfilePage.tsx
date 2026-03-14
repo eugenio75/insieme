@@ -10,6 +10,7 @@ const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
 const ProfilePage = () => {
   const { user, checkIns, weeklyHabits, toggleIntolerance, addCustomIntolerance, removeCustomIntolerance, setUser } = useAppStore();
   const { saveProfile } = useProfile();
+  const { signOut } = useAuth();
   const completedHabits = weeklyHabits.filter((h) => h.completed).length;
   const [editingIntolerances, setEditingIntolerances] = useState(false);
   const [customInput, setCustomInput] = useState('');

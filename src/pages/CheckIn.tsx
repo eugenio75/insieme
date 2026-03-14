@@ -32,7 +32,7 @@ const CheckIn = () => {
   const [mood, setMood] = useState(0);
   const [energy, setEnergy] = useState(0);
   const [bloating, setBloating] = useState(0);
-  const { weeklyHabits, toggleHabit, addCheckIn } = useAppStore();
+  const { weeklyHabits, toggleHabit, addCheckIn, currentStreak } = useAppStore();
   const navigate = useNavigate();
 
   const handleComplete = () => {

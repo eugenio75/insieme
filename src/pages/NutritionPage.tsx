@@ -129,13 +129,19 @@ const TipCard = ({ tip, delay = 0 }: { tip: FoodTip; delay?: number }) => (
   </motion.div>
 );
 
-const MealCard = ({ meal, delay = 0 }: { meal: Meal; delay?: number }) => (
+const MealCard = ({ meal, delay = 0, warning }: { meal: Meal; delay?: number; warning?: string | null }) => (
   <motion.div
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay }}
-    className="p-5 rounded-2xl glass glass-border"
+    className={`p-5 rounded-2xl glass glass-border ${warning ? 'border-secondary/30' : ''}`}
   >
+    {warning && (
+      <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-xl bg-secondary/10">
+        <AlertTriangle className="w-3.5 h-3.5 text-secondary flex-shrink-0" />
+        <p className="text-[11px] text-secondary">{warning}</p>
+      </div>
+    )}
     <div className="flex items-start gap-4">
       <div className="flex flex-col items-center gap-1">
         <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">

@@ -5,7 +5,7 @@ import { useAppStore } from '@/store/useAppStore';
 
 export const useProfile = () => {
   const { user } = useAuth();
-  const { setUser } = useAppStore();
+  const { setUser, refreshWeeklyHabits } = useAppStore();
 
   // Load profile from DB on auth
   useEffect(() => {

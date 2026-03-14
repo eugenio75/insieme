@@ -34,20 +34,22 @@ const WeeklyCheckIn = () => {
   const navigate = useNavigate();
 
   const handleSave = async (finalEnergy: number) => {
-    if (!authUser) return;
     setSaving(true);
+    setEnergy(finalEnergy);
 
-    const payload = {
-      user_id: authUser.id,
-      week_number: weekNumber,
-      weight: weight ? parseFloat(weight) : null,
-      bloating,
-      energy: finalEnergy,
-    };
+    if (authUser) {
+      const payload = {
+        user_id: authUser.id,
+        week_number: weekNumber,
+        weight: weight ? parseFloat(weight) : null,
+        bloating,
+        energy: finalEnergy,
+      };
 
-    await supabase
-      .from('weekly_checkins')
-      .upsert(payload, { onConflict: 'user_id,week_number' });
+      await supabase
+        .from('weekly_checkins')
+        .upsert(payload, { onConflict: 'user_id,week_number' });
+    }
 
     setSaving(false);
     setDone(true);

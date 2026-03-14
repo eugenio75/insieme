@@ -20,7 +20,7 @@ const fallbackMessages = [
 ];
 
 const HomePage = () => {
-  const { user, weeklyHabits, toggleHabit, currentStreak, getStreakMilestone, weekLabel, weekNumber, totalWeeks } = useAppStore();
+  const { user, weeklyHabits, toggleHabit, currentStreak, getStreakMilestone, weekLabel, weekNumber, totalWeeks, refreshWeeklyHabits } = useAppStore();
   const { user: authUser } = useAuth();
   const navigate = useNavigate();
   const completedCount = weeklyHabits.filter((h) => h.completed).length;

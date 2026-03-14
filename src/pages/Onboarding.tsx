@@ -294,7 +294,7 @@ const Onboarding = () => {
             animate="center"
             exit="exit"
             transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
-            className="flex-1 flex flex-col relative z-10"
+            className="flex-1 flex flex-col relative z-10 overflow-y-auto min-h-0"
           >
             <h1 className="font-display text-2xl text-foreground mb-2 leading-tight">
               {currentStep.question}

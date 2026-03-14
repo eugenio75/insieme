@@ -65,7 +65,7 @@ const CheckIn = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24 max-w-lg mx-auto px-6 pt-10">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-10">
       <AnimatePresence mode="wait">
         {phase < 3 ? (
           <motion.div
@@ -75,7 +75,7 @@ const CheckIn = () => {
             exit={{ opacity: 0, x: -40 }}
             transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
           >
-            <h1 className="font-display text-2xl font-semibold text-foreground mb-8">
+            <h1 className="font-display text-2xl text-foreground mb-8">
               {phases[phase].title}
             </h1>
             <div className="flex flex-col gap-3">
@@ -87,8 +87,8 @@ const CheckIn = () => {
                   transition={{ delay: i * 0.06, duration: 0.3 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => phases[phase].onSelect(opt.value)}
-                  className="w-full flex items-center gap-4 px-6 py-5 rounded-[24px] bg-card 
-                    border border-border text-left transition-all duration-300
+                  className="w-full flex items-center gap-4 px-6 py-5 rounded-2xl glass glass-border 
+                    text-left transition-all duration-300
                     hover:border-primary/30 active:bg-accent"
                 >
                   <span className="text-2xl">{opt.icon}</span>
@@ -96,12 +96,12 @@ const CheckIn = () => {
                 </motion.button>
               ))}
             </div>
-            <div className="flex gap-1.5 justify-center mt-8">
+            <div className="flex gap-2 justify-center mt-8">
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                    i <= phase ? 'bg-primary' : 'bg-muted'
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i <= phase ? 'w-6 gradient-primary' : 'w-1.5 bg-muted'
                   }`}
                 />
               ))}
@@ -115,10 +115,10 @@ const CheckIn = () => {
             exit={{ opacity: 0, x: -40 }}
             transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
           >
-            <h1 className="font-display text-2xl font-semibold text-foreground mb-3">
+            <h1 className="font-display text-2xl text-foreground mb-3">
               Le tue abitudini di oggi
             </h1>
-            <p className="text-muted-foreground mb-8">Tocca per segnare quelle completate</p>
+            <p className="text-muted-foreground mb-8 text-sm">Tocca per segnare quelle completate</p>
             <div className="flex flex-col gap-3">
               {weeklyHabits.map((habit, i) => (
                 <motion.button
@@ -128,20 +128,20 @@ const CheckIn = () => {
                   transition={{ delay: i * 0.08 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => toggleHabit(habit.id)}
-                  className={`w-full flex items-center justify-between px-6 py-5 rounded-[24px] 
-                    border-[1.5px] transition-all duration-500
+                  className={`w-full flex items-center justify-between px-6 py-5 rounded-2xl 
+                    border transition-all duration-500
                     ${habit.completed 
-                      ? 'bg-accent border-transparent' 
-                      : 'bg-card border-border'}`}
+                      ? 'glass glass-border border-primary/20' 
+                      : 'glass glass-border'}`}
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-xl">{habit.icon}</span>
-                    <span className={`text-base font-medium text-foreground ${habit.completed ? 'line-through opacity-60' : ''}`}>
+                    <span className={`text-sm font-medium text-foreground ${habit.completed ? 'line-through opacity-50' : ''}`}>
                       {habit.title}
                     </span>
                   </div>
-                  <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all
-                    ${habit.completed ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                  <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all
+                    ${habit.completed ? 'gradient-primary border-transparent' : 'border-muted-foreground/20'}`}>
                     {habit.completed && <span className="text-primary-foreground text-xs">✓</span>}
                   </div>
                 </motion.button>
@@ -150,13 +150,13 @@ const CheckIn = () => {
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={handleComplete}
-              className="w-full mt-8 py-4 rounded-2xl bg-primary text-primary-foreground btn-text text-sm shadow-soft"
+              className="w-full mt-8 py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm shadow-glow"
             >
               COMPLETA IL CHECK-IN
             </motion.button>
-            <div className="flex gap-1.5 justify-center mt-6">
+            <div className="flex gap-2 justify-center mt-6">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="w-2 h-2 rounded-full bg-primary" />
+                <div key={i} className="w-6 h-1.5 rounded-full gradient-primary" />
               ))}
             </div>
           </motion.div>
@@ -168,21 +168,26 @@ const CheckIn = () => {
             transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
             className="flex-1 flex flex-col items-center justify-center text-center pt-20"
           >
-            <span className="text-6xl mb-6">🌿</span>
-            <h1 className="font-display text-2xl font-semibold text-foreground mb-3">
+            <motion.span 
+              className="text-6xl mb-6"
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              🌿
+            </motion.span>
+            <h1 className="font-display text-2xl text-foreground mb-3">
               Hai fatto quello che potevi oggi.
             </h1>
             <p className="font-display text-lg text-muted-foreground italic mb-6">
               È abbastanza.
             </p>
 
-            {/* Streak celebration */}
             {currentStreak > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.5 }}
-                className="mb-8 px-6 py-4 rounded-[20px] bg-accent border border-transparent"
+                className="mb-8 px-6 py-4 rounded-2xl bg-accent glass-border"
               >
                 <p className="text-accent-foreground font-medium text-lg">
                   🔥 {currentStreak} {currentStreak === 1 ? 'giorno' : 'giorni'} di fila!
@@ -198,7 +203,7 @@ const CheckIn = () => {
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={() => navigate('/home')}
-              className="px-8 py-4 rounded-2xl bg-primary text-primary-foreground btn-text text-sm shadow-soft"
+              className="px-8 py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm shadow-glow"
             >
               TORNA ALLA HOME
             </motion.button>

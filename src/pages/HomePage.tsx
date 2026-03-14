@@ -31,18 +31,18 @@ const HomePage = () => {
   const dailyTip = getDailyTip(user.objective, user.difficulty, user.intolerances);
 
   return (
-    <div className="min-h-screen bg-background pb-24 max-w-lg mx-auto">
+    <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto">
       <div className="px-6 pt-10">
         {/* Greeting */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+          transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
         >
-          <h1 className="font-display text-3xl font-semibold text-foreground">
+          <h1 className="font-display text-3xl text-foreground">
             {greeting()}, {user.name || 'cara'} ☀️
           </h1>
-          <p className="text-muted-foreground mt-2 text-base italic font-display">
+          <p className="text-muted-foreground mt-2 text-sm italic font-display">
             "{todayMessage}"
           </p>
         </motion.div>
@@ -51,8 +51,8 @@ const HomePage = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
-          className="flex justify-center my-8"
+          transition={{ delay: 0.2, duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+          className="flex justify-center my-10"
         >
           <ProgressRing progress={progress} />
         </motion.div>
@@ -63,14 +63,14 @@ const HomePage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.4 }}
-            className="mt-6 p-4 rounded-[20px] bg-card border border-border shadow-card flex items-center gap-4"
+            className="mb-8 p-4 rounded-2xl glass glass-border flex items-center gap-4"
           >
-            <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
               <span className="text-xl">{milestone?.icon || '🔥'}</span>
             </div>
             <div className="flex-1">
               <div className="flex items-baseline gap-2">
-                <span className="font-display text-2xl font-bold text-foreground">{currentStreak}</span>
+                <span className="text-2xl font-bold text-gradient font-body">{currentStreak}</span>
                 <span className="text-sm text-muted-foreground">
                   {currentStreak === 1 ? 'giorno' : 'giorni'} di fila
                 </span>
@@ -89,7 +89,7 @@ const HomePage = () => {
           transition={{ delay: 0.3 }}
         >
           <div className="flex items-baseline justify-between mb-4">
-            <h2 className="font-display text-lg font-medium text-foreground">
+            <h2 className="font-display text-lg text-foreground">
               I tuoi 3 passi
             </h2>
             <span className="text-xs text-muted-foreground font-medium">
@@ -123,8 +123,8 @@ const HomePage = () => {
           className="mt-8"
         >
           {todayCheckedIn ? (
-            <div className="p-5 rounded-[24px] bg-accent border border-transparent text-center">
-              <p className="text-accent-foreground font-medium">
+            <div className="p-5 rounded-2xl bg-accent glass-border text-center">
+              <p className="text-accent-foreground font-medium text-sm">
                 ✨ Hai già fatto il check-in di oggi. Brava!
               </p>
             </div>
@@ -132,25 +132,25 @@ const HomePage = () => {
             <motion.a
               href="/checkin"
               whileTap={{ scale: 0.98 }}
-              className="block p-5 rounded-[24px] bg-secondary text-secondary-foreground text-center shadow-soft"
+              className="block p-5 rounded-2xl gradient-warm text-center shadow-soft"
             >
-              <p className="btn-text text-sm">FAI IL CHECK-IN DI OGGI</p>
-              <p className="text-sm mt-1 opacity-80">Meno di 1 minuto ⏱️</p>
+              <p className="btn-text text-sm text-secondary-foreground">FAI IL CHECK-IN DI OGGI</p>
+              <p className="text-sm mt-1 text-secondary-foreground/70">Meno di 1 minuto ⏱️</p>
             </motion.a>
           )}
         </motion.div>
 
-        {/* Weekly Check-in Prompt (show on weekends or after 7+ days) */}
+        {/* Weekly Check-in Prompt */}
         {new Date().getDay() === 0 || new Date().getDay() === 6 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.75, duration: 0.4 }}
-            className="mt-6"
+            className="mt-5"
           >
             <Link
               to="/weekly-checkin"
-              className="block p-5 rounded-[24px] bg-accent border border-primary/20 shadow-card hover:shadow-soft transition-shadow duration-300"
+              className="block p-5 rounded-2xl glass glass-border border-primary/10 hover:border-primary/30 transition-all duration-300"
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">📊</span>
@@ -170,9 +170,9 @@ const HomePage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.4 }}
-          className="mt-6"
+          className="mt-5"
         >
-          <Link to="/nutrition" className="block p-5 rounded-[24px] bg-card border border-border shadow-card hover:shadow-soft transition-shadow duration-300">
+          <Link to="/nutrition" className="block p-5 rounded-2xl glass glass-border hover:border-primary/20 transition-all duration-300">
             <p className="text-[10px] text-muted-foreground btn-text mb-2">💡 CONSIGLIO DEL GIORNO</p>
             <div className="flex items-start gap-3">
               <span className="text-xl">{dailyTip.icon}</span>
@@ -190,10 +190,10 @@ const HomePage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9, duration: 0.4 }}
-            className="mt-6 p-6 rounded-[32px] bg-card border border-border shadow-card"
+            className="mt-5 p-6 rounded-2xl glass glass-border"
           >
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-display text-base font-medium text-foreground">
+              <h3 className="font-display text-base text-foreground">
                 Insieme a {user.partnerName || 'qualcuno di speciale'}
               </h3>
               <span className="animate-pulse-gentle text-secondary text-xl">❤️</span>
@@ -203,7 +203,7 @@ const HomePage = () => {
                 {badges.slice(-3).map((badge, i) => (
                   <span
                     key={i}
-                    className="px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-medium"
+                    className="px-3 py-1.5 rounded-xl bg-accent text-accent-foreground text-xs font-medium"
                   >
                     {badge.type}
                   </span>

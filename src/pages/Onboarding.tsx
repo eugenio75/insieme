@@ -7,12 +7,14 @@ import { useProfile } from '@/hooks/useProfile';
 
 const steps = [
   {
-    question: 'Qual è il tuo obiettivo principale?',
+    question: 'Quali sono i tuoi obiettivi?',
+    subtitle: 'Puoi sceglierne più di uno.',
     key: 'objective',
-    multiSelect: false,
+    multiSelect: true,
     options: [
       { label: 'Sentirmi più leggera', icon: '🌿' },
       { label: 'Avere più energia', icon: '⚡' },
+      { label: 'Perdere peso', icon: '⚖️' },
       { label: 'Ridurre il gonfiore', icon: '🫧' },
       { label: 'Essere più costante', icon: '🎯' },
       { label: 'Stare meglio nel mio corpo', icon: '💛' },

@@ -143,11 +143,10 @@ export const useAppStore = create<AppState>((set, get) => {
       return milestone || null;
     },
     setWeeklyHabits: (habits) => set({ weeklyHabits: habits }),
-    refreshWeeklyHabits: () => {
+    refreshWeeklyHabits: (signals) => {
       const { user } = get();
-      // Use profile created_at as start date (falls back to now)
-      const startDate = undefined; // Will be set from profile load
-      const result = getInitialHabits(user.objective, startDate);
+      const startDate = undefined;
+      const result = getInitialHabits(user.objective, startDate, signals);
       set({
         weeklyHabits: result.habits,
         weekLabel: result.weekLabel,

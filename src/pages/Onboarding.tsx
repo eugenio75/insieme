@@ -113,6 +113,7 @@ const Onboarding = () => {
   const [customInput, setCustomInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const { setUser, completeOnboarding } = useAppStore();
+  const { saveProfile } = useProfile();
   const navigate = useNavigate();
 
   const handleNameSubmit = () => {

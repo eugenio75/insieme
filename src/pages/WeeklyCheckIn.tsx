@@ -33,21 +33,23 @@ const WeeklyCheckIn = () => {
   const { weekNumber } = useAppStore();
   const navigate = useNavigate();
 
-  const handleSave = async () => {
-    if (!authUser) return;
+  const handleSave = async (finalEnergy: number) => {
     setSaving(true);
+    setEnergy(finalEnergy);
 
-    const payload = {
-      user_id: authUser.id,
-      week_number: weekNumber,
-      weight: weight ? parseFloat(weight) : null,
-      bloating,
-      energy,
-    };
+    if (authUser) {
+      const payload = {
+        user_id: authUser.id,
+        week_number: weekNumber,
+        weight: weight ? parseFloat(weight) : null,
+        bloating,
+        energy: finalEnergy,
+      };
 
-    await supabase
-      .from('weekly_checkins')
-      .upsert(payload, { onConflict: 'user_id,week_number' });
+      await supabase
+        .from('weekly_checkins')
+        .upsert(payload, { onConflict: 'user_id,week_number' });
+    }
 
     setSaving(false);
     setDone(true);
@@ -198,7 +200,7 @@ const WeeklyCheckIn = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.06, duration: 0.3 }}
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => { setEnergy(opt.value); handleSave(); }}
+                  onClick={() => { setEnergy(opt.value); handleSave(opt.value); }}
                   className="w-full flex items-center gap-4 px-6 py-5 rounded-[24px] bg-card 
                     border border-border text-left transition-all duration-300
                     hover:border-primary/30 active:bg-accent"

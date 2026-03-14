@@ -34,7 +34,10 @@ const ProgressPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!authUser) return;
+    if (!authUser) {
+      setLoading(false);
+      return;
+    }
 
     const load = async () => {
       const { data: rows } = await supabase

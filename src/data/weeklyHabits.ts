@@ -356,8 +356,15 @@ export const getCurrentWeekNumber = (startDate?: string): number => {
   return Math.max(1, diffWeeks + 1);
 };
 
+/** Fixed water habit — always present */
+const WATER_HABIT: HabitTemplate = {
+  id: 'fixed-water',
+  title: 'Bere almeno 1.5 litri di acqua',
+  icon: '💧',
+};
+
 /**
- * Selects 3 habits for today from the week's pool.
+ * Selects 3 habits for today from the week's pool (excluding water).
  * Uses day-of-year for deterministic daily rotation.
  * Prioritizes habits that match recent check-in signals.
  */
@@ -365,13 +372,15 @@ const selectDailyHabits = (
   pool: HabitTemplate[],
   signals: CheckInSignals,
 ): HabitTemplate[] => {
-  if (pool.length <= 3) return pool;
+  // Filter out water habits (water is always fixed as first)
+  const filtered = pool.filter(h => !h.title.toLowerCase().includes('acqua'));
 
-  // Separate boosted and normal habits
+  if (filtered.length <= 3) return filtered;
+
   const boosted: HabitTemplate[] = [];
   const normal: HabitTemplate[] = [];
 
-  for (const h of pool) {
+  for (const h of filtered) {
     let isBoosted = false;
     if (h.boost) {
       if (h.boost.lowEnergy && signals.avgEnergy !== undefined && signals.avgEnergy <= 2) isBoosted = true;
@@ -384,13 +393,11 @@ const selectDailyHabits = (
 
   const selected: HabitTemplate[] = [];
 
-  // Add up to 1 boosted habit (most relevant)
   if (boosted.length > 0) {
     const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
     selected.push(boosted[dayOfYear % boosted.length]);
   }
 
-  // Fill remaining spots from normal habits, rotating by day
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
   const remaining = normal.filter(h => !selected.includes(h));
   
@@ -399,7 +406,6 @@ const selectDailyHabits = (
     selected.push(remaining.splice(idx, 1)[0]);
   }
 
-  // If still not enough, add from boosted
   const leftover = boosted.filter(h => !selected.includes(h));
   while (selected.length < 3 && leftover.length > 0) {
     selected.push(leftover.shift()!);
@@ -409,7 +415,7 @@ const selectDailyHabits = (
 };
 
 /**
- * Gets the 3 habits for TODAY based on objective, week, and check-in signals.
+ * Gets 4 habits for TODAY: 1 fixed (water) + 3 adaptive from pool.
  */
 export const getWeeklyHabitsForUser = (
   objective: string,
@@ -422,8 +428,8 @@ export const getWeeklyHabitsForUser = (
   const weekIndex = ((rawWeek - 1) % levels.length);
   const weekLevel = levels[weekIndex];
 
-  // Select 3 daily habits from the pool
-  const dailyHabits = selectDailyHabits(weekLevel.habits, signals || {});
+  // Water first, then 3 adaptive habits
+  const dailyHabits = [WATER_HABIT, ...selectDailyHabits(weekLevel.habits, signals || {})];
 
   return {
     weekLevel: { ...weekLevel, habits: dailyHabits },

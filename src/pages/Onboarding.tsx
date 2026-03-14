@@ -298,6 +298,36 @@ const Onboarding = () => {
               <p className="text-muted-foreground text-sm mb-6">{currentStep.subtitle}</p>
             )}
             {!currentStep.subtitle && <div className="mb-6" />}
+
+            {isWeightInput ? (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={weightInput}
+                    onChange={(e) => setWeightInput(e.target.value)}
+                    placeholder="Es: 65.5"
+                    className="flex-1 px-6 py-4 rounded-2xl bg-card border border-border text-foreground text-lg
+                      focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                      transition-all duration-300 placeholder:text-muted-foreground/50"
+                    autoFocus
+                  />
+                  <span className="text-muted-foreground font-medium text-lg">kg</span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-8">
+                  Non è obbligatorio. Puoi sempre modificarlo dal profilo.
+                </p>
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleWeightSubmit}
+                  className="w-full py-4 rounded-2xl bg-primary text-primary-foreground btn-text text-sm
+                    shadow-soft"
+                >
+                  {weightInput ? 'CONTINUA' : 'SALTA E CONTINUA'}
+                </motion.button>
+              </div>
+            ) : (
             <div className="flex flex-col gap-3">
               {currentStep.options.map((option, i) => {
                 const isSelected = isMultiSelect && getSelections(currentStep.key).includes(option.label);

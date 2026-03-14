@@ -33,7 +33,7 @@ const WeeklyCheckIn = () => {
   const { weekNumber } = useAppStore();
   const navigate = useNavigate();
 
-  const handleSave = async () => {
+  const handleSave = async (finalEnergy: number) => {
     if (!authUser) return;
     setSaving(true);
 
@@ -42,7 +42,7 @@ const WeeklyCheckIn = () => {
       week_number: weekNumber,
       weight: weight ? parseFloat(weight) : null,
       bloating,
-      energy,
+      energy: finalEnergy,
     };
 
     await supabase

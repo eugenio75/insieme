@@ -25,6 +25,7 @@ const TogetherPage = () => {
   const [copied, setCopied] = useState(false);
   const [receivedBadges, setReceivedBadges] = useState<any[]>([]);
   const [sendingBadge, setSendingBadge] = useState<string | null>(null);
+  const [customMessages, setCustomMessages] = useState<Record<string, string>>({});
 
   useEffect(() => {
     getReceivedBadges().then(setReceivedBadges);

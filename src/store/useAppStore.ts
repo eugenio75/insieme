@@ -62,8 +62,8 @@ interface AppState {
   getStreakMilestone: () => StreakMilestone | null;
 }
 
-const getInitialHabits = (objective: string, startDate?: string) => {
-  const { weekLevel, weekNumber, totalWeeks } = getWeeklyHabitsForUser(objective, startDate);
+const getInitialHabits = (objective: string, startDate?: string, signals?: { avgMood?: number; avgEnergy?: number; avgBloating?: number }) => {
+  const { weekLevel, weekNumber, totalWeeks } = getWeeklyHabitsForUser(objective, startDate, signals);
   return {
     habits: weekLevel.habits.map(h => ({ ...h, completed: false })),
     weekLabel: weekLevel.label,

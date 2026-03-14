@@ -85,6 +85,14 @@ const steps = [
     ],
   },
   {
+    question: 'Qual è il tuo peso attuale?',
+    subtitle: 'Opzionale. Ci aiuta a monitorare i tuoi progressi.',
+    key: 'weight',
+    multiSelect: false,
+    isWeightInput: true,
+    options: [],
+  },
+  {
     question: 'Hai intolleranze o sensibilità alimentari?',
     subtitle: 'Puoi selezionarne più di una. Aggiungi le tue se non le trovi in lista.',
     key: 'intolerances',

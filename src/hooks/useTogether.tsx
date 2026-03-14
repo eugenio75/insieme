@@ -152,6 +152,40 @@ export const useTogether = () => {
     return data || [];
   };
 
+  const sendSOS = async (message?: string) => {
+    if (!user) return { success: false, error: 'Non autenticato' };
+
+    // Check 4h cooldown
+    const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
+    const { data: recent } = await supabase
+      .from('badges')
+      .select('id')
+      .eq('from_user_id', user.id)
+      .like('badge_type', 'SOS:%')
+      .gte('created_at', fourHoursAgo)
+      .limit(1);
+
+    if (recent && recent.length > 0) {
+      return { success: false, error: 'Puoi inviare una richiesta SOS ogni 4 ore' };
+    }
+
+    // Send SOS to all supporters
+    const badgeType = message?.trim() ? `SOS:${message.trim()}` : 'SOS:Ho bisogno di supporto';
+
+    const inserts = supporters.map(s => ({
+      from_user_id: user.id,
+      to_user_id: s.partner_id,
+      badge_type: badgeType,
+    }));
+
+    if (inserts.length === 0) {
+      return { success: false, error: 'Non hai ancora supporter a cui inviare la richiesta' };
+    }
+
+    await supabase.from('badges').insert(inserts);
+    return { success: true, error: null };
+  };
+
   return {
     supporters,
     supporting,
@@ -161,6 +195,7 @@ export const useTogether = () => {
     acceptInvite,
     sendBadge,
     getReceivedBadges,
+    sendSOS,
     reload: load,
   };
 };

@@ -18,7 +18,7 @@ type View = 'supporters' | 'supporting';
 
 const TogetherPage = () => {
   const { user: authUser } = useAuth();
-  const { supporters, supporting, myInvites, loading, createInvite, acceptInvite, sendBadge, getReceivedBadges, reload } = useTogether();
+  const { supporters, supporting, myInvites, loading, createInvite, acceptInvite, sendBadge, getReceivedBadges, sendSOS, reload } = useTogether();
   const [view, setView] = useState<View>('supporters');
   const [showInviteCode, setShowInviteCode] = useState(false);
   const [codeInput, setCodeInput] = useState('');
@@ -26,6 +26,9 @@ const TogetherPage = () => {
   const [receivedBadges, setReceivedBadges] = useState<any[]>([]);
   const [sendingBadge, setSendingBadge] = useState<string | null>(null);
   const [customMessages, setCustomMessages] = useState<Record<string, string>>({});
+  const [sosMessage, setSosMessage] = useState('');
+  const [showSOS, setShowSOS] = useState(false);
+  const [sendingSOS, setSendingSOS] = useState(false);
 
   useEffect(() => {
     getReceivedBadges().then(setReceivedBadges);

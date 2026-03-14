@@ -87,6 +87,7 @@ const ProgressPage = () => {
         >
           📊
         </motion.span>
+        </div>
         <BottomNav />
       </div>
     );

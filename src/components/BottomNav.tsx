@@ -81,17 +81,26 @@ const BottomNav = () => {
               );
             }
 
+            const showBadge = tab.path === '/together' && badgeCount > 0 && !isActive;
+
             return (
               <button
                 key={tab.path}
                 onClick={() => navigate(tab.path)}
                 className="flex flex-col items-center justify-center gap-1 py-2 px-3 relative"
               >
-                <Icon
-                  className={`w-5 h-5 transition-all duration-300 ${
-                    isActive ? 'text-primary scale-110' : 'text-muted-foreground'
-                  }`}
-                />
+                <div className="relative">
+                  <Icon
+                    className={`w-5 h-5 transition-all duration-300 ${
+                      isActive ? 'text-primary scale-110' : 'text-muted-foreground'
+                    }`}
+                  />
+                  {showBadge && (
+                    <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center animate-pulse">
+                      {badgeCount}
+                    </span>
+                  )}
+                </div>
                 <span
                   className={`text-[10px] font-semibold transition-colors duration-300 ${
                     isActive ? 'text-primary' : 'text-muted-foreground'

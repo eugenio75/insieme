@@ -200,6 +200,8 @@ const Onboarding = () => {
         : selected.filter((i) => !customIntolerances.includes(i));
       const customs = selected.includes('Nessuna') ? [] : customIntolerances;
       setUser({ intolerances: standardIntolerances, customIntolerances: customs });
+      // Also ensure custom intolerances are in selections for the check
+      if (standardIntolerances.length === 0 && customs.length === 0 && selected.length === 0) return;
     } else if (key === 'objective') {
       setUser({ objective: selected.join(', ') });
     } else if (key === 'difficulty') {

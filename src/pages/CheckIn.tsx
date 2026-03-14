@@ -32,7 +32,7 @@ const CheckIn = () => {
   const [mood, setMood] = useState(0);
   const [energy, setEnergy] = useState(0);
   const [bloating, setBloating] = useState(0);
-  const { weeklyHabits, toggleHabit, addCheckIn } = useAppStore();
+  const { weeklyHabits, toggleHabit, addCheckIn, currentStreak } = useAppStore();
   const navigate = useNavigate();
 
   const handleComplete = () => {
@@ -172,9 +172,29 @@ const CheckIn = () => {
             <h1 className="font-display text-2xl font-semibold text-foreground mb-3">
               Hai fatto quello che potevi oggi.
             </h1>
-            <p className="font-display text-lg text-muted-foreground italic mb-10">
+            <p className="font-display text-lg text-muted-foreground italic mb-6">
               È abbastanza.
             </p>
+
+            {/* Streak celebration */}
+            {currentStreak > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="mb-8 px-6 py-4 rounded-[20px] bg-accent border border-transparent"
+              >
+                <p className="text-accent-foreground font-medium text-lg">
+                  🔥 {currentStreak} {currentStreak === 1 ? 'giorno' : 'giorni'} di fila!
+                </p>
+                {currentStreak === 3 && <p className="text-sm text-primary mt-1">Stai creando un'abitudine 🌱</p>}
+                {currentStreak === 7 && <p className="text-sm text-primary mt-1">Una settimana intera! Sei fantastica ✨</p>}
+                {currentStreak === 14 && <p className="text-sm text-primary mt-1">Due settimane di costanza. Che forza! 💪</p>}
+                {currentStreak === 21 && <p className="text-sm text-primary mt-1">21 giorni: è ufficialmente un'abitudine! 🦋</p>}
+                {currentStreak === 30 && <p className="text-sm text-primary mt-1">Un mese intero. Incredibile! 🌟</p>}
+              </motion.div>
+            )}
+
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={() => navigate('/home')}

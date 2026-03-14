@@ -30,11 +30,19 @@ interface CheckInData {
   habitsCompleted: string[];
 }
 
+interface StreakMilestone {
+  days: number;
+  message: string;
+  icon: string;
+}
+
 interface AppState {
   user: UserProfile;
   weeklyHabits: Habit[];
   checkIns: CheckInData[];
   todayCheckedIn: boolean;
+  currentStreak: number;
+  lastCheckInDate: string | null;
   badges: { from: string; type: string; date: string }[];
   setUser: (u: Partial<UserProfile>) => void;
   completeOnboarding: () => void;
@@ -45,6 +53,7 @@ interface AppState {
   toggleIntolerance: (intolerance: string) => void;
   addCustomIntolerance: (intolerance: string) => void;
   removeCustomIntolerance: (intolerance: string) => void;
+  getStreakMilestone: () => StreakMilestone | null;
 }
 
 const defaultHabits: Habit[] = [
@@ -53,7 +62,28 @@ const defaultHabits: Habit[] = [
   { id: '3', title: 'Niente dolci dopo cena', completed: false, icon: '🌙' },
 ];
 
-export const useAppStore = create<AppState>((set) => ({
+const streakMilestones: StreakMilestone[] = [
+  { days: 3, message: 'Stai creando un\'abitudine 🌱', icon: '🌱' },
+  { days: 7, message: 'Una settimana intera! Sei fantastica ✨', icon: '✨' },
+  { days: 14, message: 'Due settimane di costanza. Che forza! 💪', icon: '💪' },
+  { days: 21, message: '21 giorni: è ufficialmente un\'abitudine! 🦋', icon: '🦋' },
+  { days: 30, message: 'Un mese intero. Incredibile! 🌟', icon: '🌟' },
+  { days: 60, message: '60 giorni di cura di te. Sei un esempio 🌺', icon: '🌺' },
+  { days: 90, message: '90 giorni! Hai trasformato la tua vita 👑', icon: '👑' },
+];
+
+const getDateStr = (d: Date) => d.toISOString().split('T')[0];
+
+const calcStreak = (lastDate: string | null, currentStreak: number): number => {
+  if (!lastDate) return 1;
+  const today = getDateStr(new Date());
+  const yesterday = getDateStr(new Date(Date.now() - 86400000));
+  if (lastDate === today) return currentStreak; // already checked in today
+  if (lastDate === yesterday) return currentStreak + 1; // consecutive
+  return 1; // streak broken, restart
+};
+
+export const useAppStore = create<AppState>((set, get) => ({
   user: {
     name: '',
     objective: '',
@@ -68,6 +98,8 @@ export const useAppStore = create<AppState>((set) => ({
   weeklyHabits: defaultHabits,
   checkIns: [],
   todayCheckedIn: false,
+  currentStreak: 0,
+  lastCheckInDate: null,
   badges: [
     { from: 'Sara', type: 'Brava!', date: new Date().toISOString() },
   ],
@@ -80,7 +112,21 @@ export const useAppStore = create<AppState>((set) => ({
       ),
     })),
   addCheckIn: (data) =>
-    set((s) => ({ checkIns: [...s.checkIns, data], todayCheckedIn: true })),
+    set((s) => {
+      const newStreak = calcStreak(s.lastCheckInDate, s.currentStreak);
+      return {
+        checkIns: [...s.checkIns, data],
+        todayCheckedIn: true,
+        currentStreak: newStreak,
+        lastCheckInDate: getDateStr(new Date()),
+      };
+    }),
+  getStreakMilestone: () => {
+    const { currentStreak } = get();
+    // Find the highest milestone reached
+    const milestone = [...streakMilestones].reverse().find(m => currentStreak >= m.days);
+    return milestone || null;
+  },
   setWeeklyHabits: (habits) => set({ weeklyHabits: habits }),
   addBadge: (badge) => set((s) => ({ badges: [...s.badges, badge] })),
   toggleIntolerance: (intolerance) =>

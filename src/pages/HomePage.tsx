@@ -15,9 +15,10 @@ const encouragements = [
 ];
 
 const HomePage = () => {
-  const { user, weeklyHabits, toggleHabit, todayCheckedIn, badges } = useAppStore();
+  const { user, weeklyHabits, toggleHabit, todayCheckedIn, badges, currentStreak, getStreakMilestone } = useAppStore();
   const completedCount = weeklyHabits.filter((h) => h.completed).length;
   const progress = completedCount / weeklyHabits.length;
+  const milestone = getStreakMilestone();
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -55,6 +56,31 @@ const HomePage = () => {
         >
           <ProgressRing progress={progress} />
         </motion.div>
+
+        {/* Streak Counter */}
+        {currentStreak > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.4 }}
+            className="mt-6 p-4 rounded-[20px] bg-card border border-border shadow-card flex items-center gap-4"
+          >
+            <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center">
+              <span className="text-xl">{milestone?.icon || '🔥'}</span>
+            </div>
+            <div className="flex-1">
+              <div className="flex items-baseline gap-2">
+                <span className="font-display text-2xl font-bold text-foreground">{currentStreak}</span>
+                <span className="text-sm text-muted-foreground">
+                  {currentStreak === 1 ? 'giorno' : 'giorni'} di fila
+                </span>
+              </div>
+              {milestone && (
+                <p className="text-xs text-primary mt-0.5 font-medium">{milestone.message}</p>
+              )}
+            </div>
+          </motion.div>
+        )}
 
         {/* Weekly Habits */}
         <motion.div

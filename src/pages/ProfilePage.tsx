@@ -262,6 +262,15 @@ const ProfilePage = () => {
             mai i dati personali o le note emotive.
           </p>
         </div>
+
+        {/* Logout */}
+        <button
+          onClick={signOut}
+          className="mt-6 w-full p-4 rounded-2xl glass glass-border text-destructive text-sm font-medium flex items-center justify-center gap-2 hover:bg-destructive/5 transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          Esci dall'account
+        </button>
       </motion.div>
 
       <BottomNav />

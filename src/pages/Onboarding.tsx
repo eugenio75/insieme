@@ -138,7 +138,7 @@ const Onboarding = () => {
     setSelectedIntolerances((prev) => prev.filter((i) => i !== intolerance));
   };
 
-  const handleSelect = (value: string) => {
+  const handleSelect = async (value: string) => {
     const currentStep = steps[step];
 
     if (currentStep.multiSelect) {

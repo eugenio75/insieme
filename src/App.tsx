@@ -9,6 +9,7 @@ import CheckIn from "./pages/CheckIn.tsx";
 import WeekPage from "./pages/WeekPage.tsx";
 import TogetherPage from "./pages/TogetherPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
+import NutritionPage from "./pages/NutritionPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();

@@ -76,8 +76,10 @@ const BottomNav = () => {
                     }`}
                   />
                   {showBadge && (
-                    <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center animate-pulse">
-                      {badgeCount}
+                    <span className={`absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold flex items-center justify-center animate-pulse ${
+                      hasSOS ? 'bg-destructive text-destructive-foreground ring-2 ring-destructive/30' : 'bg-destructive text-destructive-foreground'
+                    }`}>
+                      {hasSOS ? '🆘' : badgeCount}
                     </span>
                   )}
                 </div>

@@ -44,21 +44,21 @@ const FastingTimer = () => {
 
         {!status.isActive ? (
           // Not active — show start button
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             <div className="flex-1">
-              <p className="text-sm text-foreground font-medium mb-1">
+              <p className="text-base text-foreground font-medium mb-2">
                 Pronta per iniziare?
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Finestra alimentare: {formatHour(status.eatingWindowStart)} — {formatHour(status.eatingWindowEnd)}
               </p>
             </div>
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={startSession}
-              className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shadow-glow"
+              className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center shadow-glow"
             >
-              <Play className="w-5 h-5 text-primary-foreground ml-0.5" />
+              <Play className="w-6 h-6 text-primary-foreground ml-0.5" />
             </motion.button>
           </div>
         ) : (

@@ -2,13 +2,27 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
 import BottomNav from '../components/BottomNav';
+import { Plus, X } from 'lucide-react';
 
 const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
 
 const ProfilePage = () => {
-  const { user, checkIns, weeklyHabits, toggleIntolerance } = useAppStore();
+  const { user, checkIns, weeklyHabits, toggleIntolerance, addCustomIntolerance, removeCustomIntolerance } = useAppStore();
   const completedHabits = weeklyHabits.filter((h) => h.completed).length;
   const [editingIntolerances, setEditingIntolerances] = useState(false);
+  const [customInput, setCustomInput] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
+
+  const allUserIntolerances = [...user.intolerances, ...user.customIntolerances];
+
+  const handleAddCustom = () => {
+    const trimmed = customInput.trim();
+    if (trimmed && !user.customIntolerances.includes(trimmed) && !user.intolerances.includes(trimmed)) {
+      addCustomIntolerance(trimmed);
+      setCustomInput('');
+      setShowCustomInput(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background pb-24 max-w-lg mx-auto px-6 pt-10">
@@ -45,7 +59,10 @@ const ProfilePage = () => {
             { label: 'Obiettivo', value: user.objective || '—' },
             { label: 'Modalità', value: user.mode === 'together' ? 'Insieme' : 'Da sola' },
             { label: 'Ritmo', value: user.pace || '—' },
+            { label: 'Attività', value: user.activity || '—' },
             { label: 'Difficoltà principale', value: user.difficulty || '—' },
+            { label: 'Età', value: user.age || '—' },
+            { label: 'Genere', value: user.sex || '—' },
           ].map((item) => (
             <div
               key={item.label}
@@ -71,9 +88,9 @@ const ProfilePage = () => {
             </button>
           </div>
 
-          {user.intolerances.length > 0 && !editingIntolerances ? (
+          {allUserIntolerances.length > 0 && !editingIntolerances ? (
             <div className="flex gap-2 flex-wrap">
-              {user.intolerances.map((intolerance) => (
+              {allUserIntolerances.map((intolerance) => (
                 <span
                   key={intolerance}
                   className="px-4 py-2 rounded-full bg-accent text-accent-foreground text-sm font-medium"
@@ -117,6 +134,57 @@ const ProfilePage = () => {
                     </motion.button>
                   );
                 })}
+
+                {/* Custom intolerances */}
+                {user.customIntolerances.map((ci) => (
+                  <div
+                    key={ci}
+                    className="w-full flex items-center justify-between p-4 rounded-[20px] border bg-accent border-primary/40"
+                  >
+                    <span className="text-sm font-medium text-foreground">⚠️ {ci}</span>
+                    <button
+                      onClick={() => removeCustomIntolerance(ci)}
+                      className="w-6 h-6 rounded-full bg-muted flex items-center justify-center"
+                    >
+                      <X className="w-3 h-3 text-muted-foreground" />
+                    </button>
+                  </div>
+                ))}
+
+                {/* Add custom */}
+                {showCustomInput ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={customInput}
+                      onChange={(e) => setCustomInput(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddCustom()}
+                      placeholder="Es: Soia, Uova..."
+                      className="flex-1 px-4 py-3 rounded-[16px] bg-card border border-border text-foreground text-sm
+                        focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                        transition-all duration-300 placeholder:text-muted-foreground/50"
+                      autoFocus
+                    />
+                    <button
+                      onClick={handleAddCustom}
+                      disabled={!customInput.trim()}
+                      className="px-4 py-3 rounded-[16px] bg-primary text-primary-foreground text-sm font-medium
+                        disabled:opacity-40 transition-opacity"
+                    >
+                      Aggiungi
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowCustomInput(true)}
+                    className="w-full flex items-center justify-center gap-2 p-4 rounded-[20px] 
+                      border border-dashed border-muted-foreground/30 text-muted-foreground
+                      hover:border-primary/40 hover:text-foreground transition-all duration-300"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span className="text-sm font-medium">Aggiungi altra sensibilità</span>
+                  </button>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

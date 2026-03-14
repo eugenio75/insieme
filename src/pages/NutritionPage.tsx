@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
 import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } from '../data/foodTips';
+import { getTodayPlan, getWeeklyPlan, Meal, DayPlan } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
-import { ChevronDown, RefreshCw } from 'lucide-react';
+import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 
-type Tab = 'consigli' | 'ricette' | 'gonfiore';
+type Tab = 'piano' | 'consigli' | 'ricette' | 'gonfiore';
 
 const antiBloatingGuide = [
   { title: 'Mangia lentamente', description: 'Posa la forchetta tra un boccone e l\'altro. Aiuta a ridurre l\'aria ingerita.', icon: '🧘‍♀️' },
@@ -124,15 +125,86 @@ const TipCard = ({ tip, delay = 0 }: { tip: FoodTip; delay?: number }) => (
   </motion.div>
 );
 
+const MealCard = ({ meal, delay = 0 }: { meal: Meal; delay?: number }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 12 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay }}
+    className="p-5 rounded-[24px] bg-card border border-border"
+  >
+    <div className="flex items-start gap-4">
+      <div className="flex flex-col items-center gap-1">
+        <span className="text-2xl">{meal.icon}</span>
+        <span className="text-[10px] text-muted-foreground font-medium">{meal.typeLabel}</span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <h4 className="text-sm font-medium text-foreground mb-1">{meal.title}</h4>
+        <p className="text-sm text-muted-foreground">{meal.description}</p>
+        {meal.simpleVariant && <SimpleVariantBadge variant={meal.simpleVariant} />}
+        {meal.ingredients && meal.ingredients.length > 0 && (
+          <SubstitutionPanel ingredients={meal.ingredients} />
+        )}
+      </div>
+    </div>
+  </motion.div>
+);
+
+const DaySelector = ({
+  weekPlan,
+  selectedDay,
+  onSelectDay,
+}: {
+  weekPlan: DayPlan[];
+  selectedDay: number;
+  onSelectDay: (idx: number) => void;
+}) => {
+  const today = new Date().getDay();
+  const todayIdx = today === 0 ? 6 : today - 1;
+
+  return (
+    <div className="flex gap-1.5 mb-6 overflow-x-auto pb-1">
+      {weekPlan.map((day, idx) => {
+        const isToday = idx === todayIdx;
+        const isSelected = idx === selectedDay;
+        return (
+          <button
+            key={day.day}
+            onClick={() => onSelectDay(idx)}
+            className={`flex flex-col items-center px-3 py-2.5 rounded-2xl min-w-[52px] transition-all duration-300
+              ${isSelected
+                ? 'bg-primary text-primary-foreground'
+                : isToday
+                  ? 'bg-accent text-accent-foreground'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+              }`}
+          >
+            <span className="text-[10px] font-medium">{day.dayShort}</span>
+            {isToday && !isSelected && (
+              <span className="w-1 h-1 rounded-full bg-primary mt-0.5" />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
 const NutritionPage = () => {
   const { user } = useAppStore();
-  const [activeTab, setActiveTab] = useState<Tab>('consigli');
+  const [activeTab, setActiveTab] = useState<Tab>('piano');
+
+  const today = new Date().getDay();
+  const todayIdx = today === 0 ? 6 : today - 1;
+  const [selectedDay, setSelectedDay] = useState(todayIdx);
 
   const dailyTip = getDailyTip(user.objective, user.difficulty, user.intolerances);
   const intoleranceTips = getIntoleranceTips(user.intolerances);
   const allRecipes = getAllRecipes();
+  const weekPlan = getWeeklyPlan(user.objective, user.activity, user.sex, user.age);
+  const selectedDayPlan = weekPlan[selectedDay];
 
   const tabs: { key: Tab; label: string }[] = [
+    { key: 'piano', label: '📋 Piano' },
     { key: 'consigli', label: 'Per te' },
     { key: 'ricette', label: 'Idee' },
     { key: 'gonfiore', label: 'Anti-gonfiore' },
@@ -153,12 +225,12 @@ const NutritionPage = () => {
         </p>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-8">
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-1">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300
+              className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap
                 ${activeTab === tab.key
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-muted text-muted-foreground'
@@ -168,6 +240,60 @@ const NutritionPage = () => {
             </button>
           ))}
         </div>
+
+        {/* Piano settimanale */}
+        {activeTab === 'piano' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* Info banner */}
+            <div className="p-4 rounded-[20px] bg-accent border border-transparent mb-5">
+              <p className="text-sm text-accent-foreground/80 italic font-display">
+                "Non è una dieta. Sono idee per mangiare bene, con quello che hai. Cambia tutto quello che vuoi." 💛
+              </p>
+            </div>
+
+            <DaySelector
+              weekPlan={weekPlan}
+              selectedDay={selectedDay}
+              onSelectDay={setSelectedDay}
+            />
+
+            {selectedDayPlan && (
+              <div className="space-y-3">
+                <h3 className="font-display text-base font-medium text-foreground">
+                  {selectedDayPlan.day}
+                  {selectedDay === todayIdx && (
+                    <span className="ml-2 text-xs text-primary font-normal">• oggi</span>
+                  )}
+                </h3>
+                {selectedDayPlan.meals.map((meal, i) => (
+                  <MealCard key={meal.type} meal={meal} delay={i * 0.06} />
+                ))}
+              </div>
+            )}
+
+            {/* Navigation arrows */}
+            <div className="flex justify-between mt-6">
+              <button
+                onClick={() => setSelectedDay(Math.max(0, selectedDay - 1))}
+                disabled={selectedDay === 0}
+                className="flex items-center gap-1 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm disabled:opacity-30 transition-opacity"
+              >
+                <ChevronLeft className="w-4 h-4" /> Giorno prima
+              </button>
+              <button
+                onClick={() => setSelectedDay(Math.min(6, selectedDay + 1))}
+                disabled={selectedDay === 6}
+                className="flex items-center gap-1 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm disabled:opacity-30 transition-opacity"
+              >
+                Giorno dopo <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
 
         {activeTab === 'consigli' && (
           <motion.div

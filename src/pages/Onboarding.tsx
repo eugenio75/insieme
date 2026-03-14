@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { Plus, X } from 'lucide-react';
+import { useProfile } from '@/hooks/useProfile';
 
 const steps = [
   {

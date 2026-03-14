@@ -10,6 +10,9 @@ interface UserProfile {
   onboarded: boolean;
   partnerName?: string;
   intolerances: string[];
+  customIntolerances: string[];
+  age?: string;
+  sex?: string;
 }
 
 interface Habit {

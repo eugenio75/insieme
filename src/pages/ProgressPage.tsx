@@ -361,6 +361,12 @@ const ProgressPage = () => {
               )}
             </motion.div>
           )}
+
+          {activeTab === 'digiuno' && (
+            <motion.div key="digiuno" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <FastingReport getStats={getFastingStats} />
+            </motion.div>
+          )}
         </AnimatePresence>
       </motion.div>
 

@@ -68,6 +68,39 @@ export type Database = {
         }
         Relationships: []
       }
+      fasting_sessions: {
+        Row: {
+          completed: boolean
+          created_at: string
+          ended_at: string | null
+          id: string
+          protocol: string
+          started_at: string
+          target_hours: number
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          protocol?: string
+          started_at?: string
+          target_hours?: number
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          protocol?: string
+          started_at?: string
+          target_hours?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       invites: {
         Row: {
           accepted_by: string | null
@@ -121,6 +154,10 @@ export type Database = {
           current_streak: number | null
           custom_intolerances: string[] | null
           difficulty: string | null
+          fasting_enabled: boolean
+          fasting_hours: number | null
+          fasting_protocol: string | null
+          fasting_start_hour: number | null
           id: string
           intolerances: string[] | null
           last_check_in_date: string | null
@@ -141,6 +178,10 @@ export type Database = {
           current_streak?: number | null
           custom_intolerances?: string[] | null
           difficulty?: string | null
+          fasting_enabled?: boolean
+          fasting_hours?: number | null
+          fasting_protocol?: string | null
+          fasting_start_hour?: number | null
           id?: string
           intolerances?: string[] | null
           last_check_in_date?: string | null
@@ -161,6 +202,10 @@ export type Database = {
           current_streak?: number | null
           custom_intolerances?: string[] | null
           difficulty?: string | null
+          fasting_enabled?: boolean
+          fasting_hours?: number | null
+          fasting_protocol?: string | null
+          fasting_start_hour?: number | null
           id?: string
           intolerances?: string[] | null
           last_check_in_date?: string | null

@@ -27,6 +27,7 @@ const HomePage = () => {
   };
 
   const todayMessage = encouragements[new Date().getDay() % encouragements.length];
+  const dailyTip = getDailyTip(user.objective, user.difficulty, user.intolerances);
 
   return (
     <div className="min-h-screen bg-background pb-24 max-w-lg mx-auto">

@@ -250,6 +250,8 @@ const HomePage = () => {
           </Link>
         </motion.div>
 
+        {/* Fasting Suggestion — gentle weekly nudge */}
+        <FastingSuggestion />
 
         {/* Together Card */}
         {user.mode === 'together' && (

@@ -118,7 +118,7 @@ const HomePage = () => {
           transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
         >
           <h1 className="font-display text-3xl text-foreground">
-            {greeting()}, {user.name || 'cara'} ☀️
+            {greeting()}{user.name ? `, ${user.name}` : ''} ☀️
           </h1>
         </motion.div>
 

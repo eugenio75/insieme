@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { getDailyTip } from '@/data/foodTips';
 import { PenLine } from 'lucide-react';
 import FastingTimer from '@/components/FastingTimer';
+import FastingSuggestion from '@/components/FastingSuggestion';
 
 const fallbackMessages = [
   'Impara dal tuo corpo, con la gentilezza che meriti. 🌿',
@@ -249,6 +250,8 @@ const HomePage = () => {
           </Link>
         </motion.div>
 
+        {/* Fasting Suggestion — gentle weekly nudge */}
+        <FastingSuggestion />
 
         {/* Together Card */}
         {user.mode === 'together' && (

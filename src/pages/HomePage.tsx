@@ -33,6 +33,27 @@ const HomePage = () => {
 
   const [aiMessage, setAiMessage] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState(true);
+  const [sosCoach, setSosCoach] = useState<{ message: string; actionTips: string[] } | null>(null);
+
+  // Load SOS coach response from localStorage (expires after 24h)
+  useEffect(() => {
+    const stored = localStorage.getItem(SOS_COACH_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
+          setSosCoach(parsed);
+        } else {
+          localStorage.removeItem(SOS_COACH_KEY);
+        }
+      } catch { localStorage.removeItem(SOS_COACH_KEY); }
+    }
+  }, []);
+
+  const dismissSosCoach = () => {
+    setSosCoach(null);
+    localStorage.removeItem(SOS_COACH_KEY);
+  };
 
   const dailyTip = getDailyTip(user.objective, user.difficulty, user.intolerances);
 

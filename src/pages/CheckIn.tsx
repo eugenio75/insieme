@@ -95,6 +95,8 @@ const CheckIn = () => {
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [alreadyLoggedSleep, setAlreadyLoggedSleep] = useState(false);
+  const [coachMessage, setCoachMessage] = useState<{ message: string; actionTips: string[]; tone: string } | null>(null);
+  const [coachLoading, setCoachLoading] = useState(false);
   const { addCheckIn, currentStreak, user } = useAppStore();
   const { user: authUser } = useAuth();
   const navigate = useNavigate();

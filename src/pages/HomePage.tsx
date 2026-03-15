@@ -159,6 +159,47 @@ const HomePage = () => {
           </div>
         </motion.div>
 
+        {/* SOS Coach Response */}
+        <AnimatePresence>
+          {sosCoach && (
+            <motion.div
+              initial={{ opacity: 0, y: 16, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.97 }}
+              transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+              className="mt-5"
+            >
+              <div className="relative p-5 rounded-2xl bg-primary/5 border-2 border-primary/20 overflow-hidden">
+                <button
+                  onClick={dismissSosCoach}
+                  className="absolute top-3 right-3 w-7 h-7 rounded-full bg-muted/60 flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+                <div className="flex items-start gap-3 pr-6">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-lg">💛</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] text-primary btn-text mb-1">IL TUO COACH È CON TE</p>
+                    <p className="text-sm text-foreground leading-relaxed">{sosCoach.message}</p>
+                    {sosCoach.actionTips?.length > 0 && (
+                      <div className="mt-3 space-y-1.5">
+                        {sosCoach.actionTips.map((tip, i) => (
+                          <div key={i} className="flex items-start gap-2">
+                            <span className="text-primary text-xs mt-0.5">•</span>
+                            <p className="text-xs text-muted-foreground">{tip}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Fasting Timer */}
         <FastingTimer />
 

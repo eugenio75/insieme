@@ -95,6 +95,18 @@ const TogetherPage = () => {
       toast.success('Richiesta inviata ai tuoi supporter 💛');
       setSosMessage('');
       setShowSOS(false);
+
+      // Trigger AI Coach for immediate support
+      try {
+        const { data, error } = await supabase.functions.invoke('ai-coach', {
+          body: { trigger: 'sos' },
+        });
+        if (data && !error) {
+          setCoachResponse(data);
+        }
+      } catch (e) {
+        console.error('AI coach error after SOS:', e);
+      }
     } else {
       toast.error(result.error || 'Errore');
     }

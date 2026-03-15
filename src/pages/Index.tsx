@@ -49,7 +49,7 @@ const Index = () => {
           Insieme
         </h1>
         <p className="font-display text-lg text-muted-foreground italic mb-10 leading-relaxed">
-          Un passo alla volta,<br />
+          Impara dal tuo corpo,<br />
           con la gentilezza che meriti.
         </p>
         <motion.button

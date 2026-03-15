@@ -13,7 +13,7 @@ import { PenLine } from 'lucide-react';
 import FastingTimer from '@/components/FastingTimer';
 
 const fallbackMessages = [
-  'Un passo alla volta, con la gentilezza che meriti. 🌿',
+  'Impara dal tuo corpo, con la gentilezza che meriti. 🌿',
   'Oggi basta un piccolo passo. Sei già abbastanza.',
   'Non serve perfezione, serve continuità.',
   'Ogni giorno è un\'opportunità, non un obbligo.',

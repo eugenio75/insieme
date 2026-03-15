@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN work_type text NULL DEFAULT '';

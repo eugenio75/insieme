@@ -92,15 +92,15 @@ const FastingTimer = () => {
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
-                <span className={`w-2 h-2 rounded-full ${status.isFasting ? 'bg-primary animate-pulse' : 'bg-secondary'}`} />
+                <span className={`w-2 h-2 rounded-full ${status.isFasting ? 'bg-primary animate-pulse' : 'bg-secondary animate-pulse'}`} />
                 <span className="text-sm font-medium text-foreground">
-                  {status.isFasting ? 'In digiuno' : 'Finestra alimentare'}
+                  {status.isFasting ? 'Periodo di digiuno' : 'Finestra alimentare'}
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mb-3">
                 {status.isFasting
-                  ? `${formatTime(status.elapsedMinutes)} su ${config.fastingHours}h`
-                  : 'Hai completato il digiuno! 🎉'}
+                  ? `${formatTime(status.elapsedMinutes)} di ${Math.floor(status.targetMinutes / 60)}h completati`
+                  : `${formatTime(status.elapsedMinutes)} di ${Math.floor(status.targetMinutes / 60)}h — puoi mangiare 🍽️`}
               </p>
 
               <AnimatePresence mode="wait">

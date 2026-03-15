@@ -28,13 +28,6 @@ interface WeeklyData {
   created_at: string;
 }
 
-interface FoodFinding {
-  food: string;
-  issue: string;
-  correlation: number;
-  description: string;
-  icon: string;
-}
 
 const ProgressPage = () => {
   const [data, setData] = useState<WeeklyData[]>([]);

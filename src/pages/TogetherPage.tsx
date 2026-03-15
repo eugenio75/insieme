@@ -4,8 +4,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTogether } from '@/hooks/useTogether';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
-import { Copy, Check, UserPlus, Send, Heart, ArrowRight, MessageCircle } from 'lucide-react';
+import { Copy, Check, UserPlus, Send, Heart, ArrowRight, MessageCircle, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const badgeOptions = [
   { label: 'Brava! 👏', type: 'Brava!' },

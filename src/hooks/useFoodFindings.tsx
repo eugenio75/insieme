@@ -10,9 +10,63 @@ export interface FoodFinding {
   icon: string;
 }
 
+export interface Pattern {
+  type: string;
+  title: string;
+  description: string;
+  icon: string;
+  correlation: number;
+  actionTip: string;
+}
+
+export interface DietSuggestion {
+  type: 'add' | 'reduce' | 'replace' | 'timing';
+  category: string;
+  suggestion: string;
+  reason: string;
+  priority: 'alta' | 'media' | 'bassa';
+}
+
+export interface PatternAnalysis {
+  patterns: Pattern[];
+  foodFindings: FoodFinding[];
+  dietSuggestions: DietSuggestion[];
+  confidence: string;
+  dataPoints: number;
+  message?: string;
+  nextAnalysisIn?: number;
+}
+
 /**
- * Hook that fetches food analysis findings (cached per session).
- * Returns problematic foods that should be flagged in the meal plan.
+ * Hook that fetches pattern analysis (cached per session).
+ */
+export const usePatternAnalysis = () => {
+  const [analysis, setAnalysis] = useState<PatternAnalysis | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const { user } = useAuth();
+
+  const load = async () => {
+    if (!user || loaded) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('pattern-analysis');
+      if (error) throw error;
+      setAnalysis(data);
+    } catch (e) {
+      console.error('Error fetching pattern analysis:', e);
+      setAnalysis({ patterns: [], foodFindings: [], dietSuggestions: [], confidence: '', dataPoints: 0, message: 'Errore nel caricamento.' });
+    } finally {
+      setLoading(false);
+      setLoaded(true);
+    }
+  };
+
+  return { analysis, loading, load, loaded };
+};
+
+/**
+ * Hook for food findings only (backward compatible).
  */
 export const useFoodFindings = () => {
   const [findings, setFindings] = useState<FoodFinding[]>([]);
@@ -24,10 +78,12 @@ export const useFoodFindings = () => {
 
     const fetch = async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('food-analysis');
+        const { data, error } = await supabase.functions.invoke('pattern-analysis');
         if (error) throw error;
-        if (data?.findings) {
-          // Only keep findings with moderate+ correlation
+        if (data?.foodFindings) {
+          setFindings(data.foodFindings.filter((f: FoodFinding) => f.correlation >= 0.4));
+        } else if (data?.findings) {
+          // Backward compat with old food-analysis
           setFindings(data.findings.filter((f: FoodFinding) => f.correlation >= 0.4));
         }
       } catch (e) {
@@ -39,16 +95,11 @@ export const useFoodFindings = () => {
     fetch();
   }, [user]);
 
-  /**
-   * Check if a meal title or description contains a problematic food.
-   * Returns the finding if found, null otherwise.
-   */
   const checkMeal = (title: string, description: string): FoodFinding | null => {
     const text = `${title} ${description}`.toLowerCase();
     for (const f of findings) {
       const foodLower = f.food.toLowerCase();
       if (text.includes(foodLower)) return f;
-      // Also check common aliases
       const aliases: Record<string, string[]> = {
         'latticini': ['yogurt', 'formaggio', 'parmigiano', 'mozzarella', 'latte', 'ricotta', 'pecorino', 'burro'],
         'pane': ['pane', 'panino', 'fette biscottate'],

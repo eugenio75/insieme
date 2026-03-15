@@ -46,6 +46,8 @@ export type Database = {
           foods_eaten: string[] | null
           id: string
           mood: number
+          sleep_hours: number | null
+          stress: number | null
           user_id: string
         }
         Insert: {
@@ -55,6 +57,8 @@ export type Database = {
           foods_eaten?: string[] | null
           id?: string
           mood: number
+          sleep_hours?: number | null
+          stress?: number | null
           user_id: string
         }
         Update: {
@@ -64,6 +68,8 @@ export type Database = {
           foods_eaten?: string[] | null
           id?: string
           mood?: number
+          sleep_hours?: number | null
+          stress?: number | null
           user_id?: string
         }
         Relationships: []

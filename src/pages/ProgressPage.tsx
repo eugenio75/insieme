@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAppStore } from '@/store/useAppStore';
 import { analyzeProgress, Adjustment } from '@/data/adaptationLogic';
 import { useFasting } from '@/hooks/useFasting';
+import { usePatternAnalysis, type Pattern, type FoodFinding, type DietSuggestion } from '@/hooks/useFoodFindings';
 import BottomNav from '@/components/BottomNav';
 import AppHeader from '@/components/AppHeader';
 import {

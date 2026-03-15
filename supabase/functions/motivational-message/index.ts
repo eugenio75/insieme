@@ -38,16 +38,19 @@ serve(async (req) => {
     // Fetch profile
     const { data: profile } = await supabase
       .from("profiles")
-      .select("name, objective, current_streak, difficulty")
+      .select("name, objective, current_streak, difficulty, sex")
       .eq("user_id", user.id)
       .single();
 
-    const name = profile?.name || "cara";
+    const name = profile?.name || "";
+    const sex = profile?.sex || "";
     const streak = profile?.current_streak || 0;
     const objective = profile?.objective || "";
+    const isMale = sex === "maschio" || sex === "male" || sex === "M";
+    const salutation = name ? (isMale ? `caro ${name}` : `cara ${name}`) : (isMale ? "caro" : "cara");
 
     // Build context
-    let context = `L'utente si chiama ${name}.`;
+    let context = `L'utente si chiama ${name || "utente"} (${isMale ? "maschio" : "femmina"}).`;
     if (objective) context += ` Il suo obiettivo è: ${objective}.`;
     if (streak > 0) context += ` Ha uno streak di ${streak} giorni consecutivi.`;
 

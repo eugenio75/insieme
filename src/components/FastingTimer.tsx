@@ -80,12 +80,10 @@ const FastingTimer = () => {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-xl font-bold text-foreground">
-                  {status.isFasting
-                    ? formatTime(status.remainingMinutes)
-                    : '✅'}
+                  {formatTime(status.remainingMinutes)}
                 </span>
                 <span className="text-[10px] text-muted-foreground mt-0.5">
-                  {status.isFasting ? 'rimasti' : 'completato!'}
+                  {status.isFasting ? 'al pasto' : 'al digiuno'}
                 </span>
               </div>
             </div>

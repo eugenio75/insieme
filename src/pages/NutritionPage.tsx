@@ -207,7 +207,15 @@ const NutritionPage = () => {
   const { user } = useAppStore();
   const [activeTab, setActiveTab] = useState<Tab>('piano');
   const { checkMeal } = useFoodFindings();
+  const { analysis, load: loadPatterns, loaded: patternsLoaded } = usePatternAnalysis();
   const { config: fastingConfig, getStatus } = useFasting();
+
+  // Load patterns when component mounts
+  useEffect(() => {
+    if (!patternsLoaded) loadPatterns();
+  }, [patternsLoaded]);
+
+  const dietSuggestions = analysis?.dietSuggestions || [];
 
   const today = new Date().getDay();
   const todayIdx = today === 0 ? 6 : today - 1;

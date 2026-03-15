@@ -30,6 +30,7 @@ const TogetherPage = () => {
   const [sosMessage, setSosMessage] = useState('');
   const [showSOS, setShowSOS] = useState(false);
   const [sendingSOS, setSendingSOS] = useState(false);
+  const [coachResponse, setCoachResponse] = useState<{ message: string; actionTips: string[]; tone: string } | null>(null);
 
   const loadBadges = useCallback(async () => {
     const badges = await getReceivedBadges();

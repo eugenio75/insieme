@@ -34,11 +34,7 @@ const ProgressPage = () => {
   const [adjustments, setAdjustments] = useState<Adjustment[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'charts' | 'adjustments' | 'scoperte' | 'digiuno'>('charts');
-  const [findings, setFindings] = useState<FoodFinding[]>([]);
-  const [findingsLoading, setFindingsLoading] = useState(false);
-  const [findingsConfidence, setFindingsConfidence] = useState<string>('');
-  const [findingsDataPoints, setFindingsDataPoints] = useState(0);
-  const [findingsMessage, setFindingsMessage] = useState<string>('');
+  const { analysis, loading: patternLoading, load: loadPatterns, loaded: patternsLoaded } = usePatternAnalysis();
   const { user: authUser } = useAuth();
   const { user } = useAppStore();
   const { config: fastingConfig, getStats: getFastingStats } = useFasting();
@@ -70,29 +66,12 @@ const ProgressPage = () => {
     load();
   }, [authUser, user.objective]);
 
-  // Load food analysis when tab is selected
+  // Load pattern analysis when tab is selected
   useEffect(() => {
-    if (activeTab !== 'scoperte' || !authUser || findingsLoading) return;
-    if (findings.length > 0 || findingsMessage) return; // already loaded
-
-    const loadFindings = async () => {
-      setFindingsLoading(true);
-      try {
-        const { data, error } = await supabase.functions.invoke('food-analysis');
-        if (error) throw error;
-        if (data?.findings) setFindings(data.findings);
-        if (data?.confidence) setFindingsConfidence(data.confidence);
-        if (data?.dataPoints) setFindingsDataPoints(data.dataPoints);
-        if (data?.message) setFindingsMessage(data.message);
-      } catch (e) {
-        console.error('Error loading food analysis:', e);
-        setFindingsMessage('Errore nel caricamento dell\'analisi.');
-      } finally {
-        setFindingsLoading(false);
-      }
-    };
-    loadFindings();
-  }, [activeTab, authUser]);
+    if (activeTab === 'scoperte' && !patternsLoaded) {
+      loadPatterns();
+    }
+  }, [activeTab, patternsLoaded]);
 
   const chartData = data.map((d) => ({
     name: `S${d.week_number}`,

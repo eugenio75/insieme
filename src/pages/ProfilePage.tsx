@@ -70,6 +70,7 @@ const ProfilePage = () => {
             { label: 'Peso', value: user.weight ? `${user.weight} kg` : '—', editable: true },
             { label: 'Ritmo', value: user.pace || '—' },
             { label: 'Attività', value: user.activity || '—' },
+            { label: 'Lavoro', value: user.workType || '—' },
             { label: 'Difficoltà principale', value: user.difficulty || '—' },
             { label: 'Età', value: user.age || '—' },
             { label: 'Genere', value: user.sex || '—' },

@@ -83,7 +83,9 @@ PROFILO UTENTE:
 - Sesso: ${profile?.sex || 'non specificato'}
 - Età: ${profile?.age || 'non specificata'}
 - Attività fisica: ${profile?.activity || 'non specificata'}
+- Tipo di lavoro: ${(profile as any)?.work_type || 'non specificato'}
 - Obiettivo: ${profile?.objective || 'benessere generale'}
+- Difficoltà: ${profile?.difficulty || 'non specificata'}
 - Intolleranze certificate: ${(profile?.intolerances || []).join(', ') || 'nessuna'}
 - Sensibilità personalizzate: ${(profile?.custom_intolerances || []).join(', ') || 'nessuna'}
 

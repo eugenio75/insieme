@@ -148,7 +148,7 @@ export const useFasting = () => {
   const getStatus = useCallback((): FastingStatus => {
     const eatingHours = 24 - config.fastingHours;
     const eatingStart = (config.startHour + config.fastingHours) % 24;
-    const eatingEnd = (eatingStart + eatingHours) % 24;
+    const eatingEnd = config.startHour; // eating ends when fasting starts
 
     if (!activeSession) {
       return {
@@ -164,21 +164,46 @@ export const useFasting = () => {
       };
     }
 
-    const started = new Date(activeSession.started_at).getTime();
-    const now = Date.now();
-    const elapsedMs = now - started;
-    const elapsedMin = Math.floor(elapsedMs / 60000);
-    const targetMin = activeSession.target_hours * 60;
-    const remainingMin = Math.max(0, targetMin - elapsedMin);
-    const progress = Math.min(1, elapsedMin / targetMin);
+    // Determine current phase based on clock time relative to config
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const fastingStartMin = config.startHour * 60;
+    const fastingDurationMin = config.fastingHours * 60;
+    const eatingDurationMin = eatingHours * 60;
+
+    // Minutes since fasting start (handles midnight wrap)
+    let minSinceFastingStart = currentMinutes - fastingStartMin;
+    if (minSinceFastingStart < 0) minSinceFastingStart += 1440;
+
+    let inFasting: boolean;
+    let remainingMin: number;
+    let totalPhaseMin: number;
+    let elapsedMin: number;
+
+    if (minSinceFastingStart < fastingDurationMin) {
+      // Currently in fasting phase
+      inFasting = true;
+      elapsedMin = minSinceFastingStart;
+      remainingMin = fastingDurationMin - minSinceFastingStart;
+      totalPhaseMin = fastingDurationMin;
+    } else {
+      // Currently in eating phase
+      inFasting = false;
+      const minSinceEatingStart = minSinceFastingStart - fastingDurationMin;
+      elapsedMin = minSinceEatingStart;
+      remainingMin = eatingDurationMin - minSinceEatingStart;
+      totalPhaseMin = eatingDurationMin;
+    }
+
+    const progress = Math.min(1, elapsedMin / totalPhaseMin);
 
     return {
       isActive: true,
-      isFasting: remainingMin > 0,
+      isFasting: inFasting,
       currentSession: activeSession,
       elapsedMinutes: elapsedMin,
-      remainingMinutes: remainingMin,
-      targetMinutes: targetMin,
+      remainingMinutes: Math.max(0, remainingMin),
+      targetMinutes: totalPhaseMin,
       eatingWindowStart: eatingStart,
       eatingWindowEnd: eatingEnd,
       progress,

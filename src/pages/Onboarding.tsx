@@ -73,6 +73,18 @@ const steps = [
     ],
   },
   {
+    question: 'Che tipo di lavoro fai?',
+    subtitle: 'Ci aiuta a calibrare il piano alimentare.',
+    key: 'workType',
+    multiSelect: false,
+    options: [
+      { label: 'Sedentario (ufficio, smart working)', icon: '💻' },
+      { label: 'In piedi (negozio, ospedale, scuola)', icon: '🧑‍⚕️' },
+      { label: 'Fisico (manuale, sport, cantiere)', icon: '🔨' },
+      { label: 'Misto', icon: '🔄' },
+    ],
+  },
+  {
     question: 'Qual è la difficoltà più grande per te?',
     subtitle: 'Puoi sceglierne più di una, ci aiuta a tarare obiettivi e dieta.',
     key: 'difficulty',

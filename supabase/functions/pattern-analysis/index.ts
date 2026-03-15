@@ -36,7 +36,7 @@ serve(async (req) => {
     // Fetch user profile for context
     const { data: profile } = await supabase
       .from("profiles")
-      .select("objective, age, sex, activity, intolerances, custom_intolerances")
+      .select("objective, age, sex, activity, intolerances, custom_intolerances, work_type, difficulty")
       .eq("user_id", user.id)
       .single();
 
@@ -83,14 +83,19 @@ PROFILO UTENTE:
 - Sesso: ${profile?.sex || 'non specificato'}
 - Età: ${profile?.age || 'non specificata'}
 - Attività fisica: ${profile?.activity || 'non specificata'}
+- Tipo di lavoro: ${(profile as any)?.work_type || 'non specificato'}
 - Obiettivo: ${profile?.objective || 'benessere generale'}
+- Difficoltà: ${profile?.difficulty || 'non specificata'}
 - Intolleranze certificate: ${(profile?.intolerances || []).join(', ') || 'nessuna'}
 - Sensibilità personalizzate: ${(profile?.custom_intolerances || []).join(', ') || 'nessuna'}
 
 LINEE GUIDA NUTRIZIONALI OBBLIGATORIE:
 - I suggerimenti devono SEMPRE rispettare le intolleranze e sensibilità dell'utente
 - MAI suggerire cibi che contengono allergeni o intolleranze dichiarate
-- Adattare le porzioni e il fabbisogno in base a sesso, età e livello di attività:
+- Adattare le porzioni e il fabbisogno in base a sesso, età, livello di attività E tipo di lavoro:
+  * Lavoro sedentario: più pause attive, spuntini leggeri, attenzione a non eccedere con carboidrati semplici
+  * Lavoro in piedi: più idratazione, spuntini energetici, supporto per gambe e circolazione
+  * Lavoro fisico: più carboidrati complessi, proteine per recupero muscolare, pasti più sostanziosi
   * Donna sedentaria: ~1600-1800 kcal, più ferro e calcio
   * Donna attiva: ~2000-2200 kcal, più proteine per recupero
   * Uomo sedentario: ~2000-2200 kcal

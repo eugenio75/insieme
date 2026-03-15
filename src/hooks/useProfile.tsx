@@ -32,6 +32,7 @@ export const useProfile = () => {
           sex: data.sex || '',
           partnerName: data.partner_name || '',
           weight: (data as any).weight ? String((data as any).weight) : '',
+          workType: (data as any).work_type || '',
           onboarded: !!(data.objective && data.name),
         });
         setTimeout(() => refreshWeeklyHabits(), 0);
@@ -61,6 +62,7 @@ export const useProfile = () => {
         sex: state.sex,
         partner_name: state.partnerName || '',
         weight: state.weight ? parseFloat(state.weight) : null,
+        work_type: state.workType || '',
       } as any)
       .eq('user_id', user.id);
   };

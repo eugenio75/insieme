@@ -15,6 +15,7 @@ interface UserProfile {
   age?: string;
   sex?: string;
   weight?: string;
+  workType?: string;
 }
 
 interface Habit {

@@ -38,16 +38,19 @@ serve(async (req) => {
     // Fetch profile
     const { data: profile } = await supabase
       .from("profiles")
-      .select("name, objective, current_streak, difficulty")
+      .select("name, objective, current_streak, difficulty, sex")
       .eq("user_id", user.id)
       .single();
 
-    const name = profile?.name || "cara";
+    const name = profile?.name || "";
+    const sex = profile?.sex || "";
     const streak = profile?.current_streak || 0;
     const objective = profile?.objective || "";
+    const isMale = sex === "maschio" || sex === "male" || sex === "M";
+    const salutation = name ? (isMale ? `caro ${name}` : `cara ${name}`) : (isMale ? "caro" : "cara");
 
     // Build context
-    let context = `L'utente si chiama ${name}.`;
+    let context = `L'utente si chiama ${name || "utente"} (${isMale ? "maschio" : "femmina"}).`;
     if (objective) context += ` Il suo obiettivo è: ${objective}.`;
     if (streak > 0) context += ` Ha uno streak di ${streak} giorni consecutivi.`;
 
@@ -73,10 +76,12 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `Sei un coach gentile e motivazionale per un'app di benessere femminile. 
-Genera UN SOLO messaggio motivazionale breve (max 2 frasi) personalizzato in base ai dati dell'utente.
-Il tono deve essere caldo, incoraggiante, mai giudicante. Come una migliore amica che ti sostiene.
+            content: `Sei un coach gentile e motivazionale per un'app di benessere. 
+Genera UN SOLO messaggio motivazionale breve (max 2 frasi) personalizzato.
+Rivolgiti all'utente come "${salutation}".
+Il tono deve essere caldo, incoraggiante, mai giudicante. Come un/una migliore amico/a che ti sostiene.
 Non usare emoji eccessive. Max 1-2 emoji. Non mettere virgolette.
+Usa il genere corretto (${isMale ? "maschile" : "femminile"}) per aggettivi e participi.
 Rispondi SOLO con il messaggio, nient'altro.`,
           },
           { role: "user", content: context },

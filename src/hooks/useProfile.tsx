@@ -62,6 +62,7 @@ export const useProfile = () => {
         sex: state.sex,
         partner_name: state.partnerName || '',
         weight: state.weight ? parseFloat(state.weight) : null,
+        work_type: state.workType || '',
       } as any)
       .eq('user_id', user.id);
   };

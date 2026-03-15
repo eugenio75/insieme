@@ -269,56 +269,81 @@ const ProgressPage = () => {
               {/* Header explanation */}
               <div className="p-4 rounded-2xl bg-accent glass-border">
                 <p className="text-sm text-accent-foreground/80 italic font-display">
-                  "Analizziamo cosa mangi e come ti senti per capire quali cibi funzionano meglio per te." 🔬
+                  "Analizziamo i tuoi dati per capire cosa funziona meglio per il tuo corpo." 🔬
                 </p>
               </div>
 
-              {findingsLoading ? (
+              {patternLoading ? (
                 <div className="flex flex-col items-center py-12">
                   <motion.span className="text-4xl mb-4" animate={{ rotate: [0, 360] }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>🔍</motion.span>
-                  <p className="text-sm text-muted-foreground">Analizzo i tuoi dati...</p>
+                  <p className="text-sm text-muted-foreground">Analizzo i tuoi pattern...</p>
                 </div>
-              ) : findings.length > 0 ? (
+              ) : analysis && (analysis.patterns.length > 0 || analysis.foodFindings.length > 0) ? (
                 <>
                   {/* Confidence indicator */}
                   <div className="flex items-center justify-between px-1">
                     <p className="text-xs text-muted-foreground">
-                      Basato su <span className="font-medium text-foreground">{findingsDataPoints}</span> check-in
+                      Basato su <span className="font-medium text-foreground">{analysis.dataPoints}</span> check-in
                     </p>
-                    <span className={`text-xs font-medium ${confidenceColor(findingsConfidence)}`}>
-                      Confidenza: {findingsConfidence}
+                    <span className={`text-xs font-medium ${confidenceColor(analysis.confidence)}`}>
+                      Confidenza: {analysis.confidence}
                     </span>
                   </div>
 
-                  {/* Findings */}
-                  {findings.map((finding, i) => (
-                    <motion.div
-                      key={finding.food}
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.08 }}
-                      className="p-5 rounded-2xl glass glass-border"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
-                          <span className="text-xl">{finding.icon}</span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-sm font-medium text-foreground">{finding.food}</h4>
-                            <span className="text-[10px] px-2 py-0.5 rounded-lg bg-muted text-muted-foreground">
-                              {issueLabel(finding.issue)}
-                            </span>
+                  {/* Behavioral patterns */}
+                  {analysis.patterns.length > 0 && (
+                    <>
+                      <p className="text-[10px] btn-text text-primary mt-2 mb-1">🧠 PATTERN RILEVATI</p>
+                      {analysis.patterns.map((pattern, i) => (
+                        <PatternCard key={i} pattern={pattern} index={i} correlationBar={correlationBar} />
+                      ))}
+                    </>
+                  )}
+
+                  {/* Food findings */}
+                  {analysis.foodFindings.length > 0 && (
+                    <>
+                      <p className="text-[10px] btn-text text-secondary mt-4 mb-1">🍽️ SENSIBILITÀ ALIMENTARI</p>
+                      {analysis.foodFindings.map((finding, i) => (
+                        <motion.div
+                          key={finding.food}
+                          initial={{ opacity: 0, y: 16 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.08 }}
+                          className="p-5 rounded-2xl glass glass-border"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
+                              <span className="text-xl">{finding.icon}</span>
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <h4 className="text-sm font-medium text-foreground">{finding.food}</h4>
+                                <span className="text-[10px] px-2 py-0.5 rounded-lg bg-muted text-muted-foreground">
+                                  {issueLabel(finding.issue)}
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">{finding.description}</p>
+                              {correlationBar(finding.correlation)}
+                              <p className="text-[10px] text-muted-foreground/60 mt-1">
+                                Correlazione: {Math.round(finding.correlation * 100)}%
+                              </p>
+                            </div>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">{finding.description}</p>
-                          {correlationBar(finding.correlation)}
-                          <p className="text-[10px] text-muted-foreground/60 mt-1">
-                            Correlazione: {Math.round(finding.correlation * 100)}%
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                        </motion.div>
+                      ))}
+                    </>
+                  )}
+
+                  {/* Diet suggestions */}
+                  {analysis.dietSuggestions && analysis.dietSuggestions.length > 0 && (
+                    <>
+                      <p className="text-[10px] btn-text text-primary mt-4 mb-1">💡 SUGGERIMENTI PER IL TUO PIANO</p>
+                      {analysis.dietSuggestions.map((sug, i) => (
+                        <DietSuggestionCard key={i} suggestion={sug} index={i} />
+                      ))}
+                    </>
+                  )}
 
                   <p className="text-xs text-muted-foreground text-center italic mt-4">
                     ⚠️ Queste sono osservazioni basate sui tuoi dati, non diagnosi mediche.
@@ -329,8 +354,13 @@ const ProgressPage = () => {
                 <div className="flex flex-col items-center py-12">
                   <span className="text-4xl mb-4">🌱</span>
                   <p className="text-sm text-muted-foreground text-center px-4">
-                    {findingsMessage || 'Nessuna correlazione significativa trovata ancora. Continua a tracciare i cibi nei check-in!'}
+                    {analysis?.message || 'Nessun pattern significativo trovato ancora. Continua con i check-in giornalieri!'}
                   </p>
+                  {analysis?.nextAnalysisIn && analysis.nextAnalysisIn > 0 && (
+                    <p className="text-xs text-primary mt-3">
+                      Ancora {analysis.nextAnalysisIn} check-in per la prima analisi
+                    </p>
+                  )}
                 </div>
               )}
             </motion.div>

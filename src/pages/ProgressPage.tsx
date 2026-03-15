@@ -485,4 +485,73 @@ const FastingReport = ({ getStats }: { getStats: () => any }) => {
   );
 };
 
+const PatternCard = ({ pattern, index, correlationBar }: { pattern: Pattern; index: number; correlationBar: (v: number) => JSX.Element }) => {
+  const typeIcon: Record<string, string> = {
+    sleep_hunger: '😴→🍽️',
+    sleep_energy: '😴→⚡',
+    stress_eating: '😤→🍰',
+    food_combo: '🍞+🍰',
+    meal_timing: '⏰',
+    stress_bloating: '😤→🫧',
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.08 }}
+      className="p-5 rounded-2xl glass glass-border"
+    >
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
+          <span className="text-lg">{pattern.icon || typeIcon[pattern.type] || '🔍'}</span>
+        </div>
+        <div className="flex-1">
+          <h4 className="text-sm font-medium text-foreground">{pattern.title}</h4>
+          <p className="text-xs text-muted-foreground mt-1">{pattern.description}</p>
+          {correlationBar(pattern.correlation)}
+          {pattern.actionTip && (
+            <div className="mt-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
+              <p className="text-xs text-primary font-medium">💡 {pattern.actionTip}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const DietSuggestionCard = ({ suggestion, index }: { suggestion: DietSuggestion; index: number }) => {
+  const typeIcon = { add: '➕', reduce: '➖', replace: '🔄', timing: '⏰' };
+  const priorityStyle = {
+    alta: 'border-primary/30 bg-primary/5',
+    media: 'border-secondary/30 bg-secondary/5',
+    bassa: 'glass-border',
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.08 }}
+      className={`p-4 rounded-2xl glass ${priorityStyle[suggestion.priority]}`}
+    >
+      <div className="flex items-start gap-3">
+        <span className="text-lg">{typeIcon[suggestion.type]}</span>
+        <div className="flex-1">
+          <p className="text-sm font-medium text-foreground">{suggestion.suggestion}</p>
+          <p className="text-xs text-muted-foreground mt-1">{suggestion.reason}</p>
+          <span className={`inline-block mt-2 text-[10px] px-2 py-0.5 rounded-lg ${
+            suggestion.priority === 'alta' ? 'bg-primary/10 text-primary' :
+            suggestion.priority === 'media' ? 'bg-secondary/10 text-secondary' :
+            'bg-muted text-muted-foreground'
+          }`}>
+            Priorità {suggestion.priority}
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 export default ProgressPage;

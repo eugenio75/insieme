@@ -103,6 +103,11 @@ const TogetherPage = () => {
         });
         if (data && !error) {
           setCoachResponse(data);
+          // Save for Home page display (expires in 24h)
+          localStorage.setItem('sos_coach_response', JSON.stringify({
+            ...data,
+            timestamp: Date.now(),
+          }));
         }
       } catch (e) {
         console.error('AI coach error after SOS:', e);

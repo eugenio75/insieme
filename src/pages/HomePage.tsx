@@ -8,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { getDailyTip } from '@/data/foodTips';
 import { PenLine, X } from 'lucide-react';
 import FastingTimer from '@/components/FastingTimer';

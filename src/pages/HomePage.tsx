@@ -27,6 +27,7 @@ const fallbackMessages = [
 const HomePage = () => {
   const { user, weeklyHabits, toggleHabit, currentStreak, getStreakMilestone, weekLabel, weekNumber, totalWeeks, refreshWeeklyHabits } = useAppStore();
   const { user: authUser } = useAuth();
+  useProfile(); // Ensure profile is loaded from DB
   const navigate = useNavigate();
   const completedCount = weeklyHabits.filter((h) => h.completed).length;
   const progress = completedCount / weeklyHabits.length;

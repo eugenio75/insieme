@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useTogether } from '@/hooks/useTogether';
@@ -30,9 +30,21 @@ const TogetherPage = () => {
   const [showSOS, setShowSOS] = useState(false);
   const [sendingSOS, setSendingSOS] = useState(false);
 
+  const loadBadges = useCallback(async () => {
+    const badges = await getReceivedBadges();
+    setReceivedBadges(badges);
+  }, [getReceivedBadges]);
+
   useEffect(() => {
-    getReceivedBadges().then(setReceivedBadges);
-  }, [authUser]);
+    loadBadges();
+  }, [loadBadges]);
+
+  // Reload badges when switching to supporting view (to see fresh SOS)
+  useEffect(() => {
+    if (view === 'supporting') {
+      loadBadges();
+    }
+  }, [view, loadBadges]);
 
   const handleCreateInvite = async () => {
     const invite = await createInvite();

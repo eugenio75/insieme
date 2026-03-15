@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
+const TOGETHER_LAST_VISIT_KEY = 'together_last_visit';
+
 const tabs = [
   { path: '/home', icon: Home, label: 'Home' },
   { path: '/nutrition', icon: Utensils, label: 'Cibo' },
@@ -22,7 +24,9 @@ const BottomNav = () => {
   useEffect(() => {
     if (!user) return;
     const checkBadges = async () => {
-      const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      // Only count badges newer than last visit to /together
+      const lastVisit = localStorage.getItem(TOGETHER_LAST_VISIT_KEY);
+      const since = lastVisit || new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const { data } = await supabase
         .from('badges')
         .select('badge_type, created_at')
@@ -48,9 +52,12 @@ const BottomNav = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user]);
 
+  // When user visits /together, mark as read
   useEffect(() => {
     if (location.pathname === '/together') {
+      localStorage.setItem(TOGETHER_LAST_VISIT_KEY, new Date().toISOString());
       setBadgeCount(0);
+      setHasSOS(false);
     }
   }, [location.pathname]);
 

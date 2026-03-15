@@ -9,9 +9,11 @@ import AppHeader from '../components/AppHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { getDailyTip } from '@/data/foodTips';
-import { PenLine } from 'lucide-react';
+import { PenLine, X } from 'lucide-react';
 import FastingTimer from '@/components/FastingTimer';
 import FastingSuggestion from '@/components/FastingSuggestion';
+
+const SOS_COACH_KEY = 'sos_coach_response';
 
 const fallbackMessages = [
   'Impara dal tuo corpo, con la gentilezza che meriti. 🌿',

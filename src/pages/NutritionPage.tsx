@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
 import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } from '../data/foodTips';
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
-import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer } from 'lucide-react';
+import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer, Sparkles } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
 import { useFoodFindings } from '@/hooks/useFoodFindings';
+import { usePatternAnalysis } from '@/hooks/useFoodFindings';
 import { useFasting } from '@/hooks/useFasting';
 
 type Tab = 'piano' | 'consigli' | 'ricette' | 'gonfiore';
@@ -206,7 +207,15 @@ const NutritionPage = () => {
   const { user } = useAppStore();
   const [activeTab, setActiveTab] = useState<Tab>('piano');
   const { checkMeal } = useFoodFindings();
+  const { analysis, load: loadPatterns, loaded: patternsLoaded } = usePatternAnalysis();
   const { config: fastingConfig, getStatus } = useFasting();
+
+  // Load patterns when component mounts
+  useEffect(() => {
+    if (!patternsLoaded) loadPatterns();
+  }, [patternsLoaded]);
+
+  const dietSuggestions = analysis?.dietSuggestions || [];
 
   const today = new Date().getDay();
   const todayIdx = today === 0 ? 6 : today - 1;
@@ -304,6 +313,34 @@ const NutritionPage = () => {
                   <span className="text-muted-foreground ml-1">• I pasti fuori finestra sono segnalati</span>
                 </p>
               </div>
+            )}
+
+            {/* AI Diet Adaptation Banner */}
+            {dietSuggestions.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-5 p-4 rounded-2xl bg-primary/5 border border-primary/10"
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <p className="text-xs font-medium text-foreground">Il piano si sta adattando a te</p>
+                </div>
+                <div className="space-y-2">
+                  {dietSuggestions.slice(0, 3).map((sug, i) => {
+                    const icon = sug.type === 'add' ? '➕' : sug.type === 'reduce' ? '➖' : sug.type === 'replace' ? '🔄' : '⏰';
+                    return (
+                      <div key={i} className="flex items-start gap-2 text-xs">
+                        <span>{icon}</span>
+                        <div>
+                          <p className="text-foreground font-medium">{sug.suggestion}</p>
+                          <p className="text-muted-foreground">{sug.reason}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
             )}
 
             <DaySelector

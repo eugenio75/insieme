@@ -95,6 +95,8 @@ const CheckIn = () => {
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [alreadyLoggedSleep, setAlreadyLoggedSleep] = useState(false);
+  const [coachMessage, setCoachMessage] = useState<{ message: string; actionTips: string[]; tone: string } | null>(null);
+  const [coachLoading, setCoachLoading] = useState(false);
   const { addCheckIn, currentStreak, user } = useAppStore();
   const { user: authUser } = useAuth();
   const navigate = useNavigate();
@@ -132,6 +134,20 @@ const CheckIn = () => {
     );
   };
 
+  const fetchCoachMessage = async (m: number, e: number, s: number, sleep: number | null, b: number) => {
+    setCoachLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-coach', {
+        body: { trigger: 'checkin_critical', mood: m, energy: e, stress: s, sleepHours: sleep, bloating: b },
+      });
+      if (!error && data?.message) setCoachMessage(data);
+    } catch (err) {
+      console.error('Coach message error:', err);
+    } finally {
+      setCoachLoading(false);
+    }
+  };
+
   const saveCheckIn = async (foods: string[]) => {
     setSaving(true);
     try {
@@ -148,6 +164,12 @@ const CheckIn = () => {
 
         const { error } = await supabase.from('daily_checkins').insert(insertData);
         if (error) console.error('Error saving check-in:', error);
+
+        // Check if critical — trigger AI coach
+        const isCritical = mood <= 2 || energy <= 2 || stress >= 3 || (sleepHours !== null && sleepHours < 6);
+        if (isCritical) {
+          fetchCoachMessage(mood, energy, stress, sleepHours, bloating);
+        }
       }
       addCheckIn({
         date: new Date().toISOString(),
@@ -268,6 +290,8 @@ const CheckIn = () => {
         ) : isDone ? (
           <DonePhase
             currentStreak={currentStreak}
+            coachMessage={coachMessage}
+            coachLoading={coachLoading}
             onNewCheckIn={() => {
               setPhase(0);
               setMood(0);
@@ -276,6 +300,7 @@ const CheckIn = () => {
               setStress(0);
               setSleepHours(null);
               setSelectedFoods([]);
+              setCoachMessage(null);
             }}
             onGoHome={() => navigate('/home')}
           />
@@ -408,10 +433,14 @@ const FoodPhase = ({
 
 const DonePhase = ({
   currentStreak,
+  coachMessage,
+  coachLoading,
   onNewCheckIn,
   onGoHome,
 }: {
   currentStreak: number;
+  coachMessage: { message: string; actionTips: string[]; tone: string } | null;
+  coachLoading: boolean;
   onNewCheckIn: () => void;
   onGoHome: () => void;
 }) => (
@@ -420,7 +449,7 @@ const DonePhase = ({
     initial={{ opacity: 0, scale: 0.95 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
-    className="flex-1 flex flex-col items-center justify-center text-center pt-20"
+    className="flex-1 flex flex-col items-center justify-center text-center pt-12"
   >
     <motion.span
       className="text-6xl mb-6"
@@ -435,16 +464,63 @@ const DonePhase = ({
     <p className="font-display text-base text-muted-foreground italic mb-2">
       Grazie per aver ascoltato il tuo corpo.
     </p>
-    <p className="text-sm text-muted-foreground mb-6">
-      Puoi fare un altro check-in più tardi per tenere traccia dei cambiamenti.
-    </p>
+
+    {/* AI Coach Message */}
+    {(coachLoading || coachMessage) && (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        className="w-full mt-4 mb-4"
+      >
+        <div className={`p-5 rounded-2xl text-left ${
+          coachMessage?.tone === 'comforting' ? 'bg-accent glass-border' :
+          coachMessage?.tone === 'encouraging' ? 'bg-primary/5 border border-primary/10' :
+          'bg-accent glass-border'
+        }`}>
+          {coachLoading ? (
+            <motion.p
+              className="text-sm text-muted-foreground italic"
+              animate={{ opacity: [0.4, 0.8, 0.4] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              Sto pensando a come aiutarti...
+            </motion.p>
+          ) : coachMessage && (
+            <>
+              <p className="text-[10px] btn-text text-primary mb-2">💛 IL TUO COACH</p>
+              <p className="text-sm text-foreground leading-relaxed mb-3">{coachMessage.message}</p>
+              {coachMessage.actionTips && coachMessage.actionTips.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] btn-text text-muted-foreground">PROVA ADESSO:</p>
+                  {coachMessage.actionTips.map((tip, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs text-foreground">
+                      <span className="w-5 h-5 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-[10px] flex-shrink-0">
+                        {i + 1}
+                      </span>
+                      {tip}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </motion.div>
+    )}
+
+    {!coachMessage && (
+      <p className="text-sm text-muted-foreground mb-6">
+        Puoi fare un altro check-in più tardi per tenere traccia dei cambiamenti.
+      </p>
+    )}
 
     {currentStreak > 0 && (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.5 }}
-        className="mb-8 px-6 py-4 rounded-2xl bg-accent glass-border"
+        className="mb-6 px-6 py-4 rounded-2xl bg-accent glass-border"
       >
         <p className="text-accent-foreground font-medium text-lg">
           🔥 {currentStreak} {currentStreak === 1 ? 'giorno' : 'giorni'} di fila!

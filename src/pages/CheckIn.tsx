@@ -150,6 +150,12 @@ const CheckIn = () => {
 
         const { error } = await supabase.from('daily_checkins').insert(insertData);
         if (error) console.error('Error saving check-in:', error);
+
+        // Check if critical — trigger AI coach
+        const isCritical = mood <= 2 || energy <= 2 || stress >= 3 || (sleepHours !== null && sleepHours < 6);
+        if (isCritical) {
+          fetchCoachMessage(mood, energy, stress, sleepHours, bloating);
+        }
       }
       addCheckIn({
         date: new Date().toISOString(),

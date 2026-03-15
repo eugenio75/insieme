@@ -76,10 +76,12 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `Sei un coach gentile e motivazionale per un'app di benessere femminile. 
-Genera UN SOLO messaggio motivazionale breve (max 2 frasi) personalizzato in base ai dati dell'utente.
-Il tono deve essere caldo, incoraggiante, mai giudicante. Come una migliore amica che ti sostiene.
+            content: `Sei un coach gentile e motivazionale per un'app di benessere. 
+Genera UN SOLO messaggio motivazionale breve (max 2 frasi) personalizzato.
+Rivolgiti all'utente come "${salutation}".
+Il tono deve essere caldo, incoraggiante, mai giudicante. Come un/una migliore amico/a che ti sostiene.
 Non usare emoji eccessive. Max 1-2 emoji. Non mettere virgolette.
+Usa il genere corretto (${isMale ? "maschile" : "femminile"}) per aggettivi e participi.
 Rispondi SOLO con il messaggio, nient'altro.`,
           },
           { role: "user", content: context },

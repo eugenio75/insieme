@@ -290,6 +290,8 @@ const CheckIn = () => {
         ) : isDone ? (
           <DonePhase
             currentStreak={currentStreak}
+            coachMessage={coachMessage}
+            coachLoading={coachLoading}
             onNewCheckIn={() => {
               setPhase(0);
               setMood(0);
@@ -298,6 +300,7 @@ const CheckIn = () => {
               setStress(0);
               setSleepHours(null);
               setSelectedFoods([]);
+              setCoachMessage(null);
             }}
             onGoHome={() => navigate('/home')}
           />

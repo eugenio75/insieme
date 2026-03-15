@@ -134,6 +134,20 @@ const CheckIn = () => {
     );
   };
 
+  const fetchCoachMessage = async (m: number, e: number, s: number, sleep: number | null, b: number) => {
+    setCoachLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-coach', {
+        body: { trigger: 'checkin_critical', mood: m, energy: e, stress: s, sleepHours: sleep, bloating: b },
+      });
+      if (!error && data?.message) setCoachMessage(data);
+    } catch (err) {
+      console.error('Coach message error:', err);
+    } finally {
+      setCoachLoading(false);
+    }
+  };
+
   const saveCheckIn = async (foods: string[]) => {
     setSaving(true);
     try {

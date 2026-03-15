@@ -13,6 +13,8 @@ const moods = [
   { label: 'Serena', icon: '😊', value: 5 },
   { label: 'Calma', icon: '😌', value: 4 },
   { label: 'Così così', icon: '😐', value: 3 },
+  { label: 'Affamata', icon: '🍽️', value: 2 },
+  { label: 'Assonnata', icon: '😴', value: 2 },
   { label: 'Stanca', icon: '😔', value: 2 },
   { label: 'Difficile', icon: '😢', value: 1 },
 ];

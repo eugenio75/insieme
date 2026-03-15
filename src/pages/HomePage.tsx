@@ -17,7 +17,7 @@ import FastingSuggestion from '@/components/FastingSuggestion';
 const SOS_COACH_KEY = 'sos_coach_response';
 
 const fallbackMessages = [
-  'Listen to your body. Live better. 🌿',
+  'Ascolta il tuo corpo. Vivi meglio. 🌿',
   'Oggi basta un piccolo passo. Sei già abbastanza.',
   'Non serve perfezione, serve continuità.',
   'Ogni giorno è un\'opportunità, non un obbligo.',

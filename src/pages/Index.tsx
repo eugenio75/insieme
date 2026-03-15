@@ -49,8 +49,8 @@ const Index = () => {
           Insieme
         </h1>
         <p className="font-display text-lg text-muted-foreground italic mb-10 leading-relaxed">
-          Listen to your body.<br />
-          Live better.
+          Ascolta il tuo corpo.<br />
+          Vivi meglio.
         </p>
         <motion.button
           whileTap={{ scale: 0.98 }}

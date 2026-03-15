@@ -76,8 +76,8 @@ const AuthPage = () => {
           Insieme
         </h1>
         <p className="font-display text-lg text-muted-foreground italic mb-12 leading-relaxed">
-          Listen to your body.<br />
-          Live better.
+          Ascolta il tuo corpo.<br />
+          Vivi meglio.
         </p>
 
         {inApp && (

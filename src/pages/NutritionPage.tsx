@@ -343,6 +343,7 @@ const NutritionPage = () => {
               </motion.div>
             )}
 
+            <DaySelector
               weekPlan={weekPlan}
               selectedDay={selectedDay}
               onSelectDay={setSelectedDay}

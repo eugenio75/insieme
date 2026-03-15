@@ -8,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { getDailyTip } from '@/data/foodTips';
 import { PenLine, X } from 'lucide-react';
 import FastingTimer from '@/components/FastingTimer';
@@ -26,6 +27,7 @@ const fallbackMessages = [
 const HomePage = () => {
   const { user, weeklyHabits, toggleHabit, currentStreak, getStreakMilestone, weekLabel, weekNumber, totalWeeks, refreshWeeklyHabits } = useAppStore();
   const { user: authUser } = useAuth();
+  useProfile(); // Ensure profile is loaded from DB
   const navigate = useNavigate();
   const completedCount = weeklyHabits.filter((h) => h.completed).length;
   const progress = completedCount / weeklyHabits.length;

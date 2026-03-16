@@ -375,8 +375,15 @@ const NutritionPage = () => {
                         ? `${finding.food} potrebbe causare ${finding.issue === 'gonfiore' ? 'gonfiore' : finding.issue === 'energia_bassa' ? 'calo di energia' : 'disagio'}. Prova la versione alternativa!`
                         : null;
                     // Enhance meal description when fasting is enabled and meal is within window
+                    const fastingEnhancements: Record<string, string> = {
+                      'colazione': '💪 Potenzia: aggiungi uovo sodo, avocado o burro di arachidi per più energie.',
+                      'spuntino_mattina': '💪 Potenzia: noci, mandorle, semi di chia o yogurt greco intero.',
+                      'pranzo': '💪 Potenzia: aggiungi olio EVO, salmone, uova, legumi o avocado per grassi buoni e proteine.',
+                      'spuntino_pomeriggio': '💪 Potenzia: hummus, frutta secca, formaggio stagionato o semi misti.',
+                      'cena': '💪 Potenzia: aggiungi olio di oliva, pesce grasso (salmone, sgombro), tofu o uova.',
+                    };
                     const enhancedMeal = (fastingConfig.enabled && !outsideWindow) 
-                      ? { ...meal, description: meal.description + ' 💪 Porzione potenziata: aggiungi proteine e grassi buoni.' }
+                      ? { ...meal, description: meal.description + ' ' + (fastingEnhancements[meal.type] || '') }
                       : meal;
                     return <MealCard key={meal.type} meal={enhancedMeal} delay={i * 0.06} warning={warning} dimmed={outsideWindow} />;
                   })}

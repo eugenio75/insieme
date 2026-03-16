@@ -306,12 +306,20 @@ const NutritionPage = () => {
 
             {/* Fasting window info */}
             {fastingConfig.enabled && (
-              <div className="flex items-center gap-2 mb-4 px-4 py-3 rounded-xl bg-primary/5 border border-primary/10">
-                <Timer className="w-4 h-4 text-primary flex-shrink-0" />
-                <p className="text-xs text-foreground">
-                  Finestra alimentare: <span className="font-medium">{fastingStatus.eatingWindowStart.toString().padStart(2, '0')}:00 — {fastingStatus.eatingWindowEnd.toString().padStart(2, '0')}:00</span>
-                  <span className="text-muted-foreground ml-1">• I pasti fuori finestra sono segnalati</span>
-                </p>
+              <div className="mb-4 space-y-3">
+                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-primary/5 border border-primary/10">
+                  <Timer className="w-4 h-4 text-primary flex-shrink-0" />
+                  <p className="text-xs text-foreground">
+                    Finestra alimentare: <span className="font-medium">{fastingStatus.eatingWindowStart.toString().padStart(2, '0')}:00 — {fastingStatus.eatingWindowEnd.toString().padStart(2, '0')}:00</span>
+                    <span className="text-muted-foreground ml-1">• I pasti fuori finestra sono segnalati</span>
+                  </p>
+                </div>
+                <div className="px-4 py-3 rounded-xl bg-secondary/5 border border-secondary/10">
+                  <p className="text-xs text-foreground font-medium mb-1">🍽️ Pasti più nutrienti attivi</p>
+                  <p className="text-xs text-muted-foreground">
+                    Con il digiuno {fastingConfig.protocol}, i pasti nella finestra alimentare sono potenziati con più proteine, grassi buoni e fibre per compensare i pasti saltati.
+                  </p>
+                </div>
               </div>
             )}
 
@@ -366,7 +374,11 @@ const NutritionPage = () => {
                       : finding
                         ? `${finding.food} potrebbe causare ${finding.issue === 'gonfiore' ? 'gonfiore' : finding.issue === 'energia_bassa' ? 'calo di energia' : 'disagio'}. Prova la versione alternativa!`
                         : null;
-                    return <MealCard key={meal.type} meal={meal} delay={i * 0.06} warning={warning} dimmed={outsideWindow} />;
+                    // Enhance meal description when fasting is enabled and meal is within window
+                    const enhancedMeal = (fastingConfig.enabled && !outsideWindow) 
+                      ? { ...meal, description: meal.description + ' 💪 Porzione potenziata: aggiungi proteine e grassi buoni.' }
+                      : meal;
+                    return <MealCard key={meal.type} meal={enhancedMeal} delay={i * 0.06} warning={warning} dimmed={outsideWindow} />;
                   })}
               </div>
             )}

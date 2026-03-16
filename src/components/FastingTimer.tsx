@@ -40,7 +40,14 @@ const FastingTimer = () => {
         <div className="flex items-center gap-2 mb-5">
           <Timer className="w-5 h-5 text-primary" />
           <span className="text-xs text-muted-foreground btn-text">DIGIUNO INTERMITTENTE</span>
-          <span className="ml-auto text-xs font-medium text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full">{config.protocol}</span>
+          <div className="ml-auto flex items-center gap-2">
+            {stats.completedSessions > 0 && (
+              <span className="text-xs font-medium text-secondary/80 bg-secondary/10 px-2 py-0.5 rounded-full">
+                🔥 {stats.completedSessions} {stats.completedSessions === 1 ? 'giorno' : 'giorni'}
+              </span>
+            )}
+            <span className="text-xs font-medium text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full">{config.protocol}</span>
+          </div>
         </div>
 
         {!status.isActive ? (

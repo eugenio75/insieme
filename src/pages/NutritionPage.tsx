@@ -374,7 +374,11 @@ const NutritionPage = () => {
                       : finding
                         ? `${finding.food} potrebbe causare ${finding.issue === 'gonfiore' ? 'gonfiore' : finding.issue === 'energia_bassa' ? 'calo di energia' : 'disagio'}. Prova la versione alternativa!`
                         : null;
-                    return <MealCard key={meal.type} meal={meal} delay={i * 0.06} warning={warning} dimmed={outsideWindow} />;
+                    // Enhance meal description when fasting is enabled and meal is within window
+                    const enhancedMeal = (fastingConfig.enabled && !outsideWindow) 
+                      ? { ...meal, description: meal.description + ' 💪 Porzione potenziata: aggiungi proteine e grassi buoni.' }
+                      : meal;
+                    return <MealCard key={meal.type} meal={enhancedMeal} delay={i * 0.06} warning={warning} dimmed={outsideWindow} />;
                   })}
               </div>
             )}

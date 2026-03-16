@@ -12,9 +12,10 @@ const formatTime = (minutes: number) => {
 const formatHour = (h: number) => `${h.toString().padStart(2, '0')}:00`;
 
 const FastingTimer = () => {
-  const { config, activeSession, startSession, endSession, getStatus } = useFasting();
+  const { config, activeSession, startSession, endSession, getStatus, getStats } = useFasting();
   const [status, setStatus] = useState(getStatus());
   const [showConfirmEnd, setShowConfirmEnd] = useState(false);
+  const stats = getStats();
 
   // Refresh status every minute
   useEffect(() => {

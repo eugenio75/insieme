@@ -60,7 +60,7 @@ const modeOptions = [
 type EditingField = null | 'objective' | 'pace' | 'activity' | 'difficulty' | 'sex' | 'weight' | 'age' | 'workType' | 'mode';
 
 const ProfilePage = () => {
-  const { user, checkIns, weeklyHabits, toggleIntolerance, addCustomIntolerance, removeCustomIntolerance, setUser } = useAppStore();
+  const { user, checkIns, weeklyHabits, setUser } = useAppStore();
   const { saveProfile } = useProfile();
   const { signOut } = useAuth();
   const completedHabits = weeklyHabits.filter((h) => h.completed).length;
@@ -77,11 +77,13 @@ const ProfilePage = () => {
 
   const handleAddCustom = () => {
     const trimmed = customInput.trim();
-    if (trimmed && !user.customIntolerances.includes(trimmed) && !user.intolerances.includes(trimmed)) {
-      addCustomIntolerance(trimmed);
-      setCustomInput('');
-      setShowCustomInput(false);
-    }
+    if (!trimmed || user.customIntolerances.includes(trimmed) || user.intolerances.includes(trimmed)) return;
+
+    const nextCustomIntolerances = [...user.customIntolerances, trimmed];
+    setUser({ customIntolerances: nextCustomIntolerances });
+    void saveProfile({ customIntolerances: nextCustomIntolerances });
+    setCustomInput('');
+    setShowCustomInput(false);
   };
 
   const openEditor = (field: EditingField) => {
@@ -98,14 +100,17 @@ const ProfilePage = () => {
   };
 
   const handleSingleSelect = (field: string, value: string, storeValue?: string) => {
-    setUser({ [field]: storeValue || value });
-    setTimeout(() => saveProfile(), 100);
+    const nextValue = storeValue || value;
+    const patch = { [field]: nextValue } as any;
+    setUser(patch);
+    void saveProfile(patch);
     setEditingField(null);
   };
 
   const handleMultiSelectSave = (field: string) => {
-    setUser({ [field]: multiSelections.join(', ') });
-    setTimeout(() => saveProfile(), 100);
+    const patch = { [field]: multiSelections.join(', ') } as any;
+    setUser(patch);
+    void saveProfile(patch);
     setEditingField(null);
   };
 
@@ -282,7 +287,7 @@ const ProfilePage = () => {
                       <button
                         onClick={() => {
                           setUser({ weight: weightInput || undefined });
-                          setTimeout(() => saveProfile(), 100);
+                          void saveProfile({ weight: weightInput || undefined });
                           setEditingField(null);
                         }}
                         className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium"
@@ -327,7 +332,7 @@ const ProfilePage = () => {
                         onClick={() => {
                           if (ageInput.trim()) {
                             setUser({ age: ageInput.trim() });
-                            setTimeout(() => saveProfile(), 100);
+                            void saveProfile({ age: ageInput.trim() });
                           }
                           setEditingField(null);
                         }}
@@ -394,7 +399,13 @@ const ProfilePage = () => {
                     <motion.button
                       key={intolerance}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => { toggleIntolerance(intolerance); setTimeout(() => saveProfile(), 100); }}
+                      onClick={() => {
+                        const nextIntolerances = isSelected
+                          ? user.intolerances.filter((i) => i !== intolerance)
+                          : [...user.intolerances, intolerance];
+                        setUser({ intolerances: nextIntolerances });
+                        void saveProfile({ intolerances: nextIntolerances });
+                      }}
                       className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300
                         ${isSelected ? 'glass glass-border border-primary/30' : 'glass glass-border'}`}
                     >
@@ -414,7 +425,11 @@ const ProfilePage = () => {
                   >
                     <span className="text-sm font-medium text-foreground">⚠️ {ci}</span>
                     <button
-                      onClick={() => { removeCustomIntolerance(ci); setTimeout(() => saveProfile(), 100); }}
+                      onClick={() => {
+                        const nextCustomIntolerances = user.customIntolerances.filter((item) => item !== ci);
+                        setUser({ customIntolerances: nextCustomIntolerances });
+                        void saveProfile({ customIntolerances: nextCustomIntolerances });
+                      }}
                       className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center"
                     >
                       <X className="w-3 h-3 text-muted-foreground" />
@@ -436,7 +451,7 @@ const ProfilePage = () => {
                       autoFocus
                     />
                     <button
-                      onClick={() => { handleAddCustom(); setTimeout(() => saveProfile(), 200); }}
+                      onClick={handleAddCustom}
                       disabled={!customInput.trim()}
                       className="px-4 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium
                         disabled:opacity-40 transition-opacity"

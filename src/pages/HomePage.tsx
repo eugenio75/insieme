@@ -32,6 +32,7 @@ const HomePage = () => {
   const [loadingMessage, setLoadingMessage] = useState(true);
   const [lastCheckin, setLastCheckin] = useState<{ mood: number; energy: number; bloating: number; stress: number | null } | null>(null);
   const [checkedInToday, setCheckedInToday] = useState(false);
+  const [hasPartnership, setHasPartnership] = useState(false);
   const [proactiveCoach, setProactiveCoach] = useState<{ title: string; message: string; tips: string[]; category: string } | null>(null);
   const [coachLoading, setCoachLoading] = useState(true);
 
@@ -63,6 +64,27 @@ const HomePage = () => {
     fetchCheckin();
   }, [authUser]);
 
+  // Check if user has at least one partnership (used as resilient fallback for Insieme section)
+  useEffect(() => {
+    if (!authUser) return;
+
+    const fetchPartnership = async () => {
+      const { data, error } = await supabase
+        .from('partnerships')
+        .select('id')
+        .or(`user_id.eq.${authUser.id},partner_id.eq.${authUser.id}`)
+        .limit(1);
+
+      if (!error && data && data.length > 0) {
+        setHasPartnership(true);
+      } else {
+        setHasPartnership(false);
+      }
+    };
+
+    fetchPartnership();
+  }, [authUser]);
+
   // Fetch check-in signals for habit refresh
   useEffect(() => {
     if (!authUser) return;
@@ -88,9 +110,20 @@ const HomePage = () => {
   // Fetch AI motivational message
   useEffect(() => {
     const fetchMessage = async () => {
-      if (!authUser) { setLoadingMessage(false); return; }
+      if (!authUser) {
+        setLoadingMessage(false);
+        return;
+      }
+
       try {
-        const { data, error } = await supabase.functions.invoke('motivational-message');
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        if (!accessToken) return;
+
+        const { data, error } = await supabase.functions.invoke('motivational-message', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
         if (error) throw error;
         if (data?.message) setAiMessage(data.message);
       } catch (e) {
@@ -99,37 +132,37 @@ const HomePage = () => {
         setLoadingMessage(false);
       }
     };
+
     fetchMessage();
   }, [authUser]);
 
   // Fetch proactive AI coach insight
   useEffect(() => {
     const fetchCoachInsight = async () => {
-      if (!authUser) return;
+      if (!authUser) {
+        setCoachLoading(false);
+        return;
+      }
+
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-coach-chat`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${session.access_token}`,
-            },
-            body: JSON.stringify({ mode: 'proactive' }),
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          if (data?.message) setProactiveCoach(data);
-        }
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        if (!accessToken) return;
+
+        const { data, error } = await supabase.functions.invoke('ai-coach-chat', {
+          body: { mode: 'proactive' },
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (error) throw error;
+        if (data?.message) setProactiveCoach(data);
       } catch (e) {
         console.error('Error fetching coach insight:', e);
       } finally {
         setCoachLoading(false);
       }
     };
+
     fetchCoachInsight();
   }, [authUser]);
 
@@ -375,7 +408,7 @@ const HomePage = () => {
         </motion.div>
 
         {/* Together Card */}
-        {user.mode === 'together' && (
+        {(user.mode === 'together' || hasPartnership) && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}

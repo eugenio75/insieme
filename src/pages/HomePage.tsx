@@ -425,9 +425,6 @@ const HomePage = () => {
           </div>
         </motion.div>
 
-        {/* Fasting Timer (only if enabled) */}
-        <FastingTimer />
-
         {/* Together Card */}
         {user.mode === 'together' && (
           <motion.div

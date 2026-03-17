@@ -14,18 +14,20 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Missing authorization header");
+    if (!authHeader?.startsWith("Bearer ")) throw new Error("Missing authorization header");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
     
-    // Auth client for user verification
+    // Verify JWT via getClaims (no DB round-trip, avoids timeouts)
     const authClient = createClient(supabaseUrl, anonKey!, {
       global: { headers: { Authorization: authHeader } },
     });
-    const { data: { user }, error: authError } = await authClient.auth.getUser();
-    if (authError || !user) throw new Error("Unauthorized");
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await authClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) throw new Error("Unauthorized");
+    const user = { id: claimsData.claims.sub as string };
 
     // Service client for data fetching
     const supabase = createClient(supabaseUrl, serviceKey);

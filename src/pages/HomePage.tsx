@@ -329,11 +329,12 @@ const HomePage = () => {
             >
               {statusIndicators.map((s) => (
                 <div
-                  key={s.label}
+                  key={s.category}
                   className="flex-1 p-2.5 rounded-xl glass glass-border flex flex-col items-center gap-1"
                 >
                   <span className="text-base">{s.icon}</span>
-                  <span className="text-[9px] text-muted-foreground btn-text">{s.label.toUpperCase()}</span>
+                  <span className="text-[10px] text-foreground font-medium">{s.label}</span>
+                  <span className="text-[8px] text-muted-foreground">{s.category}</span>
                 </div>
               ))}
             </motion.div>

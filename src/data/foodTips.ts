@@ -109,7 +109,7 @@ const allTips: FoodTip[] = [
       { name: 'Banana', substitutes: ['Mela', 'Pera', 'Frutta surgelata'] },
       { name: 'Spinaci', substitutes: ['Niente (lo smoothie è buono anche senza)', 'Un cucchiaino di cacao'] },
       { name: 'Latte vegetale', substitutes: ['Latte normale', 'Acqua + yogurt', 'Succo di frutta'] },
-      { name: 'Miele', substitutes: ['Zucchero', 'Un dattero', 'Niente, la banana è già dolce'] },
+      { name: 'Miele', substitutes: ['Un dattero', 'Niente, la banana è già dolce', 'Cannella (un pizzico)'] },
     ],
     simpleVariant: {
       title: 'Senza frullatore?',
@@ -219,8 +219,45 @@ const tipsByIntolerance: Record<string, FoodTip[]> = {
   ],
 };
 
-export const getDailyTip = (objective: string, difficulty: string, intolerances: string[]): FoodTip => {
-  const relevant = allTips.filter((tip) => {
+// High-GI keywords for filtering tips
+const highGITipKeywords = ['marmellata', 'miele', 'zucchero', 'sciroppo', 'biscotti', 'dolce', 'succo di frutta', 'nutella', 'crema di nocciole', 'pancake'];
+
+interface TipHealthConstraints {
+  hasGlycemicRisk?: boolean;
+  hasCholesterolRisk?: boolean;
+}
+
+/**
+ * Filter a tip's substitutes to remove high-GI options, and clean description/simpleVariant.
+ */
+const filterTipForHealth = (tip: FoodTip, constraints: TipHealthConstraints): FoodTip => {
+  if (!constraints.hasGlycemicRisk) return tip;
+  
+  const filtered = { ...tip };
+  
+  // Filter substitutes
+  if (filtered.ingredients) {
+    filtered.ingredients = filtered.ingredients.map(ing => ({
+      ...ing,
+      substitutes: ing.substitutes.filter(sub => 
+        !highGITipKeywords.some(kw => sub.toLowerCase().includes(kw))
+      ),
+    })).filter(ing => ing.substitutes.length > 0);
+  }
+  
+  return filtered;
+};
+
+/**
+ * Check if a tip contains high-GI content in title/description.
+ */
+const tipHasHighGI = (tip: FoodTip): boolean => {
+  const text = `${tip.title} ${tip.description}`.toLowerCase();
+  return highGITipKeywords.some(kw => text.includes(kw));
+};
+
+export const getDailyTip = (objective: string, difficulty: string, intolerances: string[], healthConstraints?: TipHealthConstraints): FoodTip => {
+  let pool = allTips.filter((tip) => {
     const objTag = objective.toLowerCase().includes('gonfiore') ? 'gonfiore'
       : objective.toLowerCase().includes('energia') ? 'energia'
       : objective.toLowerCase().includes('leggera') ? 'leggera'
@@ -234,9 +271,19 @@ export const getDailyTip = (objective: string, difficulty: string, intolerances:
     return tip.tags.includes(objTag) || tip.tags.includes(diffTag);
   });
 
-  const pool = relevant.length > 0 ? relevant : allTips;
+  if (pool.length === 0) pool = [...allTips];
+
+  // Remove tips with high-GI content if glycemic risk
+  if (healthConstraints?.hasGlycemicRisk) {
+    const safe = pool.filter(t => !tipHasHighGI(t));
+    if (safe.length > 0) pool = safe;
+  }
+
   const dayIndex = new Date().getDay() + new Date().getDate();
-  return pool[dayIndex % pool.length];
+  const tip = pool[dayIndex % pool.length];
+  
+  // Also filter substitutes
+  return healthConstraints ? filterTipForHealth(tip, healthConstraints) : tip;
 };
 
 export const getIntoleranceTips = (intolerances: string[]): FoodTip[] => {

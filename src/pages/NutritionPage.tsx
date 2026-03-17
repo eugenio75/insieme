@@ -269,7 +269,7 @@ const NutritionPage = () => {
   const todayIdx = today === 0 ? 6 : today - 1;
   const [selectedDay, setSelectedDay] = useState(todayIdx);
 
-  const dailyTip = getDailyTip(user.objective, user.difficulty, user.intolerances);
+  const dailyTip = getDailyTip(user.objective, user.difficulty, user.intolerances, healthConstraints);
   const intoleranceTips = getIntoleranceTips(user.intolerances);
   const allRecipes = getAllRecipes();
   const weekPlan = getWeeklyPlan(user.objective, user.activity, user.sex, user.age, healthConstraints);

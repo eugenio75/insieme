@@ -301,7 +301,7 @@ const healthReplacements: Record<string, Meal[]> = {
 
 // Keywords that indicate a meal has high glycemic content
 const highGIMealKeywords = ['marmellata', 'miele', 'zucchero', 'sciroppo', 'biscotti', 'ciambellone', 'torta', 'dolce', 'succo di frutta', 'pancake', 'nutella', 'crema di nocciole', 'pane e marmellata', 'fette biscottate'];
-const highGISubstituteKeywords = ['marmellata', 'miele', 'sciroppo d\'acero', 'crema di nocciole'];
+const highGISubstituteKeywords = ['marmellata', 'miele', 'sciroppo d\'acero', 'crema di nocciole', 'zucchero', 'succo di frutta'];
 
 export interface HealthConstraints {
   foodsToReduce: string[];

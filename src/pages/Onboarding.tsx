@@ -41,16 +41,12 @@ const steps = [
     ],
   },
   {
-    question: 'Qual è la tua fascia d\'età?',
-    subtitle: 'Per adattare i consigli alle tue esigenze.',
+    question: 'Quanti anni hai?',
+    subtitle: 'Ci aiuta ad adattare i consigli alle tue esigenze.',
     key: 'age',
     multiSelect: false,
-    options: [
-      { label: '18-25', icon: '🌱' },
-      { label: '26-35', icon: '🌿' },
-      { label: '36-45', icon: '🌳' },
-      { label: '46+', icon: '🌻' },
-    ],
+    isAgeInput: true,
+    options: [],
   },
   {
     question: 'Che tipo di percorso preferisci?',
@@ -136,6 +132,7 @@ const Onboarding = () => {
   const [customInput, setCustomInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [weightInput, setWeightInput] = useState('');
+  const [ageInput, setAgeInput] = useState('');
   const { setUser, completeOnboarding } = useAppStore();
   const { saveProfile } = useProfile();
   const navigate = useNavigate();
@@ -234,6 +231,19 @@ const Onboarding = () => {
   const isMultiSelect = currentStep?.multiSelect;
   const hasCustomInput = (currentStep as any)?.hasCustomInput;
   const isWeightInput = (currentStep as any)?.isWeightInput;
+  const isAgeInput = (currentStep as any)?.isAgeInput;
+
+  const handleAgeSubmit = async () => {
+    if (!ageInput.trim()) return;
+    setUser({ age: ageInput.trim() });
+    if (step < steps.length - 1) {
+      setStep(step + 1);
+    } else {
+      completeOnboarding();
+      await saveProfile();
+      navigate('/home');
+    }
+  };
 
   const handleWeightSubmit = async () => {
     setUser({ weight: weightInput || undefined });
@@ -318,7 +328,34 @@ const Onboarding = () => {
             )}
             {!currentStep.subtitle && <div className="mb-6" />}
 
-            {isWeightInput ? (
+            {isAgeInput ? (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <input
+                    type="number"
+                    min="14"
+                    max="100"
+                    value={ageInput}
+                    onChange={(e) => setAgeInput(e.target.value)}
+                    placeholder="Es: 32"
+                    className="flex-1 px-6 py-4 rounded-xl bg-muted border border-border text-foreground text-lg
+                      focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                      transition-all duration-300 placeholder:text-muted-foreground/50"
+                    autoFocus
+                  />
+                  <span className="text-muted-foreground font-medium text-lg">anni</span>
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleAgeSubmit}
+                  disabled={!ageInput.trim()}
+                  className="w-full py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm
+                    shadow-glow disabled:opacity-40 transition-opacity"
+                >
+                  CONTINUA
+                </motion.button>
+              </div>
+            ) : isWeightInput ? (
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <input

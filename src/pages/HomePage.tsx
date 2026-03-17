@@ -318,7 +318,7 @@ const HomePage = () => {
         </motion.div>
 
         {/* ═══════════════════════════════════════════
-            COACH AI — SEMPRE VISIBILE
+            COACH AI + INSIGHT UNIFICATO
         ═══════════════════════════════════════════ */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -329,16 +329,19 @@ const HomePage = () => {
           <Link to="/coach" className="block">
             <div className="relative overflow-hidden p-4 rounded-2xl glass glass-border hover:border-primary/30 transition-all duration-300">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-5 h-5 text-primary-foreground" />
+                <div className="w-11 h-11 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0">
+                  {proactiveCoach ? (
+                    <span className="text-lg">{smartInsight?.icon || '🤖'}</span>
+                  ) : (
+                    <Bot className="w-5 h-5 text-primary-foreground" />
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-[10px] text-primary btn-text">🤖 IL TUO COACH AI</p>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  </div>
                   {proactiveCoach ? (
                     <>
+                      <p className="text-[10px] text-primary btn-text mb-1">
+                        {smartInsight?.label ? `💡 ${smartInsight.label}` : '🤖 IL TUO COACH AI'}
+                      </p>
                       <p className="text-sm font-medium text-foreground">{proactiveCoach.title}</p>
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{proactiveCoach.message}</p>
                       {proactiveCoach.tips?.length > 0 && (
@@ -351,80 +354,29 @@ const HomePage = () => {
                         </div>
                       )}
                     </>
+                  ) : smartInsight ? (
+                    <>
+                      <p className="text-[10px] text-primary btn-text mb-1">💡 {smartInsight.label}</p>
+                      <p className="text-sm font-medium text-foreground">{smartInsight.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{smartInsight.desc}</p>
+                    </>
                   ) : (
                     <>
+                      <p className="text-[10px] text-primary btn-text mb-1">🤖 IL TUO COACH AI</p>
                       <p className="text-sm font-medium text-foreground">Chiedimi qualsiasi cosa</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Conosco le tue analisi, la tua dieta e i tuoi progressi
                       </p>
                     </>
                   )}
+                  <p className="text-[10px] text-primary mt-2 btn-text flex items-center gap-1">
+                    Chatta col coach <ChevronRight className="w-3 h-3" />
+                  </p>
                 </div>
               </div>
             </div>
           </Link>
         </motion.div>
-
-        {/* ═══════════════════════════════════════════
-            BLOCCO 2: AZIONI DI OGGI
-        ═══════════════════════════════════════════ */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-6"
-        >
-          <h2 className="font-display text-lg text-foreground mb-3">I tuoi passi di oggi</h2>
-          <div className="flex flex-col gap-2.5">
-            {weeklyHabits.map((habit, i) => (
-              <motion.div
-                key={habit.id}
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.35 + i * 0.08, duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
-              >
-                <HabitCard
-                  title={habit.title}
-                  icon={habit.icon}
-                  completed={habit.completed}
-                  onToggle={() => toggleHabit(habit.id)}
-                />
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Fasting Timer (only if enabled) */}
-        <FastingTimer />
-
-        {/* ═══════════════════════════════════════════
-            BLOCCO 3: INSIGHT INTELLIGENTE (1 sola card)
-        ═══════════════════════════════════════════ */}
-        {smartInsight && (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="mt-6"
-          >
-            <h2 className="font-display text-lg text-foreground mb-3">Per te oggi</h2>
-            <Link to={smartInsight.type === 'tip' ? '/nutrition' : '/checkin'} className="block">
-              <div className="p-5 rounded-2xl bg-accent glass-border hover:border-primary/20 transition-all duration-300">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">{smartInsight.icon}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] text-accent-foreground/50 btn-text mb-1">💡 {smartInsight.label}</p>
-                    <p className="text-sm font-medium text-accent-foreground">{smartInsight.title}</p>
-                    <p className="text-xs text-accent-foreground/70 mt-1 leading-relaxed">{smartInsight.desc}</p>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground mt-1 flex-shrink-0" />
-                </div>
-              </div>
-            </Link>
-          </motion.div>
-        )}
 
         {/* Together Card */}
         {user.mode === 'together' && (

@@ -33,7 +33,7 @@ const HomePage = () => {
   const [lastCheckin, setLastCheckin] = useState<{ mood: number; energy: number; bloating: number; stress: number | null } | null>(null);
   const [checkedInToday, setCheckedInToday] = useState(false);
   const [proactiveCoach, setProactiveCoach] = useState<{ title: string; message: string; tips: string[]; category: string } | null>(null);
-  const [smartInsight, setSmartInsight] = useState<{ type: 'tip' | 'fasting' | 'motivation'; icon: string; label: string; title: string; desc: string } | null>(null);
+  const [coachLoading, setCoachLoading] = useState(true);
 
   const greeting = () => {
     const hour = new Date().getHours();

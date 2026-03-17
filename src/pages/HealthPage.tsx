@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, TestTubes, Plus, Trash2, ChevronDown, ChevronUp, AlertTriangle, CheckCircle, Loader2, Utensils } from 'lucide-react';
+import { Upload, FileText, TestTubes, Plus, Trash2, ChevronDown, ChevronUp, AlertTriangle, CheckCircle, Loader2, Utensils, Activity, TrendingUp, TrendingDown, ShieldCheck } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import { useHealthDocuments, HealthDocument } from '@/hooks/useHealthDocuments';
+import { Link } from 'react-router-dom';
 
 const HealthPage = () => {
   const { dietDocs, medicalDocs, loading, uploadFile, submitManual, deleteDocument } = useHealthDocuments();

@@ -342,7 +342,7 @@ const HomePage = () => {
         </motion.div>
 
         {/* ═══════════════════════════════════════════
-            COACH AI + INSIGHT UNIFICATO
+            COACH AI — CARD COMPATTA CON CTA CHAT
         ═══════════════════════════════════════════ */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -350,56 +350,45 @@ const HomePage = () => {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="mt-5"
         >
-          <Link to="/coach" className="block">
-            <div className="relative overflow-hidden p-4 rounded-2xl glass glass-border hover:border-primary/30 transition-all duration-300">
+          <div className="relative overflow-hidden rounded-2xl glass glass-border">
+            {/* Coach content */}
+            <div className="p-4 pb-3">
               <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0">
-                  {proactiveCoach ? (
-                    <span className="text-lg">{smartInsight?.icon || '🤖'}</span>
-                  ) : (
-                    <Bot className="w-5 h-5 text-primary-foreground" />
-                  )}
+                <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-5 h-5 text-primary-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
+                  <p className="text-[10px] text-primary btn-text mb-0.5">IL TUO COACH AI</p>
                   {proactiveCoach ? (
                     <>
-                      <p className="text-[10px] text-primary btn-text mb-1">
-                        {smartInsight?.label ? `💡 ${smartInsight.label}` : '🤖 IL TUO COACH AI'}
-                      </p>
-                      <p className="text-sm font-medium text-foreground">{proactiveCoach.title}</p>
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{proactiveCoach.message}</p>
-                      {proactiveCoach.tips?.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {proactiveCoach.tips.slice(0, 2).map((tip, i) => (
-                            <span key={i} className="text-[10px] px-2 py-1 rounded-full bg-primary/10 text-primary">
-                              {tip.length > 40 ? tip.slice(0, 37) + '...' : tip}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      <p className="text-sm font-medium text-foreground leading-snug">{proactiveCoach.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{proactiveCoach.message}</p>
                     </>
                   ) : smartInsight ? (
                     <>
-                      <p className="text-[10px] text-primary btn-text mb-1">💡 {smartInsight.label}</p>
-                      <p className="text-sm font-medium text-foreground">{smartInsight.title}</p>
+                      <p className="text-sm font-medium text-foreground leading-snug">{smartInsight.title}</p>
                       <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{smartInsight.desc}</p>
                     </>
                   ) : (
                     <>
-                      <p className="text-[10px] text-primary btn-text mb-1">🤖 IL TUO COACH AI</p>
-                      <p className="text-sm font-medium text-foreground">Chiedimi qualsiasi cosa</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Conosco le tue analisi, la tua dieta e i tuoi progressi
-                      </p>
+                      <p className="text-sm font-medium text-foreground leading-snug">Pronto ad aiutarti</p>
+                      <p className="text-xs text-muted-foreground mt-1">Conosco le tue analisi, la tua dieta e i tuoi progressi</p>
                     </>
                   )}
-                  <p className="text-[10px] text-primary mt-2 btn-text flex items-center gap-1">
-                    Chatta col coach <ChevronRight className="w-3 h-3" />
-                  </p>
                 </div>
               </div>
             </div>
-          </Link>
+
+            {/* CTA chat — visually distinct, always visible */}
+            <Link
+              to="/coach"
+              className="flex items-center justify-center gap-2 py-3 px-4 bg-primary/10 hover:bg-primary/15 transition-colors border-t border-border/50"
+            >
+              <MessageCircle className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-primary">Chatta con il tuo Coach</span>
+              <ChevronRight className="w-4 h-4 text-primary" />
+            </Link>
+          </div>
         </motion.div>
 
         {/* ═══════════════════════════════════════════

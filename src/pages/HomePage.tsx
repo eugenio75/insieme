@@ -314,14 +314,13 @@ const HomePage = () => {
                       <p className="text-sm font-medium text-foreground leading-snug">{proactiveCoach.title}</p>
                       <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{proactiveCoach.message}</p>
                     </>
-                  ) : smartInsight ? (
-                    <>
-                      <p className="text-sm font-medium text-foreground leading-snug">{smartInsight.title}</p>
-                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{smartInsight.desc}</p>
-                    </>
+                  ) : coachLoading ? (
+                    <p className="text-xs text-muted-foreground mt-1 italic animate-pulse">
+                      Sto preparando un consiglio per te...
+                    </p>
                   ) : (
                     <>
-                      <p className="text-sm font-medium text-foreground leading-snug">Pronto ad aiutarti</p>
+                      <p className="text-sm font-medium text-foreground leading-snug">Sono qui per te</p>
                       <p className="text-xs text-muted-foreground mt-1">Conosco le tue analisi, la tua dieta e i tuoi progressi</p>
                     </>
                   )}

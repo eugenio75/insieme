@@ -485,10 +485,6 @@ const NutritionPage = () => {
                       : meal;
                     return <MealCard key={meal.type} meal={enhancedMeal} delay={i * 0.06} warning={warning} dimmed={outsideWindow} />;
                   })}
-                      ? { ...meal, description: meal.description + ' ' + (fastingEnhancements[meal.type] || '') }
-                      : meal;
-                    return <MealCard key={meal.type} meal={enhancedMeal} delay={i * 0.06} warning={warning} dimmed={outsideWindow} />;
-                  })}
               </div>
             )}
 

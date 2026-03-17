@@ -232,6 +232,52 @@ const HomePage = () => {
           )}
         </AnimatePresence>
 
+        {/* AI Coach Card — proactive insights */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="mt-5"
+        >
+          <Link to="/coach" className="block">
+            <div className="relative overflow-hidden p-4 rounded-2xl glass glass-border hover:border-primary/30 transition-all duration-300">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-[10px] text-primary btn-text">🤖 IL TUO COACH AI</p>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                  {proactiveCoach ? (
+                    <>
+                      <p className="text-sm font-medium text-foreground">{proactiveCoach.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{proactiveCoach.message}</p>
+                      {proactiveCoach.tips?.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {proactiveCoach.tips.slice(0, 2).map((tip, i) => (
+                            <span key={i} className="text-[10px] px-2 py-1 rounded-full bg-primary/10 text-primary">
+                              {tip.length > 40 ? tip.slice(0, 37) + '...' : tip}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm font-medium text-foreground">Chiedimi qualsiasi cosa</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Conosco le tue analisi, la tua dieta e i tuoi progressi
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </Link>
+        </motion.div>
+
         {/* Fasting Timer */}
         <FastingTimer />
 

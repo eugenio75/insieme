@@ -8,7 +8,7 @@ import AppHeader from '../components/AppHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
-import { PenLine, Bot, ChevronRight, Sparkles, TrendingUp, Moon, Flame } from 'lucide-react';
+import { PenLine, Bot, ChevronRight, Sparkles, TrendingUp, Moon, Flame, MessageCircle } from 'lucide-react';
 import FastingTimer from '@/components/FastingTimer';
 
 const fallbackMessages = [

@@ -126,6 +126,8 @@ const HomePage = () => {
         }
       } catch (e) {
         console.error('Error fetching coach insight:', e);
+      } finally {
+        setCoachLoading(false);
       }
     };
     fetchCoachInsight();

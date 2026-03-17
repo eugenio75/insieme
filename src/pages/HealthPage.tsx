@@ -1,37 +1,75 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, TestTubes, Plus, Trash2, ChevronDown, ChevronUp, AlertTriangle, CheckCircle, Loader2, Utensils } from 'lucide-react';
+import { Upload, FileText, TestTubes, Plus, Trash2, ChevronDown, ChevronUp, AlertTriangle, CheckCircle, Loader2, Utensils, Activity, TrendingUp, TrendingDown, ShieldCheck } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import { useHealthDocuments, HealthDocument } from '@/hooks/useHealthDocuments';
+import { Link } from 'react-router-dom';
 
 const HealthPage = () => {
   const { dietDocs, medicalDocs, loading, uploadFile, submitManual, deleteDocument } = useHealthDocuments();
-  const [activeTab, setActiveTab] = useState<'diet' | 'medical'>('diet');
+  const [activeTab, setActiveTab] = useState<'summary' | 'diet' | 'medical'>('summary');
   const [showManualInput, setShowManualInput] = useState(false);
   const [manualText, setManualText] = useState('');
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Extract insights from completed docs
+  const healthInsights = useMemo(() => {
+    const latestMedical = medicalDocs.find(d => d.status === 'completed' && d.ai_analysis);
+    const latestDiet = dietDocs.find(d => d.status === 'completed' && d.ai_analysis);
+    
+    const medAnalysis = latestMedical?.ai_analysis as any;
+    const dietAnalysis = latestDiet?.ai_analysis as any;
+
+    const abnormalValues = medAnalysis?.values?.filter((v: any) => v.status !== 'normal') || [];
+    const riskFactors = medAnalysis?.risk_factors || [];
+    const foodsToIncrease = medAnalysis?.foods_to_increase || [];
+    const foodsToReduce = medAnalysis?.foods_to_reduce || [];
+    const preventionTips = medAnalysis?.prevention_tips || [];
+    const dietMeals = dietAnalysis?.meals || [];
+    const fusionTips = dietAnalysis?.fusion_tips || [];
+    const dietSummary = dietAnalysis?.summary || '';
+    const medSummary = medAnalysis?.summary || '';
+
+    return {
+      hasData: !!(latestMedical || latestDiet),
+      hasMedical: !!latestMedical,
+      hasDiet: !!latestDiet,
+      abnormalValues,
+      riskFactors,
+      foodsToIncrease,
+      foodsToReduce,
+      preventionTips,
+      dietMeals,
+      fusionTips,
+      dietSummary,
+      medSummary,
+      medDate: latestMedical?.created_at,
+      dietDate: latestDiet?.created_at,
+    };
+  }, [medicalDocs, dietDocs]);
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    await uploadFile(file, activeTab === 'diet' ? 'diet' : 'medical_tests');
+    const docType = activeTab === 'medical' ? 'medical_tests' : 'diet';
+    await uploadFile(file, docType);
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleManualSubmit = async () => {
     if (!manualText.trim()) return;
-    setUploading(true);
-    await submitManual(manualText.trim(), activeTab === 'diet' ? 'diet' : 'medical_tests');
+    const docType = activeTab === 'medical' ? 'medical_tests' : 'diet';
+    await submitManual(manualText.trim(), docType);
     setManualText('');
     setShowManualInput(false);
     setUploading(false);
   };
 
-  const currentDocs = activeTab === 'diet' ? dietDocs : medicalDocs;
+  const currentDocs = activeTab === 'diet' ? dietDocs : activeTab === 'medical' ? medicalDocs : [];
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
@@ -43,15 +81,16 @@ const HealthPage = () => {
         </p>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
           {[
+            { id: 'summary' as const, icon: Activity, label: 'Panoramica' },
             { id: 'diet' as const, icon: Utensils, label: 'Dieta' },
             { id: 'medical' as const, icon: TestTubes, label: 'Analisi' },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-sm font-medium transition-all duration-300 ${
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-2xl text-sm font-medium transition-all duration-300 whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'gradient-primary text-primary-foreground'
                   : 'glass glass-border text-muted-foreground'
@@ -63,107 +102,279 @@ const HealthPage = () => {
           ))}
         </div>
 
-        {/* Upload area */}
-        <div className="mb-6 space-y-3">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*,.pdf"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="w-full p-6 rounded-2xl border-2 border-dashed border-primary/30 hover:border-primary/60 
-              transition-all duration-300 flex flex-col items-center gap-3 text-center"
-          >
-            {uploading ? (
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            ) : (
-              <Upload className="w-8 h-8 text-primary" />
-            )}
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                {activeTab === 'diet' ? 'Carica la dieta del dietologo' : 'Carica le analisi mediche'}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                PDF o foto • L'AI analizzerà il contenuto
-              </p>
-            </div>
-          </button>
-
-          {!showManualInput ? (
-            <button
-              onClick={() => setShowManualInput(true)}
-              className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl glass glass-border text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="text-sm font-medium">
-                {activeTab === 'diet' ? 'Inserisci manualmente la dieta' : 'Inserisci manualmente i valori'}
-              </span>
-            </button>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="space-y-3"
-            >
-              <textarea
-                value={manualText}
-                onChange={(e) => setManualText(e.target.value)}
-                placeholder={
-                  activeTab === 'diet'
-                    ? 'Scrivi i pasti della tua dieta:\n\nColazione: yogurt greco, frutta secca...\nPranzo: pasta integrale, verdure...\nCena: pesce, insalata...'
-                    : 'Inserisci i valori delle analisi:\n\nGlicemia: 92 mg/dL\nColesterolo totale: 210 mg/dL\nFerritina: 45 ng/mL...'
-                }
-                className="w-full h-40 px-5 py-4 rounded-2xl bg-muted border border-border text-foreground text-sm
-                  focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
-                  transition-all duration-300 placeholder:text-muted-foreground/50 resize-none"
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={handleManualSubmit}
-                  disabled={!manualText.trim() || uploading}
-                  className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium 
-                    disabled:opacity-40 transition-opacity flex items-center justify-center gap-2"
-                >
-                  {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  Analizza con AI
-                </button>
-                <button
-                  onClick={() => { setShowManualInput(false); setManualText(''); }}
-                  className="px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
-                >
-                  Annulla
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </div>
-
-        {/* Documents list */}
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 text-primary animate-spin" />
-          </div>
-        ) : currentDocs.length === 0 ? (
-          <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">
-              {activeTab === 'diet'
-                ? 'Nessuna dieta caricata ancora'
-                : 'Nessuna analisi caricata ancora'}
-            </p>
-          </div>
-        ) : (
+        {/* Summary Tab */}
+        {activeTab === 'summary' && (
           <div className="space-y-4">
-            {currentDocs.map((doc) => (
-              <DocumentCard key={doc.id} doc={doc} onDelete={deleteDocument} />
-            ))}
+            {!healthInsights.hasData ? (
+              <div className="text-center py-12">
+                <Activity className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground mb-2">Nessun dato ancora</p>
+                <p className="text-xs text-muted-foreground mb-4">
+                  Carica le tue analisi mediche o la dieta del dietologo per vedere la panoramica
+                </p>
+                <div className="flex gap-2 justify-center">
+                  <button onClick={() => setActiveTab('medical')} className="px-4 py-2 rounded-xl gradient-primary text-primary-foreground text-xs font-medium">
+                    Carica analisi
+                  </button>
+                  <button onClick={() => setActiveTab('diet')} className="px-4 py-2 rounded-xl glass glass-border text-foreground text-xs font-medium">
+                    Carica dieta
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Medical Summary */}
+                {healthInsights.hasMedical && healthInsights.medSummary && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-2xl glass glass-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TestTubes className="w-4 h-4 text-primary" />
+                      <p className="text-xs font-semibold text-primary uppercase tracking-wider">Analisi mediche</p>
+                      {healthInsights.medDate && (
+                        <span className="text-[10px] text-muted-foreground ml-auto">
+                          {new Date(healthInsights.medDate).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-foreground">{healthInsights.medSummary}</p>
+                  </motion.div>
+                )}
+
+                {/* Abnormal Values */}
+                {healthInsights.abnormalValues.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+                    <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">⚠️ Valori da monitorare</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {healthInsights.abnormalValues.map((v: any, i: number) => (
+                        <div key={i} className={`p-3 rounded-xl ${
+                          v.status === 'critical' ? 'bg-destructive/10 border border-destructive/20' :
+                          'bg-secondary/10 border border-secondary/20'
+                        }`}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-medium text-foreground truncate">{v.name}</span>
+                            {v.status === 'high' ? <TrendingUp className="w-3 h-3 text-secondary flex-shrink-0" /> : 
+                             v.status === 'low' ? <TrendingDown className="w-3 h-3 text-secondary flex-shrink-0" /> :
+                             <AlertTriangle className="w-3 h-3 text-destructive flex-shrink-0" />}
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">{v.value}</p>
+                          {v.implications && <p className="text-[10px] text-foreground mt-1">{v.implications}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Risk Factors */}
+                {healthInsights.riskFactors.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                    className="p-4 rounded-2xl bg-destructive/5 border border-destructive/10">
+                    <p className="text-xs font-semibold text-destructive uppercase tracking-wider mb-2">🛡 Fattori di rischio</p>
+                    {healthInsights.riskFactors.map((r: string, i: number) => (
+                      <p key={i} className="text-xs text-foreground mb-1">• {r}</p>
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* Foods Grid */}
+                {(healthInsights.foodsToIncrease.length > 0 || healthInsights.foodsToReduce.length > 0) && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                    className="grid grid-cols-2 gap-3">
+                    {healthInsights.foodsToIncrease.length > 0 && (
+                      <div className="p-3 rounded-xl bg-accent">
+                        <p className="text-xs font-semibold text-accent-foreground mb-2">✅ Da aumentare</p>
+                        {healthInsights.foodsToIncrease.slice(0, 5).map((f: string, i: number) => (
+                          <p key={i} className="text-[11px] text-accent-foreground mb-0.5">• {f}</p>
+                        ))}
+                      </div>
+                    )}
+                    {healthInsights.foodsToReduce.length > 0 && (
+                      <div className="p-3 rounded-xl bg-destructive/10">
+                        <p className="text-xs font-semibold text-destructive mb-2">⛔ Da ridurre</p>
+                        {healthInsights.foodsToReduce.slice(0, 5).map((f: string, i: number) => (
+                          <p key={i} className="text-[11px] text-foreground mb-0.5">• {f}</p>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+
+                {/* Diet Summary */}
+                {healthInsights.hasDiet && healthInsights.dietSummary && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                    className="p-4 rounded-2xl glass glass-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Utensils className="w-4 h-4 text-primary" />
+                      <p className="text-xs font-semibold text-primary uppercase tracking-wider">Dieta del dietologo</p>
+                    </div>
+                    <p className="text-sm text-foreground">{healthInsights.dietSummary}</p>
+                  </motion.div>
+                )}
+
+                {/* Diet Meals Preview */}
+                {healthInsights.dietMeals.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+                    <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">🍽 Pasti prescritti</p>
+                    <div className="space-y-2">
+                      {healthInsights.dietMeals.slice(0, 4).map((meal: any, i: number) => (
+                        <div key={i} className="p-3 rounded-xl bg-muted/50">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-medium text-foreground">{meal.name}</span>
+                            {meal.time && <span className="text-[10px] text-muted-foreground">{meal.time}</span>}
+                          </div>
+                          <p className="text-[11px] text-muted-foreground">{meal.foods?.join(', ')}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Fusion Tips */}
+                {healthInsights.fusionTips.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                    className="p-4 rounded-2xl bg-accent border border-primary/20">
+                    <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">🔄 Fusione intelligente</p>
+                    {healthInsights.fusionTips.map((t: string, i: number) => (
+                      <p key={i} className="text-xs text-accent-foreground mb-1">• {t}</p>
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* Prevention */}
+                {healthInsights.preventionTips.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+                    className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <ShieldCheck className="w-4 h-4 text-primary" />
+                      <p className="text-xs font-semibold text-primary uppercase tracking-wider">Prevenzione</p>
+                    </div>
+                    {healthInsights.preventionTips.map((t: string, i: number) => (
+                      <p key={i} className="text-xs text-foreground mb-1">• {t}</p>
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* Link to coach */}
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+                  <Link to="/coach" className="block p-4 rounded-2xl glass glass-border hover:border-primary/30 transition-all">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">🤖</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-foreground">Chiedi al tuo Coach AI</p>
+                        <p className="text-xs text-muted-foreground">Domande sulle analisi, dieta e consigli personalizzati</p>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-muted-foreground -rotate-90" />
+                    </div>
+                  </Link>
+                </motion.div>
+              </>
+            )}
           </div>
+        )}
+
+        {/* Upload area + Documents - only for diet/medical tabs */}
+        {activeTab !== 'summary' && (
+          <>
+            <div className="mb-6 space-y-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.pdf"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="w-full p-6 rounded-2xl border-2 border-dashed border-primary/30 hover:border-primary/60 
+                  transition-all duration-300 flex flex-col items-center gap-3 text-center"
+              >
+                {uploading ? (
+                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                ) : (
+                  <Upload className="w-8 h-8 text-primary" />
+                )}
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    {activeTab === 'diet' ? 'Carica la dieta del dietologo' : 'Carica le analisi mediche'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    PDF o foto • L'AI analizzerà il contenuto
+                  </p>
+                </div>
+              </button>
+
+              {!showManualInput ? (
+                <button
+                  onClick={() => setShowManualInput(true)}
+                  className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl glass glass-border text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {activeTab === 'diet' ? 'Inserisci manualmente la dieta' : 'Inserisci manualmente i valori'}
+                  </span>
+                </button>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-3"
+                >
+                  <textarea
+                    value={manualText}
+                    onChange={(e) => setManualText(e.target.value)}
+                    placeholder={
+                      activeTab === 'diet'
+                        ? 'Scrivi i pasti della tua dieta:\n\nColazione: yogurt greco, frutta secca...\nPranzo: pasta integrale, verdure...\nCena: pesce, insalata...'
+                        : 'Inserisci i valori delle analisi:\n\nGlicemia: 92 mg/dL\nColesterolo totale: 210 mg/dL\nFerritina: 45 ng/mL...'
+                    }
+                    className="w-full h-40 px-5 py-4 rounded-2xl bg-muted border border-border text-foreground text-sm
+                      focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                      transition-all duration-300 placeholder:text-muted-foreground/50 resize-none"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleManualSubmit}
+                      disabled={!manualText.trim() || uploading}
+                      className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium 
+                        disabled:opacity-40 transition-opacity flex items-center justify-center gap-2"
+                    >
+                      {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                      Analizza con AI
+                    </button>
+                    <button
+                      onClick={() => { setShowManualInput(false); setManualText(''); }}
+                      className="px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
+                    >
+                      Annulla
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Documents list */}
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-6 h-6 text-primary animate-spin" />
+              </div>
+            ) : currentDocs.length === 0 ? (
+              <div className="text-center py-12">
+                <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">
+                  {activeTab === 'diet'
+                    ? 'Nessuna dieta caricata ancora'
+                    : 'Nessuna analisi caricata ancora'}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {currentDocs.map((doc) => (
+                  <DocumentCard key={doc.id} doc={doc} onDelete={deleteDocument} />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </motion.div>
       <BottomNav />

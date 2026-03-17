@@ -4,11 +4,13 @@ import { useAppStore } from '../store/useAppStore';
 import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } from '../data/foodTips';
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
-import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer, Sparkles } from 'lucide-react';
+import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer, Sparkles, Stethoscope } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
 import { useFoodFindings } from '@/hooks/useFoodFindings';
 import { usePatternAnalysis } from '@/hooks/useFoodFindings';
 import { useFasting } from '@/hooks/useFasting';
+import { useHealthDocuments } from '@/hooks/useHealthDocuments';
+import { Link } from 'react-router-dom';
 
 type Tab = 'piano' | 'consigli' | 'ricette' | 'gonfiore';
 
@@ -209,6 +211,24 @@ const NutritionPage = () => {
   const { checkMeal } = useFoodFindings();
   const { analysis, load: loadPatterns, loaded: patternsLoaded } = usePatternAnalysis();
   const { config: fastingConfig, getStatus } = useFasting();
+  const { medicalDocs, dietDocs } = useHealthDocuments();
+
+  // Extract health-based insights for meal warnings
+  const healthWarnings = (() => {
+    const latestMed = medicalDocs.find(d => d.status === 'completed' && d.ai_analysis);
+    const latestDiet = dietDocs.find(d => d.status === 'completed' && d.ai_analysis);
+    const medAnalysis = latestMed?.ai_analysis as any;
+    const dietAnalysis = latestDiet?.ai_analysis as any;
+    return {
+      foodsToReduce: medAnalysis?.foods_to_reduce || [],
+      foodsToIncrease: medAnalysis?.foods_to_increase || [],
+      dietaryRecommendations: medAnalysis?.dietary_recommendations || [],
+      hasDiet: !!latestDiet,
+      dietMeals: dietAnalysis?.meals || [],
+      fusionTips: dietAnalysis?.fusion_tips || [],
+      abnormalValues: medAnalysis?.values?.filter((v: any) => v.status !== 'normal') || [],
+    };
+  })();
 
   // Load patterns when component mounts
   useEffect(() => {
@@ -321,6 +341,45 @@ const NutritionPage = () => {
                   </p>
                 </div>
               </div>
+            )}
+
+            {/* Health-based warnings from medical analyses */}
+            {(healthWarnings.abnormalValues.length > 0 || healthWarnings.hasDiet) && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-5 space-y-3"
+              >
+                {healthWarnings.abnormalValues.length > 0 && (
+                  <div className="p-4 rounded-2xl bg-secondary/5 border border-secondary/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Stethoscope className="w-4 h-4 text-secondary" />
+                      <p className="text-xs font-medium text-foreground">In base alle tue analisi</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      {healthWarnings.foodsToReduce.slice(0, 3).map((f: string, i: number) => (
+                        <p key={`r${i}`} className="text-xs text-foreground">⛔ {f}</p>
+                      ))}
+                      {healthWarnings.foodsToIncrease.slice(0, 3).map((f: string, i: number) => (
+                        <p key={`i${i}`} className="text-xs text-foreground">✅ {f}</p>
+                      ))}
+                    </div>
+                    <Link to="/health" className="text-[10px] text-primary font-medium mt-2 block">Vedi panoramica completa →</Link>
+                  </div>
+                )}
+
+                {healthWarnings.hasDiet && healthWarnings.fusionTips.length > 0 && (
+                  <div className="p-4 rounded-2xl bg-accent border border-primary/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                      <p className="text-xs font-medium text-foreground">Dalla dieta del tuo dietologo</p>
+                    </div>
+                    {healthWarnings.fusionTips.slice(0, 2).map((t: string, i: number) => (
+                      <p key={i} className="text-xs text-accent-foreground mb-1">🔄 {t}</p>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
             )}
 
             {/* AI Diet Adaptation Banner */}

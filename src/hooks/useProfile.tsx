@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useAppStore } from '@/store/useAppStore';
@@ -6,12 +6,17 @@ import { useAppStore } from '@/store/useAppStore';
 export const useProfile = () => {
   const { user } = useAuth();
   const { setUser, refreshWeeklyHabits } = useAppStore();
+  const [profileLoading, setProfileLoading] = useState(true);
 
   // Load profile from DB on auth
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setProfileLoading(false);
+      return;
+    }
 
     const loadProfile = async () => {
+      setProfileLoading(true);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -37,6 +42,7 @@ export const useProfile = () => {
         });
         setTimeout(() => refreshWeeklyHabits(), 0);
       }
+      setProfileLoading(false);
     };
 
     loadProfile();
@@ -67,5 +73,5 @@ export const useProfile = () => {
       .eq('user_id', user.id);
   };
 
-  return { saveProfile };
+  return { saveProfile, profileLoading };
 };

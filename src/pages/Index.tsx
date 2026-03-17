@@ -11,10 +11,10 @@ const Index = () => {
   const navigate = useNavigate();
 
   // Load profile from DB when authenticated
-  useProfile();
+  const { profileLoading } = useProfile();
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || profileLoading) return;
 
     // Not logged in → auth page
     if (!authUser) {
@@ -26,9 +26,9 @@ const Index = () => {
     if (profile.onboarded) {
       navigate('/home');
     }
-  }, [authUser, profile.onboarded, loading, navigate]);
+  }, [authUser, profile.onboarded, loading, profileLoading, navigate]);
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <span className="text-4xl animate-pulse">🌿</span>

@@ -62,8 +62,8 @@ const HealthPage = () => {
 
   const handleManualSubmit = async () => {
     if (!manualText.trim()) return;
-    setUploading(true);
-    await submitManual(manualText.trim(), activeTab === 'diet' ? 'diet' : 'medical_tests');
+    const docType = activeTab === 'medical' ? 'medical_tests' : 'diet';
+    await submitManual(manualText.trim(), docType);
     setManualText('');
     setShowManualInput(false);
     setUploading(false);

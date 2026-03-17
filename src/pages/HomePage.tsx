@@ -189,17 +189,40 @@ const HomePage = () => {
 
   const displayMessage = aiMessage || fallbackMessages[new Date().getDay() % fallbackMessages.length];
 
-  // Status indicators from last check-in
+  // Status indicators mapped to actual check-in labels
   const statusIndicators = useMemo(() => {
     if (!lastCheckin) return null;
+
+    const moodMap: Record<number, { label: string; icon: string }> = {
+      5: { label: 'Serena', icon: '😊' },
+      4: { label: 'Calma', icon: '😌' },
+      3: { label: 'Così così', icon: '😐' },
+      2: { label: 'Stanca', icon: '😔' },
+      1: { label: 'Difficile', icon: '😢' },
+    };
+    const energyMap: Record<number, { label: string; icon: string }> = {
+      5: { label: 'Alta', icon: '⚡' },
+      4: { label: 'Buona', icon: '✨' },
+      3: { label: 'Nella media', icon: '➡️' },
+      2: { label: 'Bassa', icon: '🔋' },
+      1: { label: 'Molto bassa', icon: '😴' },
+    };
+    const bloatingMap: Record<number, { label: string; icon: string }> = {
+      1: { label: 'Nessuno', icon: '🌿' },
+      2: { label: 'Leggero', icon: '🫧' },
+      3: { label: 'Moderato', icon: '💨' },
+      4: { label: 'Forte', icon: '😣' },
+    };
+
+    const mood = moodMap[lastCheckin.mood] || moodMap[3];
+    const energy = energyMap[lastCheckin.energy] || energyMap[3];
+    const bloating = bloatingMap[lastCheckin.bloating] || bloatingMap[1];
+
     const items = [
-      { label: 'Umore', value: lastCheckin.mood, icon: ['😢', '😕', '😐', '🙂', '😄'][lastCheckin.mood - 1] || '😐' },
-      { label: 'Energia', value: lastCheckin.energy, icon: ['🪫', '🔋', '⚡', '💪', '🚀'][lastCheckin.energy - 1] || '⚡' },
-      { label: 'Gonfiore', value: lastCheckin.bloating, icon: lastCheckin.bloating <= 2 ? '✅' : lastCheckin.bloating <= 3 ? '⚠️' : '🔴' },
+      { label: mood.label, icon: mood.icon, category: 'Umore' },
+      { label: energy.label, icon: energy.icon, category: 'Energia' },
+      { label: bloating.label, icon: bloating.icon, category: 'Gonfiore' },
     ];
-    if (lastCheckin.stress !== null) {
-      items.push({ label: 'Stress', value: lastCheckin.stress!, icon: lastCheckin.stress! <= 2 ? '😌' : lastCheckin.stress! <= 3 ? '😤' : '🫨' });
-    }
     return items;
   }, [lastCheckin]);
 

@@ -8,11 +8,47 @@ import { Link } from 'react-router-dom';
 
 const HealthPage = () => {
   const { dietDocs, medicalDocs, loading, uploadFile, submitManual, deleteDocument } = useHealthDocuments();
-  const [activeTab, setActiveTab] = useState<'diet' | 'medical'>('diet');
+  const [activeTab, setActiveTab] = useState<'summary' | 'diet' | 'medical'>('summary');
   const [showManualInput, setShowManualInput] = useState(false);
   const [manualText, setManualText] = useState('');
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Extract insights from completed docs
+  const healthInsights = useMemo(() => {
+    const latestMedical = medicalDocs.find(d => d.status === 'completed' && d.ai_analysis);
+    const latestDiet = dietDocs.find(d => d.status === 'completed' && d.ai_analysis);
+    
+    const medAnalysis = latestMedical?.ai_analysis as any;
+    const dietAnalysis = latestDiet?.ai_analysis as any;
+
+    const abnormalValues = medAnalysis?.values?.filter((v: any) => v.status !== 'normal') || [];
+    const riskFactors = medAnalysis?.risk_factors || [];
+    const foodsToIncrease = medAnalysis?.foods_to_increase || [];
+    const foodsToReduce = medAnalysis?.foods_to_reduce || [];
+    const preventionTips = medAnalysis?.prevention_tips || [];
+    const dietMeals = dietAnalysis?.meals || [];
+    const fusionTips = dietAnalysis?.fusion_tips || [];
+    const dietSummary = dietAnalysis?.summary || '';
+    const medSummary = medAnalysis?.summary || '';
+
+    return {
+      hasData: !!(latestMedical || latestDiet),
+      hasMedical: !!latestMedical,
+      hasDiet: !!latestDiet,
+      abnormalValues,
+      riskFactors,
+      foodsToIncrease,
+      foodsToReduce,
+      preventionTips,
+      dietMeals,
+      fusionTips,
+      dietSummary,
+      medSummary,
+      medDate: latestMedical?.created_at,
+      dietDate: latestDiet?.created_at,
+    };
+  }, [medicalDocs, dietDocs]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

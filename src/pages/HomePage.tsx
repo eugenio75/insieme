@@ -83,6 +83,7 @@ const HomePage = () => {
     };
 
     fetchPartnership();
+  }, [authUser]);
 
   // Fetch check-in signals for habit refresh
   useEffect(() => {

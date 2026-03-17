@@ -408,7 +408,7 @@ const HomePage = () => {
         </motion.div>
 
         {/* Together Card */}
-        {user.mode === 'together' && (
+        {(user.mode === 'together' || hasPartnership) && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}

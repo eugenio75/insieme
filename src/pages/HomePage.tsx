@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { getDailyTip } from '@/data/foodTips';
-import { PenLine, X } from 'lucide-react';
+import { PenLine, X, Bot, ChevronRight } from 'lucide-react';
 import FastingTimer from '@/components/FastingTimer';
 import FastingSuggestion from '@/components/FastingSuggestion';
 

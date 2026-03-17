@@ -131,15 +131,15 @@ const HomePage = () => {
     fetchCoachInsight();
   }, [authUser]);
 
-  // Determine smart insight based on check-in data
+  // Determine smart insight based on check-in data (soft, encouraging tone)
   useEffect(() => {
     if (!lastCheckin) {
       setSmartInsight({
         type: 'motivation',
         icon: '🌿',
         label: 'PER TE',
-        title: 'Inizia la giornata con consapevolezza',
-        desc: 'Fai il check-in per ricevere consigli personalizzati',
+        title: 'Prenditi un momento',
+        desc: 'Fai il check-in quando vuoi, senza fretta 🌱',
       });
       return;
     }
@@ -147,42 +147,42 @@ const HomePage = () => {
     if (energy <= 2) {
       setSmartInsight({
         type: 'tip',
-        icon: '⚡',
-        label: 'ENERGIA BASSA',
-        title: 'Prova uno snack energizzante',
-        desc: 'Frutta secca, banana o un pugno di mandorle possono aiutarti a ritrovare energia',
+        icon: '🍌',
+        label: 'UN PICCOLO AIUTO',
+        title: 'Una merenda può fare la differenza',
+        desc: 'Frutta secca o una banana sono perfetti per ricaricarti',
       });
     } else if (bloating >= 4) {
       setSmartInsight({
         type: 'tip',
-        icon: '🫗',
-        label: 'GONFIORE ALTO',
-        title: 'Riduci i cibi fermentabili oggi',
-        desc: 'Evita legumi crudi, latticini e bevande gassate. Prova tisana allo zenzero',
+        icon: '🫖',
+        label: 'CONSIGLIO GENTILE',
+        title: 'Una tisana può aiutarti',
+        desc: 'Zenzero o finocchio sono ottimi alleati naturali',
       });
     } else if (stress && stress >= 4) {
       setSmartInsight({
         type: 'tip',
-        icon: '🧘',
-        label: 'STRESS ELEVATO',
-        title: '5 minuti di respiro profondo',
-        desc: 'La respirazione diaframmatica riduce cortisolo e migliora la digestione',
+        icon: '🌬️',
+        label: 'RESPIRA',
+        title: 'Prova 3 respiri profondi',
+        desc: 'Anche solo un minuto di calma fa bene al corpo',
       });
     } else if (mood <= 2) {
       setSmartInsight({
         type: 'motivation',
         icon: '💛',
-        label: 'TI SIAMO VICINI',
-        title: 'Ogni giorno difficile passa',
-        desc: 'Concediti qualcosa che ti fa stare bene. Anche un piccolo gesto conta',
+        label: 'CON TE',
+        title: 'Va bene anche così',
+        desc: 'Non ogni giorno deve essere perfetto. Sei qui, è già tanto',
       });
     } else {
       setSmartInsight({
         type: 'motivation',
         icon: '✨',
-        label: 'STAI ANDANDO BENE',
-        title: 'Continua così!',
-        desc: 'I tuoi parametri sono positivi. Mantieni le buone abitudini di oggi',
+        label: 'BENE COSÌ',
+        title: 'Stai andando alla grande',
+        desc: 'Continua con il tuo ritmo, senza pressioni',
       });
     }
   }, [lastCheckin]);

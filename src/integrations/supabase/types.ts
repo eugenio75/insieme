@@ -107,6 +107,48 @@ export type Database = {
         }
         Relationships: []
       }
+      health_documents: {
+        Row: {
+          ai_analysis: Json | null
+          ai_meal_plan: Json | null
+          created_at: string
+          doc_type: string
+          file_name: string | null
+          file_path: string | null
+          id: string
+          manual_content: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          ai_meal_plan?: Json | null
+          created_at?: string
+          doc_type: string
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          manual_content?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_analysis?: Json | null
+          ai_meal_plan?: Json | null
+          created_at?: string
+          doc_type?: string
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          manual_content?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       invites: {
         Row: {
           accepted_by: string | null

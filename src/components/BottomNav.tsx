@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Heart, Utensils, BarChart3 } from 'lucide-react';
+import { Home, Heart, Utensils, BarChart3, Stethoscope } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -10,6 +10,7 @@ const TOGETHER_LAST_VISIT_KEY = 'together_last_visit';
 const tabs = [
   { path: '/home', icon: Home, label: 'Home' },
   { path: '/nutrition', icon: Utensils, label: 'Cibo' },
+  { path: '/health', icon: Stethoscope, label: 'Salute' },
   { path: '/progress', icon: BarChart3, label: 'Risultati' },
   { path: '/together', icon: Heart, label: 'Insieme' },
 ];

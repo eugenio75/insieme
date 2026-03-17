@@ -14,6 +14,7 @@ import ProfilePage from "./pages/ProfilePage.tsx";
 import NutritionPage from "./pages/NutritionPage.tsx";
 import WeeklyCheckIn from "./pages/WeeklyCheckIn.tsx";
 import ProgressPage from "./pages/ProgressPage.tsx";
+import HealthPage from "./pages/HealthPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/nutrition" element={<NutritionPage />} />
             <Route path="/weekly-checkin" element={<WeeklyCheckIn />} />
             <Route path="/progress" element={<ProgressPage />} />
+            <Route path="/health" element={<HealthPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -1,25 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
-import { LogOut } from 'lucide-react';
 
 const Index = () => {
   const { user: profile } = useAppStore();
-  const { user: authUser, loading, signOut } = useAuth();
+  const { user: authUser, loading } = useAuth();
   const navigate = useNavigate();
-  const [showActions, setShowActions] = useState(false);
 
   // Load profile from DB when authenticated
-  const { profileLoading, profileError, retryProfileLoad } = useProfile();
-
-  // Show actions after 3 seconds of loading so user isn't stuck
-  useEffect(() => {
-    const timer = setTimeout(() => setShowActions(true), 3000);
-    return () => clearTimeout(timer);
-  }, []);
+  const { profileLoading } = useProfile();
 
   useEffect(() => {
     if (loading || profileLoading) return;
@@ -33,75 +25,13 @@ const Index = () => {
     // Logged in + onboarded → home
     if (profile.onboarded) {
       navigate('/home');
-      return;
     }
-
-    // If backend timed out, don't mis-route user to onboarding
-    if (profileError) return;
-  }, [authUser, profile.onboarded, loading, profileLoading, profileError, navigate]);
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch {
-      // Force clear local state even if signOut fails
-      localStorage.clear();
-      window.location.href = '/auth';
-    }
-  };
+  }, [authUser, profile.onboarded, loading, profileLoading, navigate]);
 
   if (loading || profileLoading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <span className="text-4xl animate-pulse">🌿</span>
-        {showActions && authUser && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col items-center gap-3 mt-4"
-          >
-            <p className="text-xs text-muted-foreground">Caricamento lento…</p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => window.location.reload()}
-                className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-medium"
-              >
-                Ricarica
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="px-4 py-2 rounded-xl glass glass-border text-destructive text-xs font-medium flex items-center gap-1.5"
-              >
-                <LogOut className="w-3 h-3" />
-                Esci
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </div>
-    );
-  }
-
-  if (authUser && profileError && !profile.onboarded) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-8 max-w-lg mx-auto text-center gap-4">
-        <span className="text-4xl">🔄</span>
-        <p className="text-sm text-muted-foreground">Sto recuperando il tuo profilo, un attimo…</p>
-        <div className="flex gap-3">
-          <button
-            onClick={retryProfileLoad}
-            className="px-6 py-3 rounded-2xl bg-primary text-primary-foreground btn-text text-xs"
-          >
-            Riprova ora
-          </button>
-          <button
-            onClick={handleSignOut}
-            className="px-6 py-3 rounded-2xl glass glass-border text-destructive btn-text text-xs flex items-center gap-1.5"
-          >
-            <LogOut className="w-3 h-3" />
-            Esci
-          </button>
-        </div>
       </div>
     );
   }

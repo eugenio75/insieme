@@ -32,9 +32,8 @@ const HomePage = () => {
   const [loadingMessage, setLoadingMessage] = useState(true);
   const [lastCheckin, setLastCheckin] = useState<{ mood: number; energy: number; bloating: number; stress: number | null } | null>(null);
   const [checkedInToday, setCheckedInToday] = useState(false);
-  const [hasPartnership, setHasPartnership] = useState(false);
   const [proactiveCoach, setProactiveCoach] = useState<{ title: string; message: string; tips: string[]; category: string } | null>(null);
-  const [coachLoading, setCoachLoading] = useState(true);
+  const [smartInsight, setSmartInsight] = useState<{ type: 'tip' | 'fasting' | 'motivation'; icon: string; label: string; title: string; desc: string } | null>(null);
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -64,27 +63,6 @@ const HomePage = () => {
     fetchCheckin();
   }, [authUser]);
 
-  // Check if user has at least one partnership (used as resilient fallback for Insieme section)
-  useEffect(() => {
-    if (!authUser) return;
-
-    const fetchPartnership = async () => {
-      const { data, error } = await supabase
-        .from('partnerships')
-        .select('id')
-        .or(`user_id.eq.${authUser.id},partner_id.eq.${authUser.id}`)
-        .limit(1);
-
-      if (!error && data && data.length > 0) {
-        setHasPartnership(true);
-      } else {
-        setHasPartnership(false);
-      }
-    };
-
-    fetchPartnership();
-  }, [authUser]);
-
   // Fetch check-in signals for habit refresh
   useEffect(() => {
     if (!authUser) return;
@@ -110,20 +88,9 @@ const HomePage = () => {
   // Fetch AI motivational message
   useEffect(() => {
     const fetchMessage = async () => {
-      if (!authUser) {
-        setLoadingMessage(false);
-        return;
-      }
-
+      if (!authUser) { setLoadingMessage(false); return; }
       try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const accessToken = sessionData.session?.access_token;
-        if (!accessToken) return;
-
-        const { data, error } = await supabase.functions.invoke('motivational-message', {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-
+        const { data, error } = await supabase.functions.invoke('motivational-message');
         if (error) throw error;
         if (data?.message) setAiMessage(data.message);
       } catch (e) {
@@ -132,40 +99,93 @@ const HomePage = () => {
         setLoadingMessage(false);
       }
     };
-
     fetchMessage();
   }, [authUser]);
 
   // Fetch proactive AI coach insight
   useEffect(() => {
     const fetchCoachInsight = async () => {
-      if (!authUser) {
-        setCoachLoading(false);
-        return;
-      }
-
+      if (!authUser) return;
       try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const accessToken = sessionData.session?.access_token;
-        if (!accessToken) return;
-
-        const { data, error } = await supabase.functions.invoke('ai-coach-chat', {
-          body: { mode: 'proactive' },
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-
-        if (error) throw error;
-        if (data?.message) setProactiveCoach(data);
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-coach-chat`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ mode: 'proactive' }),
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.message) setProactiveCoach(data);
+        }
       } catch (e) {
         console.error('Error fetching coach insight:', e);
-      } finally {
-        setCoachLoading(false);
       }
     };
-
     fetchCoachInsight();
   }, [authUser]);
 
+  // Determine smart insight based on check-in data (soft, encouraging tone)
+  useEffect(() => {
+    if (!lastCheckin) {
+      setSmartInsight({
+        type: 'motivation',
+        icon: '🌿',
+        label: 'PER TE',
+        title: 'Prenditi un momento',
+        desc: 'Fai il check-in quando vuoi, senza fretta 🌱',
+      });
+      return;
+    }
+    const { mood, energy, bloating, stress } = lastCheckin;
+    if (energy <= 2) {
+      setSmartInsight({
+        type: 'tip',
+        icon: '🍌',
+        label: 'UN PICCOLO AIUTO',
+        title: 'Una merenda può fare la differenza',
+        desc: 'Frutta secca o una banana sono perfetti per ricaricarti',
+      });
+    } else if (bloating >= 4) {
+      setSmartInsight({
+        type: 'tip',
+        icon: '🫖',
+        label: 'CONSIGLIO GENTILE',
+        title: 'Una tisana può aiutarti',
+        desc: 'Zenzero o finocchio sono ottimi alleati naturali',
+      });
+    } else if (stress && stress >= 4) {
+      setSmartInsight({
+        type: 'tip',
+        icon: '🌬️',
+        label: 'RESPIRA',
+        title: 'Prova 3 respiri profondi',
+        desc: 'Anche solo un minuto di calma fa bene al corpo',
+      });
+    } else if (mood <= 2) {
+      setSmartInsight({
+        type: 'motivation',
+        icon: '💛',
+        label: 'CON TE',
+        title: 'Va bene anche così',
+        desc: 'Non ogni giorno deve essere perfetto. Sei qui, è già tanto',
+      });
+    } else {
+      setSmartInsight({
+        type: 'motivation',
+        icon: '✨',
+        label: 'BENE COSÌ',
+        title: 'Stai andando alla grande',
+        desc: 'Continua con il tuo ritmo, senza pressioni',
+      });
+    }
+  }, [lastCheckin]);
 
   const displayMessage = aiMessage || fallbackMessages[new Date().getDay() % fallbackMessages.length];
 
@@ -281,25 +301,22 @@ const HomePage = () => {
               </div>
             </div>
 
-            {/* Check-in CTA — always visible for multiple daily check-ins */}
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/checkin')}
-              className={`p-3.5 rounded-2xl shadow-soft flex flex-col items-center justify-center gap-1 min-w-[90px]
-                ${checkedInToday ? 'glass glass-border' : 'gradient-warm'}`}
-            >
-              {checkedInToday ? (
-                <>
-                  <PenLine className="w-5 h-5 text-primary" />
-                  <span className="text-[10px] btn-text text-primary">AGGIORNA</span>
-                </>
-              ) : (
-                <>
-                  <PenLine className="w-5 h-5 text-secondary-foreground" />
-                  <span className="text-[10px] btn-text text-secondary-foreground">CHECK-IN</span>
-                </>
-              )}
-            </motion.button>
+            {/* Check-in status / CTA */}
+            {!checkedInToday ? (
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/checkin')}
+                className="p-3.5 rounded-2xl gradient-warm shadow-soft flex flex-col items-center justify-center gap-1 min-w-[90px]"
+              >
+                <PenLine className="w-5 h-5 text-secondary-foreground" />
+                <span className="text-[10px] btn-text text-secondary-foreground">CHECK-IN</span>
+              </motion.button>
+            ) : (
+              <div className="p-3.5 rounded-2xl glass glass-border flex flex-col items-center justify-center gap-1 min-w-[90px]">
+                <span className="text-lg">✅</span>
+                <span className="text-[10px] btn-text text-muted-foreground">FATTO OGGI</span>
+              </div>
+            )}
           </div>
 
           {/* Status indicators from last check-in */}
@@ -345,15 +362,16 @@ const HomePage = () => {
                   {proactiveCoach ? (
                     <>
                       <p className="text-sm font-medium text-foreground leading-snug">{proactiveCoach.title}</p>
-                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{proactiveCoach.message}</p>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{proactiveCoach.message}</p>
                     </>
-                  ) : coachLoading ? (
-                    <p className="text-xs text-muted-foreground mt-1 italic animate-pulse">
-                      Sto preparando un consiglio per te...
-                    </p>
+                  ) : smartInsight ? (
+                    <>
+                      <p className="text-sm font-medium text-foreground leading-snug">{smartInsight.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{smartInsight.desc}</p>
+                    </>
                   ) : (
                     <>
-                      <p className="text-sm font-medium text-foreground leading-snug">Sono qui per te</p>
+                      <p className="text-sm font-medium text-foreground leading-snug">Pronto ad aiutarti</p>
                       <p className="text-xs text-muted-foreground mt-1">Conosco le tue analisi, la tua dieta e i tuoi progressi</p>
                     </>
                   )}
@@ -372,11 +390,6 @@ const HomePage = () => {
             </Link>
           </div>
         </motion.div>
-
-        {/* ═══════════════════════════════════════════
-            DIGIUNO INTERMITTENTE (se attivo)
-        ═══════════════════════════════════════════ */}
-        <FastingTimer />
 
         {/* ═══════════════════════════════════════════
             I TUOI PASSI DI OGGI
@@ -407,8 +420,11 @@ const HomePage = () => {
           </div>
         </motion.div>
 
+        {/* Fasting Timer (only if enabled) */}
+        <FastingTimer />
+
         {/* Together Card */}
-        {(user.mode === 'together' || hasPartnership) && (
+        {user.mode === 'together' && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}

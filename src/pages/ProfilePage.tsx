@@ -5,206 +5,35 @@ import { useProfile } from '@/hooks/useProfile';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import { useAuth } from '@/hooks/useAuth';
-import { Plus, X, LogOut, ChevronRight } from 'lucide-react';
+import { Plus, X, LogOut } from 'lucide-react';
 import FastingSettings from '@/components/FastingSettings';
 
 const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
 
-const objectiveOptions = [
-  { label: 'Sentirmi più leggera', icon: '🌿' },
-  { label: 'Avere più energia', icon: '⚡' },
-  { label: 'Perdere peso', icon: '⚖️' },
-  { label: 'Ridurre il gonfiore', icon: '🫧' },
-  { label: 'Essere più costante', icon: '🎯' },
-  { label: 'Stare meglio nel mio corpo', icon: '💛' },
-];
-
-const paceOptions = [
-  { label: 'Molto gentile', icon: '🌸' },
-  { label: 'Equilibrato', icon: '⚖️' },
-  { label: 'Un po\' più strutturato', icon: '📋' },
-];
-
-const activityOptions = [
-  { label: 'Poco', icon: '🛋️' },
-  { label: 'Moderatamente', icon: '🚶‍♀️' },
-  { label: 'Abbastanza', icon: '🏃‍♀️' },
-];
-
-const difficultyOptions = [
-  { label: 'Fame nervosa', icon: '😰' },
-  { label: 'Voglia di dolci', icon: '🍫' },
-  { label: 'Mancanza di tempo', icon: '⏰' },
-  { label: 'Stress', icon: '😮‍💨' },
-  { label: 'Non riesco ad essere costante', icon: '🔄' },
-];
-
-const sexOptions = [
-  { label: 'Donna', icon: '👩' },
-  { label: 'Uomo', icon: '👨' },
-  { label: 'Preferisco non dirlo', icon: '🤍' },
-];
-
-const workTypeOptions = [
-  { label: 'Sedentario (ufficio, smart working)', icon: '💻' },
-  { label: 'In piedi (negozio, ospedale, scuola)', icon: '🧑‍⚕️' },
-  { label: 'Fisico (manuale, sport, cantiere)', icon: '🔨' },
-  { label: 'Misto', icon: '🔄' },
-];
-
-const modeOptions = [
-  { label: 'Da sola', icon: '🧘‍♀️', value: 'solo' },
-  { label: 'Con un partner', icon: '🤝', value: 'together' },
-];
-
-type EditingField = null | 'objective' | 'pace' | 'activity' | 'difficulty' | 'sex' | 'weight' | 'age' | 'workType' | 'mode';
-
 const ProfilePage = () => {
-  const { user, checkIns, weeklyHabits, setUser } = useAppStore();
+  const { user, checkIns, weeklyHabits, toggleIntolerance, addCustomIntolerance, removeCustomIntolerance, setUser } = useAppStore();
   const { saveProfile } = useProfile();
   const { signOut } = useAuth();
   const completedHabits = weeklyHabits.filter((h) => h.completed).length;
   const [editingIntolerances, setEditingIntolerances] = useState(false);
   const [customInput, setCustomInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
-  const [editingField, setEditingField] = useState<EditingField>(null);
+  const [editingWeight, setEditingWeight] = useState(false);
   const [weightInput, setWeightInput] = useState(user.weight || '');
+  const [editingAge, setEditingAge] = useState(false);
   const [ageInput, setAgeInput] = useState(user.age || '');
-  // For multi-select fields (objective, difficulty)
-  const [multiSelections, setMultiSelections] = useState<string[]>([]);
+  const [editingWorkType, setEditingWorkType] = useState(false);
 
   const allUserIntolerances = [...user.intolerances, ...user.customIntolerances];
 
   const handleAddCustom = () => {
     const trimmed = customInput.trim();
-    if (!trimmed || user.customIntolerances.includes(trimmed) || user.intolerances.includes(trimmed)) return;
-
-    const nextCustomIntolerances = [...user.customIntolerances, trimmed];
-    setUser({ customIntolerances: nextCustomIntolerances });
-    void saveProfile({ customIntolerances: nextCustomIntolerances });
-    setCustomInput('');
-    setShowCustomInput(false);
-  };
-
-  const openEditor = (field: EditingField) => {
-    if (field === 'objective') {
-      setMultiSelections(user.objective ? user.objective.split(', ') : []);
-    } else if (field === 'difficulty') {
-      setMultiSelections(user.difficulty ? user.difficulty.split(', ') : []);
-    } else if (field === 'weight') {
-      setWeightInput(user.weight || '');
-    } else if (field === 'age') {
-      setAgeInput(user.age || '');
+    if (trimmed && !user.customIntolerances.includes(trimmed) && !user.intolerances.includes(trimmed)) {
+      addCustomIntolerance(trimmed);
+      setCustomInput('');
+      setShowCustomInput(false);
     }
-    setEditingField(field);
   };
-
-  const handleSingleSelect = (field: string, value: string, storeValue?: string) => {
-    const nextValue = storeValue || value;
-    const patch = { [field]: nextValue } as any;
-    setUser(patch);
-    void saveProfile(patch);
-    setEditingField(null);
-  };
-
-  const handleMultiSelectSave = (field: string) => {
-    const patch = { [field]: multiSelections.join(', ') } as any;
-    setUser(patch);
-    void saveProfile(patch);
-    setEditingField(null);
-  };
-
-  const toggleMultiSelection = (value: string) => {
-    setMultiSelections(prev =>
-      prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
-    );
-  };
-
-  const renderSingleSelectEditor = (options: { label: string; icon: string; value?: string }[], field: string) => (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 10 }}
-      className="mt-4 p-5 rounded-2xl glass glass-border border-primary/20 space-y-2"
-    >
-      {options.map((opt) => (
-        <button
-          key={opt.label}
-          onClick={() => handleSingleSelect(field, opt.label, opt.value)}
-          className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-300
-            ${(opt.value ? user[field as keyof typeof user] === opt.value : user[field as keyof typeof user] === opt.label)
-              ? 'glass glass-border border-primary/30'
-              : 'glass glass-border hover:border-primary/20'}`}
-        >
-          <span className="text-lg">{opt.icon}</span>
-          <span className="text-sm text-foreground">{opt.label}</span>
-        </button>
-      ))}
-      <button
-        onClick={() => setEditingField(null)}
-        className="w-full mt-2 px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
-      >
-        Annulla
-      </button>
-    </motion.div>
-  );
-
-  const renderMultiSelectEditor = (options: { label: string; icon: string }[], field: string) => (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 10 }}
-      className="mt-4 p-5 rounded-2xl glass glass-border border-primary/20 space-y-2"
-    >
-      {options.map((opt) => {
-        const isSelected = multiSelections.includes(opt.label);
-        return (
-          <button
-            key={opt.label}
-            onClick={() => toggleMultiSelection(opt.label)}
-            className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all duration-300
-              ${isSelected ? 'glass glass-border border-primary/30' : 'glass glass-border hover:border-primary/20'}`}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-lg">{opt.icon}</span>
-              <span className="text-sm text-foreground">{opt.label}</span>
-            </div>
-            <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all
-              ${isSelected ? 'gradient-primary border-transparent' : 'border-muted-foreground/20'}`}>
-              {isSelected && <span className="text-primary-foreground text-xs">✓</span>}
-            </div>
-          </button>
-        );
-      })}
-      <div className="flex gap-2 mt-3">
-        <button
-          onClick={() => handleMultiSelectSave(field)}
-          disabled={multiSelections.length === 0}
-          className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium disabled:opacity-40"
-        >
-          Salva
-        </button>
-        <button
-          onClick={() => setEditingField(null)}
-          className="px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
-        >
-          Annulla
-        </button>
-      </div>
-    </motion.div>
-  );
-
-  const profileFields = [
-    { label: 'Obiettivo', value: user.objective || '—', editKey: 'objective' as EditingField },
-    { label: 'Modalità', value: user.mode === 'together' ? 'Insieme' : 'Da sola', editKey: 'mode' as EditingField },
-    { label: 'Genere', value: user.sex || '—', editKey: 'sex' as EditingField },
-    { label: 'Età', value: user.age ? `${user.age} anni` : '—', editKey: 'age' as EditingField },
-    { label: 'Peso', value: user.weight ? `${user.weight} kg` : '—', editKey: 'weight' as EditingField },
-    { label: 'Lavoro', value: user.workType || '—', editKey: 'workType' as EditingField },
-    { label: 'Ritmo', value: user.pace || '—', editKey: 'pace' as EditingField },
-    { label: 'Attività', value: user.activity || '—', editKey: 'activity' as EditingField },
-    { label: 'Difficoltà principale', value: user.difficulty || '—', editKey: 'difficulty' as EditingField },
-  ];
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">
@@ -238,123 +67,176 @@ const ProfilePage = () => {
           Il tuo percorso
         </h2>
         <div className="space-y-2">
-          {profileFields.map((item) => (
-            <div key={item.label}>
-              <div
-                onClick={() => openEditor(item.editKey)}
-                className="flex items-center justify-between p-4 rounded-2xl glass glass-border cursor-pointer hover:border-primary/20 transition-all"
-              >
-                <span className="text-sm text-muted-foreground">{item.label}</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground max-w-[180px] truncate">{item.value}</span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
-                </div>
+          {[
+            { label: 'Obiettivo', value: user.objective || '—' },
+            { label: 'Modalità', value: user.mode === 'together' ? 'Insieme' : 'Da sola' },
+            { label: 'Peso', value: user.weight ? `${user.weight} kg` : '—', editKey: 'weight' },
+            { label: 'Età', value: user.age ? `${user.age} anni` : '—', editKey: 'age' },
+            { label: 'Lavoro', value: user.workType || '—', editKey: 'workType' },
+            { label: 'Ritmo', value: user.pace || '—' },
+            { label: 'Attività', value: user.activity || '—' },
+            { label: 'Difficoltà principale', value: user.difficulty || '—' },
+            { label: 'Genere', value: user.sex || '—' },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="flex items-center justify-between p-4 rounded-2xl glass glass-border cursor-default"
+              onClick={() => {
+                if (item.editKey === 'weight') setEditingWeight(true);
+                if (item.editKey === 'age') setEditingAge(true);
+                if (item.editKey === 'workType') setEditingWorkType(true);
+              }}
+            >
+              <span className="text-sm text-muted-foreground">{item.label}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-foreground">{item.value}</span>
+                {item.editKey && (
+                  <span className="text-xs text-primary cursor-pointer">✏️</span>
+                )}
               </div>
-
-              {/* Inline editors */}
-              <AnimatePresence>
-                {editingField === 'objective' && item.editKey === 'objective' && renderMultiSelectEditor(objectiveOptions, 'objective')}
-                {editingField === 'difficulty' && item.editKey === 'difficulty' && renderMultiSelectEditor(difficultyOptions, 'difficulty')}
-                {editingField === 'pace' && item.editKey === 'pace' && renderSingleSelectEditor(paceOptions, 'pace')}
-                {editingField === 'activity' && item.editKey === 'activity' && renderSingleSelectEditor(activityOptions, 'activity')}
-                {editingField === 'sex' && item.editKey === 'sex' && renderSingleSelectEditor(sexOptions, 'sex')}
-                {editingField === 'mode' && item.editKey === 'mode' && renderSingleSelectEditor(modeOptions, 'mode')}
-                {editingField === 'workType' && item.editKey === 'workType' && renderSingleSelectEditor(workTypeOptions, 'workType')}
-
-                {editingField === 'weight' && item.editKey === 'weight' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="mt-4 p-5 rounded-2xl glass glass-border border-primary/20"
-                  >
-                    <p className="text-sm font-medium text-foreground mb-3">Aggiorna il tuo peso</p>
-                    <div className="flex items-center gap-3 mb-3">
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={weightInput}
-                        onChange={(e) => setWeightInput(e.target.value)}
-                        placeholder="Es: 65.5"
-                        className="flex-1 px-5 py-3 rounded-xl bg-muted border border-border text-foreground
-                          focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
-                          transition-all duration-300 placeholder:text-muted-foreground/50"
-                        autoFocus
-                      />
-                      <span className="text-muted-foreground">kg</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          setUser({ weight: weightInput || undefined });
-                          void saveProfile({ weight: weightInput || undefined });
-                          setEditingField(null);
-                        }}
-                        className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium"
-                      >
-                        Salva
-                      </button>
-                      <button
-                        onClick={() => setEditingField(null)}
-                        className="px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
-                      >
-                        Annulla
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-
-                {editingField === 'age' && item.editKey === 'age' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="mt-4 p-5 rounded-2xl glass glass-border border-primary/20"
-                  >
-                    <p className="text-sm font-medium text-foreground mb-3">Aggiorna la tua età</p>
-                    <div className="flex items-center gap-3 mb-3">
-                      <input
-                        type="number"
-                        min="14"
-                        max="100"
-                        value={ageInput}
-                        onChange={(e) => setAgeInput(e.target.value)}
-                        placeholder="Es: 32"
-                        className="flex-1 px-5 py-3 rounded-xl bg-muted border border-border text-foreground
-                          focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
-                          transition-all duration-300 placeholder:text-muted-foreground/50"
-                        autoFocus
-                      />
-                      <span className="text-muted-foreground">anni</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          if (ageInput.trim()) {
-                            setUser({ age: ageInput.trim() });
-                            void saveProfile({ age: ageInput.trim() });
-                          }
-                          setEditingField(null);
-                        }}
-                        className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium"
-                      >
-                        Salva
-                      </button>
-                      <button
-                        onClick={() => setEditingField(null)}
-                        className="px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
-                      >
-                        Annulla
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           ))}
         </div>
 
-        {/* Intolerances */}
+        {/* Weight edit modal */}
+        <AnimatePresence>
+          {editingWeight && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="mt-4 p-5 rounded-2xl glass glass-border border-primary/20"
+            >
+              <p className="text-sm font-medium text-foreground mb-3">Aggiorna il tuo peso</p>
+              <div className="flex items-center gap-3 mb-3">
+                <input
+                  type="number"
+                  step="0.1"
+                  value={weightInput}
+                  onChange={(e) => setWeightInput(e.target.value)}
+                  placeholder="Es: 65.5"
+                  className="flex-1 px-5 py-3 rounded-xl bg-muted border border-border text-foreground
+                    focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                    transition-all duration-300 placeholder:text-muted-foreground/50"
+                  autoFocus
+                />
+                <span className="text-muted-foreground">kg</span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setUser({ weight: weightInput || undefined });
+                    saveProfile();
+                    setEditingWeight(false);
+                  }}
+                  className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium"
+                >
+                  Salva
+                </button>
+                <button
+                  onClick={() => setEditingWeight(false)}
+                  className="px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
+                >
+                  Annulla
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Age edit modal */}
+        <AnimatePresence>
+          {editingAge && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="mt-4 p-5 rounded-2xl glass glass-border border-primary/20"
+            >
+              <p className="text-sm font-medium text-foreground mb-3">Aggiorna la tua età</p>
+              <div className="flex items-center gap-3 mb-3">
+                <input
+                  type="number"
+                  min="14"
+                  max="100"
+                  value={ageInput}
+                  onChange={(e) => setAgeInput(e.target.value)}
+                  placeholder="Es: 32"
+                  className="flex-1 px-5 py-3 rounded-xl bg-muted border border-border text-foreground
+                    focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                    transition-all duration-300 placeholder:text-muted-foreground/50"
+                  autoFocus
+                />
+                <span className="text-muted-foreground">anni</span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    if (ageInput.trim()) {
+                      setUser({ age: ageInput.trim() });
+                      saveProfile();
+                    }
+                    setEditingAge(false);
+                  }}
+                  className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium"
+                >
+                  Salva
+                </button>
+                <button
+                  onClick={() => setEditingAge(false)}
+                  className="px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
+                >
+                  Annulla
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Work type edit modal */}
+        <AnimatePresence>
+          {editingWorkType && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="mt-4 p-5 rounded-2xl glass glass-border border-primary/20"
+            >
+              <p className="text-sm font-medium text-foreground mb-3">Che tipo di lavoro fai?</p>
+              <div className="space-y-2">
+                {[
+                  { label: 'Sedentario (ufficio, smart working)', icon: '💻' },
+                  { label: 'In piedi (negozio, ospedale, scuola)', icon: '🧑‍⚕️' },
+                  { label: 'Fisico (manuale, sport, cantiere)', icon: '🔨' },
+                  { label: 'Misto', icon: '🔄' },
+                ].map((opt) => (
+                  <button
+                    key={opt.label}
+                    onClick={() => {
+                      setUser({ workType: opt.label });
+                      saveProfile();
+                      setEditingWorkType(false);
+                    }}
+                    className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-300
+                      ${user.workType === opt.label 
+                        ? 'glass glass-border border-primary/30' 
+                        : 'glass glass-border hover:border-primary/20'}`}
+                  >
+                    <span className="text-lg">{opt.icon}</span>
+                    <span className="text-sm text-foreground">{opt.label}</span>
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setEditingWorkType(false)}
+                className="mt-3 w-full px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
+              >
+                Annulla
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg text-foreground">
@@ -399,15 +281,12 @@ const ProfilePage = () => {
                     <motion.button
                       key={intolerance}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => {
-                        const nextIntolerances = isSelected
-                          ? user.intolerances.filter((i) => i !== intolerance)
-                          : [...user.intolerances, intolerance];
-                        setUser({ intolerances: nextIntolerances });
-                        void saveProfile({ intolerances: nextIntolerances });
-                      }}
+                      onClick={() => toggleIntolerance(intolerance)}
                       className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300
-                        ${isSelected ? 'glass glass-border border-primary/30' : 'glass glass-border'}`}
+                        ${isSelected
+                          ? 'glass glass-border border-primary/30'
+                          : 'glass glass-border'
+                        }`}
                     >
                       <span className="text-sm font-medium text-foreground">{intolerance}</span>
                       <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all
@@ -425,11 +304,7 @@ const ProfilePage = () => {
                   >
                     <span className="text-sm font-medium text-foreground">⚠️ {ci}</span>
                     <button
-                      onClick={() => {
-                        const nextCustomIntolerances = user.customIntolerances.filter((item) => item !== ci);
-                        setUser({ customIntolerances: nextCustomIntolerances });
-                        void saveProfile({ customIntolerances: nextCustomIntolerances });
-                      }}
+                      onClick={() => removeCustomIntolerance(ci)}
                       className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center"
                     >
                       <X className="w-3 h-3 text-muted-foreground" />

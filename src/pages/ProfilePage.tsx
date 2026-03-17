@@ -20,6 +20,9 @@ const ProfilePage = () => {
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [editingWeight, setEditingWeight] = useState(false);
   const [weightInput, setWeightInput] = useState(user.weight || '');
+  const [editingAge, setEditingAge] = useState(false);
+  const [ageInput, setAgeInput] = useState(user.age || '');
+  const [editingWorkType, setEditingWorkType] = useState(false);
 
   const allUserIntolerances = [...user.intolerances, ...user.customIntolerances];
 

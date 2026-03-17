@@ -81,15 +81,16 @@ const HealthPage = () => {
         </p>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
           {[
+            { id: 'summary' as const, icon: Activity, label: 'Panoramica' },
             { id: 'diet' as const, icon: Utensils, label: 'Dieta' },
             { id: 'medical' as const, icon: TestTubes, label: 'Analisi' },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-sm font-medium transition-all duration-300 ${
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-2xl text-sm font-medium transition-all duration-300 whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'gradient-primary text-primary-foreground'
                   : 'glass glass-border text-muted-foreground'
@@ -101,7 +102,176 @@ const HealthPage = () => {
           ))}
         </div>
 
-        {/* Upload area */}
+        {/* Summary Tab */}
+        {activeTab === 'summary' && (
+          <div className="space-y-4">
+            {!healthInsights.hasData ? (
+              <div className="text-center py-12">
+                <Activity className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground mb-2">Nessun dato ancora</p>
+                <p className="text-xs text-muted-foreground mb-4">
+                  Carica le tue analisi mediche o la dieta del dietologo per vedere la panoramica
+                </p>
+                <div className="flex gap-2 justify-center">
+                  <button onClick={() => setActiveTab('medical')} className="px-4 py-2 rounded-xl gradient-primary text-primary-foreground text-xs font-medium">
+                    Carica analisi
+                  </button>
+                  <button onClick={() => setActiveTab('diet')} className="px-4 py-2 rounded-xl glass glass-border text-foreground text-xs font-medium">
+                    Carica dieta
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Medical Summary */}
+                {healthInsights.hasMedical && healthInsights.medSummary && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-2xl glass glass-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TestTubes className="w-4 h-4 text-primary" />
+                      <p className="text-xs font-semibold text-primary uppercase tracking-wider">Analisi mediche</p>
+                      {healthInsights.medDate && (
+                        <span className="text-[10px] text-muted-foreground ml-auto">
+                          {new Date(healthInsights.medDate).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-foreground">{healthInsights.medSummary}</p>
+                  </motion.div>
+                )}
+
+                {/* Abnormal Values */}
+                {healthInsights.abnormalValues.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+                    <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">⚠️ Valori da monitorare</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {healthInsights.abnormalValues.map((v: any, i: number) => (
+                        <div key={i} className={`p-3 rounded-xl ${
+                          v.status === 'critical' ? 'bg-destructive/10 border border-destructive/20' :
+                          'bg-secondary/10 border border-secondary/20'
+                        }`}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-medium text-foreground truncate">{v.name}</span>
+                            {v.status === 'high' ? <TrendingUp className="w-3 h-3 text-secondary flex-shrink-0" /> : 
+                             v.status === 'low' ? <TrendingDown className="w-3 h-3 text-secondary flex-shrink-0" /> :
+                             <AlertTriangle className="w-3 h-3 text-destructive flex-shrink-0" />}
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">{v.value}</p>
+                          {v.implications && <p className="text-[10px] text-foreground mt-1">{v.implications}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Risk Factors */}
+                {healthInsights.riskFactors.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                    className="p-4 rounded-2xl bg-destructive/5 border border-destructive/10">
+                    <p className="text-xs font-semibold text-destructive uppercase tracking-wider mb-2">🛡 Fattori di rischio</p>
+                    {healthInsights.riskFactors.map((r: string, i: number) => (
+                      <p key={i} className="text-xs text-foreground mb-1">• {r}</p>
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* Foods Grid */}
+                {(healthInsights.foodsToIncrease.length > 0 || healthInsights.foodsToReduce.length > 0) && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                    className="grid grid-cols-2 gap-3">
+                    {healthInsights.foodsToIncrease.length > 0 && (
+                      <div className="p-3 rounded-xl bg-accent">
+                        <p className="text-xs font-semibold text-accent-foreground mb-2">✅ Da aumentare</p>
+                        {healthInsights.foodsToIncrease.slice(0, 5).map((f: string, i: number) => (
+                          <p key={i} className="text-[11px] text-accent-foreground mb-0.5">• {f}</p>
+                        ))}
+                      </div>
+                    )}
+                    {healthInsights.foodsToReduce.length > 0 && (
+                      <div className="p-3 rounded-xl bg-destructive/10">
+                        <p className="text-xs font-semibold text-destructive mb-2">⛔ Da ridurre</p>
+                        {healthInsights.foodsToReduce.slice(0, 5).map((f: string, i: number) => (
+                          <p key={i} className="text-[11px] text-foreground mb-0.5">• {f}</p>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+
+                {/* Diet Summary */}
+                {healthInsights.hasDiet && healthInsights.dietSummary && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                    className="p-4 rounded-2xl glass glass-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Utensils className="w-4 h-4 text-primary" />
+                      <p className="text-xs font-semibold text-primary uppercase tracking-wider">Dieta del dietologo</p>
+                    </div>
+                    <p className="text-sm text-foreground">{healthInsights.dietSummary}</p>
+                  </motion.div>
+                )}
+
+                {/* Diet Meals Preview */}
+                {healthInsights.dietMeals.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+                    <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">🍽 Pasti prescritti</p>
+                    <div className="space-y-2">
+                      {healthInsights.dietMeals.slice(0, 4).map((meal: any, i: number) => (
+                        <div key={i} className="p-3 rounded-xl bg-muted/50">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-medium text-foreground">{meal.name}</span>
+                            {meal.time && <span className="text-[10px] text-muted-foreground">{meal.time}</span>}
+                          </div>
+                          <p className="text-[11px] text-muted-foreground">{meal.foods?.join(', ')}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Fusion Tips */}
+                {healthInsights.fusionTips.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                    className="p-4 rounded-2xl bg-accent border border-primary/20">
+                    <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">🔄 Fusione intelligente</p>
+                    {healthInsights.fusionTips.map((t: string, i: number) => (
+                      <p key={i} className="text-xs text-accent-foreground mb-1">• {t}</p>
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* Prevention */}
+                {healthInsights.preventionTips.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+                    className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <ShieldCheck className="w-4 h-4 text-primary" />
+                      <p className="text-xs font-semibold text-primary uppercase tracking-wider">Prevenzione</p>
+                    </div>
+                    {healthInsights.preventionTips.map((t: string, i: number) => (
+                      <p key={i} className="text-xs text-foreground mb-1">• {t}</p>
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* Link to coach */}
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+                  <Link to="/coach" className="block p-4 rounded-2xl glass glass-border hover:border-primary/30 transition-all">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">🤖</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-foreground">Chiedi al tuo Coach AI</p>
+                        <p className="text-xs text-muted-foreground">Domande sulle analisi, dieta e consigli personalizzati</p>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-muted-foreground -rotate-90" />
+                    </div>
+                  </Link>
+                </motion.div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Upload area - only for diet/medical tabs */}
+        {activeTab !== 'summary' && (
         <div className="mb-6 space-y-3">
           <input
             ref={fileInputRef}

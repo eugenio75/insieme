@@ -228,6 +228,137 @@ const lightPlan: DayPlan[] = [
   },
 ];
 
+// Health-safe replacement meals (low glycemic, heart-healthy, etc.)
+const healthReplacements: Record<string, Meal[]> = {
+  // Low-glycemic breakfast replacements
+  colazione_lowgi: [
+    { type: 'colazione', typeLabel: 'Colazione', icon: '🌅', title: 'Uova strapazzate e avocado', description: 'Due uova con mezzo avocado e pomodorini. Proteine e grassi buoni per iniziare.',
+      ingredients: [
+        { name: 'Uova', substitutes: ['Ricotta fresca', 'Yogurt greco bianco (senza zuccheri)', 'Tofu strapazzato'] },
+        { name: 'Avocado', substitutes: ['Olio EVO su pane integrale', 'Frutta secca', 'Hummus'] },
+      ],
+      simpleVariant: { title: 'Versione veloce', description: 'Yogurt greco bianco con noci e semi. Zero zuccheri aggiunti, tanta energia.' },
+    },
+    { type: 'colazione', typeLabel: 'Colazione', icon: '🌅', title: 'Yogurt greco con noci e semi', description: 'Yogurt greco bianco, noci, semi di chia. Saziante e a basso impatto glicemico.',
+      ingredients: [
+        { name: 'Yogurt greco', substitutes: ['Ricotta', 'Yogurt bianco naturale', 'Latte intero con semi'] },
+        { name: 'Noci', substitutes: ['Mandorle', 'Nocciole', 'Semi di zucca'] },
+      ],
+      simpleVariant: { title: 'Ancora più semplice', description: 'Ricotta con un filo d\'olio e semi. Pochi ingredienti, tanta sostanza.' },
+    },
+    { type: 'colazione', typeLabel: 'Colazione', icon: '🌅', title: 'Porridge proteico', description: 'Fiocchi d\'avena con latte, semi di chia e frutta secca. Rilascio lento di energia.',
+      ingredients: [
+        { name: 'Fiocchi d\'avena', substitutes: ['Crusca d\'avena', 'Fiocchi di farro'] },
+        { name: 'Semi di chia', substitutes: ['Semi di lino', 'Semi di girasole', 'Noci tritate'] },
+      ],
+    },
+    { type: 'colazione', typeLabel: 'Colazione', icon: '🌅', title: 'Pane integrale con ricotta e noci', description: 'Una fetta di pane integrale con ricotta e qualche noce. Semplice e bilanciato.',
+      ingredients: [
+        { name: 'Pane integrale', substitutes: ['Gallette di avena', 'Pane di segale'] },
+        { name: 'Ricotta', substitutes: ['Formaggio fresco magro', 'Hummus'] },
+      ],
+    },
+    { type: 'colazione', typeLabel: 'Colazione', icon: '🌅', title: 'Frittata leggera con verdure', description: 'Un uovo con spinaci o zucchine. Proteica e saziante senza picchi glicemici.',
+      ingredients: [
+        { name: 'Uovo', substitutes: ['Albumi (2-3)', 'Ricotta al forno'] },
+        { name: 'Spinaci', substitutes: ['Zucchine', 'Peperoni', 'Funghi'] },
+      ],
+    },
+    { type: 'colazione', typeLabel: 'Colazione', icon: '🌅', title: 'Smoothie proteico verde', description: 'Yogurt greco, spinacini, mezza banana non troppo matura, semi di lino.',
+      ingredients: [
+        { name: 'Spinacini', substitutes: ['Cetriolo', 'Sedano'] },
+        { name: 'Banana (mezza, non matura)', substitutes: ['Frutti di bosco', 'Mela verde'] },
+      ],
+    },
+    { type: 'colazione', typeLabel: 'Colazione', icon: '🌅', title: 'Toast integrale con uovo e pomodoro', description: 'Pane integrale tostato, uovo in padella e fettine di pomodoro.',
+      ingredients: [
+        { name: 'Pane integrale', substitutes: ['Gallette integrali', 'Pane di segale'] },
+      ],
+    },
+  ],
+  // Low-glycemic snack replacements
+  spuntino_lowgi: [
+    { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🥜', title: 'Frutta secca mista', description: 'Un pugno di mandorle, noci o nocciole. Energia buona e stabile.',
+      simpleVariant: { title: 'Alternative', description: 'Un pezzo di formaggio stagionato o bastoncini di finocchio.' },
+    },
+    { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🥒', title: 'Verdura cruda e hummus', description: 'Carote, finocchi o cetrioli con un po\' di hummus.',
+    },
+    { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🍏', title: 'Mela verde con burro di mandorle', description: 'La mela verde ha meno zuccheri. Con un po\' di burro di mandorle è perfetta.',
+    },
+  ],
+  merenda_lowgi: [
+    { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🥜', title: 'Mandorle e cioccolato fondente 85%', description: '8-10 mandorle e 2 quadretti di fondente almeno 85%. Pochissimi zuccheri.',
+      ingredients: [
+        { name: 'Mandorle', substitutes: ['Noci', 'Nocciole', 'Semi di zucca'] },
+      ],
+    },
+    { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🧀', title: 'Formaggio e noci', description: 'Un pezzetto di parmigiano con qualche noce. Saziante e senza picchi.',
+    },
+    { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🫐', title: 'Yogurt greco con frutti di bosco', description: 'Yogurt bianco con mirtilli o lamponi. I frutti di bosco hanno pochi zuccheri.',
+    },
+  ],
+};
+
+// Keywords that indicate a meal has high glycemic content
+const highGIMealKeywords = ['marmellata', 'miele', 'zucchero', 'sciroppo', 'biscotti', 'ciambellone', 'torta', 'dolce', 'succo di frutta', 'pancake', 'nutella', 'crema di nocciole', 'pane e marmellata', 'fette biscottate'];
+const highGISubstituteKeywords = ['marmellata', 'miele', 'sciroppo d\'acero', 'crema di nocciole'];
+
+export interface HealthConstraints {
+  foodsToReduce: string[];
+  foodsToIncrease: string[];
+  hasGlycemicRisk: boolean;
+  hasCholesterolRisk: boolean;
+}
+
+/**
+ * Check if a meal conflicts with health constraints.
+ */
+const mealConflictsWithHealth = (meal: Meal, constraints: HealthConstraints): boolean => {
+  if (!constraints.hasGlycemicRisk) return false;
+  const text = `${meal.title} ${meal.description}`.toLowerCase();
+  // Check substitutes too
+  const subTexts = meal.ingredients?.flatMap(i => [i.name, ...i.substitutes].map(s => s.toLowerCase())) || [];
+  const allText = text + ' ' + subTexts.join(' ');
+  
+  return highGIMealKeywords.some(kw => allText.includes(kw));
+};
+
+/**
+ * Filter out high-GI substitutes from ingredients
+ */
+const filterSubstitutes = (meal: Meal, constraints: HealthConstraints): Meal => {
+  if (!constraints.hasGlycemicRisk || !meal.ingredients) return meal;
+  return {
+    ...meal,
+    ingredients: meal.ingredients.map(ing => ({
+      ...ing,
+      substitutes: ing.substitutes.filter(sub => 
+        !highGISubstituteKeywords.some(kw => sub.toLowerCase().includes(kw))
+      ),
+    })).filter(ing => ing.substitutes.length > 0),
+  };
+};
+
+/**
+ * Replace a conflicting meal with a health-safe alternative.
+ */
+const getHealthSafeReplacement = (meal: Meal, dayIndex: number, constraints: HealthConstraints): Meal => {
+  if (meal.type === 'colazione') {
+    const options = healthReplacements.colazione_lowgi;
+    return options[dayIndex % options.length];
+  }
+  if (meal.type === 'spuntino_mattina') {
+    const options = healthReplacements.spuntino_lowgi;
+    return options[dayIndex % options.length];
+  }
+  if (meal.type === 'spuntino_pomeriggio') {
+    const options = healthReplacements.merenda_lowgi;
+    return options[dayIndex % options.length];
+  }
+  // For pranzo/cena, just filter substitutes
+  return filterSubstitutes(meal, constraints);
+};
+
 // Energy-focused plan variations
 const energyPlan: DayPlan[] = lightPlan.map((day) => ({
   ...day,
@@ -244,12 +375,24 @@ export const getWeeklyPlan = (
   _activity: string,
   _sex?: string,
   _age?: string,
+  healthConstraints?: HealthConstraints,
 ): DayPlan[] => {
-  // For now return the base plan - can be extended with more specific plans
-  if (objective.toLowerCase().includes('energia')) {
-    return energyPlan;
+  let basePlan = objective.toLowerCase().includes('energia') ? energyPlan : lightPlan;
+
+  // Apply health constraints — replace conflicting meals
+  if (healthConstraints && (healthConstraints.hasGlycemicRisk || healthConstraints.hasCholesterolRisk)) {
+    basePlan = basePlan.map((day, dayIdx) => ({
+      ...day,
+      meals: day.meals.map(meal => {
+        if (mealConflictsWithHealth(meal, healthConstraints)) {
+          return getHealthSafeReplacement(meal, dayIdx, healthConstraints);
+        }
+        return filterSubstitutes(meal, healthConstraints);
+      }),
+    }));
   }
-  return lightPlan;
+
+  return basePlan;
 };
 
 export const getTodayPlan = (
@@ -257,9 +400,10 @@ export const getTodayPlan = (
   activity: string,
   sex?: string,
   age?: string,
+  healthConstraints?: HealthConstraints,
 ): DayPlan | undefined => {
-  const plan = getWeeklyPlan(objective, activity, sex, age);
-  const dayIndex = new Date().getDay(); // 0=Sun, 1=Mon...
-  const mappedIndex = dayIndex === 0 ? 6 : dayIndex - 1; // 0=Mon, 6=Sun
+  const plan = getWeeklyPlan(objective, activity, sex, age, healthConstraints);
+  const dayIndex = new Date().getDay();
+  const mappedIndex = dayIndex === 0 ? 6 : dayIndex - 1;
   return plan[mappedIndex];
 };

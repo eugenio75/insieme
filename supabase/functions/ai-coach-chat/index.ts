@@ -230,7 +230,7 @@ REGOLE:
 - Usa i dati specifici dell'utente quando rispondi (non risposte generiche!)
 - Se non hai dati su qualcosa, dillo onestamente
 - NON fare diagnosi mediche, ma spiega le implicazioni nutrizionali
-- ${sex === "Donna" || sex === "donna" ? "Usa il femminile" : "Usa il maschile"}
+- ${isFemale ? "Usa il femminile" : "Usa il maschile"}
 - Max 2 emoji per messaggio
 - Rispondi in italiano`;
     }

@@ -80,6 +80,8 @@ serve(async (req) => {
     // ===== BUILD CONTEXT STRING =====
     const name = profile?.name || "utente";
     const sex = profile?.sex || "";
+    const sexLower = sex.toLowerCase();
+    const isFemale = ["donna", "femmina", "female", "f"].includes(sexLower);
     const age = profile?.age || "";
 
     let context = `PROFILO UTENTE:
@@ -202,7 +204,7 @@ PRIORITÀ:
 - I consigli devono essere SEMPRE coerenti con i "cibi da ridurre" e "cibi da aumentare" delle analisi mediche.
 - Se l'utente ha caricato una dieta del dietologo, i consigli devono essere coerenti con quella dieta.
 
-TONO: Come un amico nutrizionista che ti conosce bene. Gentile e soft, mai ansiogeno. ${sex === "Donna" || sex === "donna" ? "Femminile, empatico" : "Diretto, supportivo"}. Max 1-2 emoji.`;
+TONO: Come un amico nutrizionista che ti conosce bene. Gentile e soft, mai ansiogeno. ${isFemale ? "Femminile, empatico" : "Diretto, supportivo"}. Max 1-2 emoji.`;
     } else {
       systemPrompt = `Sei il coach nutrizionale AI personale di ${name} nell'app "Insieme". Hai accesso a TUTTI i dati di salute, alimentazione e benessere dell'utente.
 
@@ -228,7 +230,7 @@ REGOLE:
 - Usa i dati specifici dell'utente quando rispondi (non risposte generiche!)
 - Se non hai dati su qualcosa, dillo onestamente
 - NON fare diagnosi mediche, ma spiega le implicazioni nutrizionali
-- ${sex === "Donna" || sex === "donna" ? "Usa il femminile" : "Usa il maschile"}
+- ${isFemale ? "Usa il femminile" : "Usa il maschile"}
 - Max 2 emoji per messaggio
 - Rispondi in italiano`;
     }

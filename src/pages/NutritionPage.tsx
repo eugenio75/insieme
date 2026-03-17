@@ -371,38 +371,48 @@ const NutritionPage = () => {
               </div>
             )}
 
-            {/* Health-based warnings from medical analyses */}
-            {(healthWarnings.abnormalValues.length > 0 || healthWarnings.hasDiet) && (
+            {/* Health-based info from medical analyses */}
+            {(healthData.abnormalValues.length > 0 || healthData.hasDiet) && (
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-5 space-y-3"
               >
-                {healthWarnings.abnormalValues.length > 0 && (
-                  <div className="p-4 rounded-2xl bg-secondary/5 border border-secondary/10">
+                {healthData.hasGlycemicRisk && (
+                  <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
                     <div className="flex items-center gap-2 mb-2">
-                      <Stethoscope className="w-4 h-4 text-secondary" />
-                      <p className="text-xs font-medium text-foreground">In base alle tue analisi</p>
+                      <Stethoscope className="w-4 h-4 text-primary" />
+                      <p className="text-xs font-medium text-foreground">Piano adattato alle tue analisi 💛</p>
                     </div>
-                    <div className="space-y-1.5">
-                      {healthWarnings.foodsToReduce.slice(0, 3).map((f: string, i: number) => (
-                        <p key={`r${i}`} className="text-xs text-foreground">⛔ {f}</p>
-                      ))}
-                      {healthWarnings.foodsToIncrease.slice(0, 3).map((f: string, i: number) => (
-                        <p key={`i${i}`} className="text-xs text-foreground">✅ {f}</p>
-                      ))}
-                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      I pasti sono stati scelti per mantenere la glicemia stabile, con cibi a basso indice glicemico, proteine e grassi buoni.
+                    </p>
                     <Link to="/health" className="text-[10px] text-primary font-medium mt-2 block">Vedi panoramica completa →</Link>
                   </div>
                 )}
 
-                {healthWarnings.hasDiet && healthWarnings.fusionTips.length > 0 && (
+                {!healthData.hasGlycemicRisk && healthData.abnormalValues.length > 0 && (
+                  <div className="p-4 rounded-2xl bg-accent border border-primary/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Stethoscope className="w-4 h-4 text-primary" />
+                      <p className="text-xs font-medium text-foreground">In base alle tue analisi</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      {healthData.foodsToIncrease.slice(0, 3).map((f: string, i: number) => (
+                        <p key={`i${i}`} className="text-xs text-foreground">✅ {f}</p>
+                      ))}
+                    </div>
+                    <Link to="/health" className="text-[10px] text-primary font-medium mt-2 block">Vedi dettagli →</Link>
+                  </div>
+                )}
+
+                {healthData.hasDiet && healthData.fusionTips.length > 0 && (
                   <div className="p-4 rounded-2xl bg-accent border border-primary/10">
                     <div className="flex items-center gap-2 mb-2">
                       <Sparkles className="w-4 h-4 text-primary" />
                       <p className="text-xs font-medium text-foreground">Dalla dieta del tuo dietologo</p>
                     </div>
-                    {healthWarnings.fusionTips.slice(0, 2).map((t: string, i: number) => (
+                    {healthData.fusionTips.slice(0, 2).map((t: string, i: number) => (
                       <p key={i} className="text-xs text-accent-foreground mb-1">🔄 {t}</p>
                     ))}
                   </div>

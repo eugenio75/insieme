@@ -231,6 +231,19 @@ const Onboarding = () => {
   const isMultiSelect = currentStep?.multiSelect;
   const hasCustomInput = (currentStep as any)?.hasCustomInput;
   const isWeightInput = (currentStep as any)?.isWeightInput;
+  const isAgeInput = (currentStep as any)?.isAgeInput;
+
+  const handleAgeSubmit = async () => {
+    if (!ageInput.trim()) return;
+    setUser({ age: ageInput.trim() });
+    if (step < steps.length - 1) {
+      setStep(step + 1);
+    } else {
+      completeOnboarding();
+      await saveProfile();
+      navigate('/home');
+    }
+  };
 
   const handleWeightSubmit = async () => {
     setUser({ weight: weightInput || undefined });

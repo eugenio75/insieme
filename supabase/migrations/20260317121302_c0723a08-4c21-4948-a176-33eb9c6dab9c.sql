@@ -1,0 +1,1 @@
+UPDATE health_documents SET status = 'error', ai_analysis = '{"error": "Il file PDF ha causato un errore. Riprova il caricamento."}'::jsonb WHERE id = 'a3f03be5-42ca-4c36-8c49-60aa0cd5db04' AND status = 'analyzing';

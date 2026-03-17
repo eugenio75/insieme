@@ -109,7 +109,7 @@ const allTips: FoodTip[] = [
       { name: 'Banana', substitutes: ['Mela', 'Pera', 'Frutta surgelata'] },
       { name: 'Spinaci', substitutes: ['Niente (lo smoothie è buono anche senza)', 'Un cucchiaino di cacao'] },
       { name: 'Latte vegetale', substitutes: ['Latte normale', 'Acqua + yogurt', 'Succo di frutta'] },
-      { name: 'Miele', substitutes: ['Zucchero', 'Un dattero', 'Niente, la banana è già dolce'] },
+      { name: 'Miele', substitutes: ['Un dattero', 'Niente, la banana è già dolce', 'Cannella (un pizzico)'] },
     ],
     simpleVariant: {
       title: 'Senza frullatore?',

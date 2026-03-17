@@ -54,7 +54,8 @@ const HealthPage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    await uploadFile(file, activeTab === 'diet' ? 'diet' : 'medical_tests');
+    const docType = activeTab === 'medical' ? 'medical_tests' : 'diet';
+    await uploadFile(file, docType);
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };

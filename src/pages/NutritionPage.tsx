@@ -4,11 +4,13 @@ import { useAppStore } from '../store/useAppStore';
 import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } from '../data/foodTips';
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
-import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer, Sparkles } from 'lucide-react';
+import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer, Sparkles, Stethoscope } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
 import { useFoodFindings } from '@/hooks/useFoodFindings';
 import { usePatternAnalysis } from '@/hooks/useFoodFindings';
 import { useFasting } from '@/hooks/useFasting';
+import { useHealthDocuments } from '@/hooks/useHealthDocuments';
+import { Link } from 'react-router-dom';
 
 type Tab = 'piano' | 'consigli' | 'ricette' | 'gonfiore';
 

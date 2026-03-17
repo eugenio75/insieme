@@ -451,7 +451,7 @@ const ProfilePage = () => {
                       autoFocus
                     />
                     <button
-                      onClick={() => { handleAddCustom(); setTimeout(() => saveProfile(), 200); }}
+                      onClick={handleAddCustom}
                       disabled={!customInput.trim()}
                       className="px-4 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium
                         disabled:opacity-40 transition-opacity"

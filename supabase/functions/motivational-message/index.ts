@@ -47,7 +47,8 @@ serve(async (req) => {
     const sex = profile?.sex || "";
     const streak = profile?.current_streak || 0;
     const objective = profile?.objective || "";
-    const isMale = sex === "maschio" || sex === "male" || sex === "M";
+    const sexLower = sex.toLowerCase();
+    const isMale = ["maschio", "male", "m", "uomo"].includes(sexLower);
     const salutation = name ? (isMale ? `caro ${name}` : `cara ${name}`) : (isMale ? "caro" : "cara");
 
     // Build context

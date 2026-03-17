@@ -14,6 +14,7 @@ import ProfilePage from "./pages/ProfilePage.tsx";
 import NutritionPage from "./pages/NutritionPage.tsx";
 import WeeklyCheckIn from "./pages/WeeklyCheckIn.tsx";
 import ProgressPage from "./pages/ProgressPage.tsx";
+import HealthPage from "./pages/HealthPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();

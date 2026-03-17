@@ -211,6 +211,24 @@ const NutritionPage = () => {
   const { checkMeal } = useFoodFindings();
   const { analysis, load: loadPatterns, loaded: patternsLoaded } = usePatternAnalysis();
   const { config: fastingConfig, getStatus } = useFasting();
+  const { medicalDocs, dietDocs } = useHealthDocuments();
+
+  // Extract health-based insights for meal warnings
+  const healthWarnings = (() => {
+    const latestMed = medicalDocs.find(d => d.status === 'completed' && d.ai_analysis);
+    const latestDiet = dietDocs.find(d => d.status === 'completed' && d.ai_analysis);
+    const medAnalysis = latestMed?.ai_analysis as any;
+    const dietAnalysis = latestDiet?.ai_analysis as any;
+    return {
+      foodsToReduce: medAnalysis?.foods_to_reduce || [],
+      foodsToIncrease: medAnalysis?.foods_to_increase || [],
+      dietaryRecommendations: medAnalysis?.dietary_recommendations || [],
+      hasDiet: !!latestDiet,
+      dietMeals: dietAnalysis?.meals || [],
+      fusionTips: dietAnalysis?.fusion_tips || [],
+      abnormalValues: medAnalysis?.values?.filter((v: any) => v.status !== 'normal') || [],
+    };
+  })();
 
   // Load patterns when component mounts
   useEffect(() => {

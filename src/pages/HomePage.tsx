@@ -32,6 +32,7 @@ const HomePage = () => {
   const [loadingMessage, setLoadingMessage] = useState(true);
   const [lastCheckin, setLastCheckin] = useState<{ mood: number; energy: number; bloating: number; stress: number | null } | null>(null);
   const [checkedInToday, setCheckedInToday] = useState(false);
+  const [hasPartnership, setHasPartnership] = useState(false);
   const [proactiveCoach, setProactiveCoach] = useState<{ title: string; message: string; tips: string[]; category: string } | null>(null);
   const [coachLoading, setCoachLoading] = useState(true);
 

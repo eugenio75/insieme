@@ -34,7 +34,41 @@ const PROTOCOLS: Record<string, { fasting: number; eating: number }> = {
   '16:8': { fasting: 16, eating: 8 },
   '18:6': { fasting: 18, eating: 6 },
   '20:4': { fasting: 20, eating: 4 },
-  'custom': { fasting: 16, eating: 8 },
+  custom: { fasting: 16, eating: 8 },
+};
+
+const DEFAULT_FASTING_CONFIG: FastingConfig = {
+  enabled: false,
+  protocol: '16:8',
+  startHour: 20,
+  fastingHours: 16,
+};
+
+const FASTING_CACHE_KEY = 'insieme_fasting_config_v1';
+
+type CachedFastingConfig = {
+  userId: string;
+  config: FastingConfig;
+};
+
+const writeFastingCache = (userId: string, config: FastingConfig) => {
+  try {
+    localStorage.setItem(FASTING_CACHE_KEY, JSON.stringify({ userId, config }));
+  } catch {
+    // ignore cache errors
+  }
+};
+
+const readFastingCache = (userId: string): FastingConfig | null => {
+  try {
+    const raw = localStorage.getItem(FASTING_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as CachedFastingConfig;
+    if (!parsed?.userId || parsed.userId !== userId || !parsed?.config) return null;
+    return parsed.config;
+  } catch {
+    return null;
+  }
 };
 
 export const getProtocolOptions = () => [
@@ -46,36 +80,64 @@ export const getProtocolOptions = () => [
 
 export const useFasting = () => {
   const { user: authUser } = useAuth();
-  const [config, setConfig] = useState<FastingConfig>({
-    enabled: false,
-    protocol: '16:8',
-    startHour: 20,
-    fastingHours: 16,
-  });
+  const [config, setConfig] = useState<FastingConfig>(DEFAULT_FASTING_CONFIG);
   const [activeSession, setActiveSession] = useState<FastingSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [sessions, setSessions] = useState<FastingSession[]>([]);
 
   // Load config from profile
   useEffect(() => {
-    if (!authUser) return;
+    let cancelled = false;
+
+    if (!authUser) {
+      setConfig(DEFAULT_FASTING_CONFIG);
+      setActiveSession(null);
+      setSessions([]);
+      setLoading(false);
+      return;
+    }
+
     const load = async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('fasting_enabled, fasting_protocol, fasting_start_hour, fasting_hours')
-        .eq('user_id', authUser.id)
-        .single();
-      if (data) {
-        setConfig({
-          enabled: (data as any).fasting_enabled ?? false,
-          protocol: (data as any).fasting_protocol ?? '16:8',
-          startHour: (data as any).fasting_start_hour ?? 20,
-          fastingHours: (data as any).fasting_hours ?? 16,
-        });
+      setLoading(true);
+
+      const cachedConfig = readFastingCache(authUser.id);
+      if (cachedConfig && !cancelled) {
+        setConfig(cachedConfig);
       }
-      // Load active session (started today, not ended)
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
+
+      let profileData: any = null;
+
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('fasting_enabled, fasting_protocol, fasting_start_hour, fasting_hours')
+          .eq('user_id', authUser.id)
+          .single();
+
+        if (cancelled) return;
+
+        if (data && !error) {
+          profileData = data;
+          break;
+        }
+
+        const isRetryable = !!error && /timeout|fetch|network|gateway|upstream/i.test(error.message || '');
+        if (!isRetryable || attempt === 2) break;
+        await new Promise((resolve) => setTimeout(resolve, 350 * (attempt + 1)));
+      }
+
+      if (profileData && !cancelled) {
+        const mappedConfig: FastingConfig = {
+          enabled: (profileData as any).fasting_enabled ?? false,
+          protocol: (profileData as any).fasting_protocol ?? '16:8',
+          startHour: (profileData as any).fasting_start_hour ?? 20,
+          fastingHours: (profileData as any).fasting_hours ?? 16,
+        };
+
+        setConfig(mappedConfig);
+        writeFastingCache(authUser.id, mappedConfig);
+      }
+
       const { data: sessionData } = await supabase
         .from('fasting_sessions')
         .select('*')
@@ -83,26 +145,40 @@ export const useFasting = () => {
         .is('ended_at', null)
         .order('started_at', { ascending: false })
         .limit(1);
-      if (sessionData && sessionData.length > 0) {
+
+      if (!cancelled && sessionData && sessionData.length > 0) {
         setActiveSession(sessionData[0] as any);
       }
-      // Load all sessions for stats
+
       const { data: allSessions } = await supabase
         .from('fasting_sessions')
         .select('*')
         .eq('user_id', authUser.id)
         .order('started_at', { ascending: false })
         .limit(60);
-      if (allSessions) setSessions(allSessions as any);
-      setLoading(false);
+
+      if (!cancelled && allSessions) {
+        setSessions(allSessions as any);
+      }
+
+      if (!cancelled) {
+        setLoading(false);
+      }
     };
+
     load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [authUser]);
 
   const saveConfig = useCallback(async (newConfig: Partial<FastingConfig>) => {
     if (!authUser) return;
     const updated = { ...config, ...newConfig };
     setConfig(updated);
+    writeFastingCache(authUser.id, updated);
+
     await supabase
       .from('profiles')
       .update({
@@ -212,23 +288,22 @@ export const useFasting = () => {
 
   // Stats for report
   const getStats = useCallback(() => {
-    const completed = sessions.filter(s => s.completed);
+    const completed = sessions.filter((s) => s.completed);
     const total = sessions.length;
     const completionRate = total > 0 ? completed.length / total : 0;
-    
-    const avgHours = completed.length > 0
-      ? completed.reduce((sum, s) => {
-          const start = new Date(s.started_at).getTime();
-          const end = new Date(s.ended_at!).getTime();
-          return sum + (end - start) / 3600000;
-        }, 0) / completed.length
-      : 0;
+
+    const avgHours =
+      completed.length > 0
+        ? completed.reduce((sum, s) => {
+            const start = new Date(s.started_at).getTime();
+            const end = new Date(s.ended_at!).getTime();
+            return sum + (end - start) / 3600000;
+          }, 0) / completed.length
+        : 0;
 
     // Streak
     let streak = 0;
-    const sortedByDate = [...sessions].sort((a, b) => 
-      new Date(b.started_at).getTime() - new Date(a.started_at).getTime()
-    );
+    const sortedByDate = [...sessions].sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime());
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     for (let i = 0; i < sortedByDate.length; i++) {

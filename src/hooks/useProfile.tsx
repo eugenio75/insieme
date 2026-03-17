@@ -29,6 +29,51 @@ type CachedProfile = {
 
 const PROFILE_CACHE_KEY = 'insieme_profile_cache_v2';
 
+const hasMeaningfulProfileData = (data: any) => {
+  const hasArrays =
+    (Array.isArray(data.intolerances) && data.intolerances.length > 0) ||
+    (Array.isArray(data.custom_intolerances) && data.custom_intolerances.length > 0);
+
+  return Boolean(
+    data.objective ||
+      data.pace ||
+      data.activity ||
+      data.difficulty ||
+      data.age ||
+      data.sex ||
+      data.weight !== null ||
+      data.work_type ||
+      data.partner_name ||
+      data.mode === 'together' ||
+      data.fasting_enabled ||
+      hasArrays,
+  );
+};
+
+const inferOnboardedFromDb = (data: any) => {
+  if (!data?.name) return false;
+  return hasMeaningfulProfileData(data);
+};
+
+const inferOnboardedFromStore = (profile: Omit<StoreProfile, 'onboarded'>) => {
+  const hasMeaningfulData = Boolean(
+    profile.objective ||
+      profile.pace ||
+      profile.activity ||
+      profile.difficulty ||
+      profile.age ||
+      profile.sex ||
+      profile.weight ||
+      profile.workType ||
+      profile.partnerName ||
+      profile.mode === 'together' ||
+      profile.intolerances.length > 0 ||
+      profile.customIntolerances.length > 0,
+  );
+
+  return Boolean(profile.name && hasMeaningfulData);
+};
+
 const mapDbProfileToStore = (data: any): StoreProfile => ({
   name: data.name || '',
   objective: data.objective || '',
@@ -43,7 +88,7 @@ const mapDbProfileToStore = (data: any): StoreProfile => ({
   partnerName: data.partner_name || '',
   weight: data.weight ? String(data.weight) : '',
   workType: data.work_type || '',
-  onboarded: !!(data.objective && data.name),
+  onboarded: inferOnboardedFromDb(data),
 });
 
 const mapStoreToDb = (state: Omit<StoreProfile, 'onboarded'>) => ({
@@ -174,7 +219,7 @@ export const useProfile = () => {
     if (!user) return;
 
     const state = useAppStore.getState().user;
-    const fullProfile: StoreProfile = {
+    const baseProfile = {
       name: state.name,
       objective: state.objective,
       mode: state.mode,
@@ -188,7 +233,11 @@ export const useProfile = () => {
       partnerName: state.partnerName || '',
       weight: state.weight || '',
       workType: state.workType || '',
-      onboarded: !!(state.objective && state.name),
+    };
+
+    const fullProfile: StoreProfile = {
+      ...baseProfile,
+      onboarded: inferOnboardedFromStore(baseProfile),
     };
 
     const dbPayload = patch

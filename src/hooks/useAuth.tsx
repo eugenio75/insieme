@@ -40,6 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const { data, error } = await supabase.auth.getSession();
         if (error) {
           console.error('Session restore error:', error.message);
+          return;
         }
         applySession(data.session);
       } catch (error) {

@@ -378,6 +378,38 @@ const HomePage = () => {
           </Link>
         </motion.div>
 
+        {/* ═══════════════════════════════════════════
+            I TUOI PASSI DI OGGI
+        ═══════════════════════════════════════════ */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-6"
+        >
+          <h2 className="font-display text-lg text-foreground mb-3">I tuoi passi di oggi</h2>
+          <div className="flex flex-col gap-2.5">
+            {weeklyHabits.map((habit, i) => (
+              <motion.div
+                key={habit.id}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.35 + i * 0.08, duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
+              >
+                <HabitCard
+                  title={habit.title}
+                  icon={habit.icon}
+                  completed={habit.completed}
+                  onToggle={() => toggleHabit(habit.id)}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Fasting Timer (only if enabled) */}
+        <FastingTimer />
+
         {/* Together Card */}
         {user.mode === 'together' && (
           <motion.div

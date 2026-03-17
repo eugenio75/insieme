@@ -41,16 +41,12 @@ const steps = [
     ],
   },
   {
-    question: 'Qual è la tua fascia d\'età?',
-    subtitle: 'Per adattare i consigli alle tue esigenze.',
+    question: 'Quanti anni hai?',
+    subtitle: 'Ci aiuta ad adattare i consigli alle tue esigenze.',
     key: 'age',
     multiSelect: false,
-    options: [
-      { label: '18-25', icon: '🌱' },
-      { label: '26-35', icon: '🌿' },
-      { label: '36-45', icon: '🌳' },
-      { label: '46+', icon: '🌻' },
-    ],
+    isAgeInput: true,
+    options: [],
   },
   {
     question: 'Che tipo di percorso preferisci?',

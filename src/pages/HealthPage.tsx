@@ -270,109 +270,111 @@ const HealthPage = () => {
           </div>
         )}
 
-        {/* Upload area - only for diet/medical tabs */}
+        {/* Upload area + Documents - only for diet/medical tabs */}
         {activeTab !== 'summary' && (
-        <div className="mb-6 space-y-3">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*,.pdf"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="w-full p-6 rounded-2xl border-2 border-dashed border-primary/30 hover:border-primary/60 
-              transition-all duration-300 flex flex-col items-center gap-3 text-center"
-          >
-            {uploading ? (
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            ) : (
-              <Upload className="w-8 h-8 text-primary" />
-            )}
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                {activeTab === 'diet' ? 'Carica la dieta del dietologo' : 'Carica le analisi mediche'}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                PDF o foto • L'AI analizzerà il contenuto
-              </p>
-            </div>
-          </button>
-
-          {!showManualInput ? (
-            <button
-              onClick={() => setShowManualInput(true)}
-              className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl glass glass-border text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="text-sm font-medium">
-                {activeTab === 'diet' ? 'Inserisci manualmente la dieta' : 'Inserisci manualmente i valori'}
-              </span>
-            </button>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="space-y-3"
-            >
-              <textarea
-                value={manualText}
-                onChange={(e) => setManualText(e.target.value)}
-                placeholder={
-                  activeTab === 'diet'
-                    ? 'Scrivi i pasti della tua dieta:\n\nColazione: yogurt greco, frutta secca...\nPranzo: pasta integrale, verdure...\nCena: pesce, insalata...'
-                    : 'Inserisci i valori delle analisi:\n\nGlicemia: 92 mg/dL\nColesterolo totale: 210 mg/dL\nFerritina: 45 ng/mL...'
-                }
-                className="w-full h-40 px-5 py-4 rounded-2xl bg-muted border border-border text-foreground text-sm
-                  focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
-                  transition-all duration-300 placeholder:text-muted-foreground/50 resize-none"
+          <>
+            <div className="mb-6 space-y-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.pdf"
+                onChange={handleFileUpload}
+                className="hidden"
               />
-              <div className="flex gap-2">
-                <button
-                  onClick={handleManualSubmit}
-                  disabled={!manualText.trim() || uploading}
-                  className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium 
-                    disabled:opacity-40 transition-opacity flex items-center justify-center gap-2"
-                >
-                  {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  Analizza con AI
-                </button>
-                <button
-                  onClick={() => { setShowManualInput(false); setManualText(''); }}
-                  className="px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
-                >
-                  Annulla
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </div>
 
-        {/* Documents list */}
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 text-primary animate-spin" />
-          </div>
-        ) : currentDocs.length === 0 ? (
-          <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">
-              {activeTab === 'diet'
-                ? 'Nessuna dieta caricata ancora'
-                : 'Nessuna analisi caricata ancora'}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {currentDocs.map((doc) => (
-              <DocumentCard key={doc.id} doc={doc} onDelete={deleteDocument} />
-            ))}
-          </div>
-        )}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="w-full p-6 rounded-2xl border-2 border-dashed border-primary/30 hover:border-primary/60 
+                  transition-all duration-300 flex flex-col items-center gap-3 text-center"
+              >
+                {uploading ? (
+                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                ) : (
+                  <Upload className="w-8 h-8 text-primary" />
+                )}
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    {activeTab === 'diet' ? 'Carica la dieta del dietologo' : 'Carica le analisi mediche'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    PDF o foto • L'AI analizzerà il contenuto
+                  </p>
+                </div>
+              </button>
+
+              {!showManualInput ? (
+                <button
+                  onClick={() => setShowManualInput(true)}
+                  className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl glass glass-border text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {activeTab === 'diet' ? 'Inserisci manualmente la dieta' : 'Inserisci manualmente i valori'}
+                  </span>
+                </button>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-3"
+                >
+                  <textarea
+                    value={manualText}
+                    onChange={(e) => setManualText(e.target.value)}
+                    placeholder={
+                      activeTab === 'diet'
+                        ? 'Scrivi i pasti della tua dieta:\n\nColazione: yogurt greco, frutta secca...\nPranzo: pasta integrale, verdure...\nCena: pesce, insalata...'
+                        : 'Inserisci i valori delle analisi:\n\nGlicemia: 92 mg/dL\nColesterolo totale: 210 mg/dL\nFerritina: 45 ng/mL...'
+                    }
+                    className="w-full h-40 px-5 py-4 rounded-2xl bg-muted border border-border text-foreground text-sm
+                      focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                      transition-all duration-300 placeholder:text-muted-foreground/50 resize-none"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleManualSubmit}
+                      disabled={!manualText.trim() || uploading}
+                      className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium 
+                        disabled:opacity-40 transition-opacity flex items-center justify-center gap-2"
+                    >
+                      {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                      Analizza con AI
+                    </button>
+                    <button
+                      onClick={() => { setShowManualInput(false); setManualText(''); }}
+                      className="px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
+                    >
+                      Annulla
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Documents list */}
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-6 h-6 text-primary animate-spin" />
+              </div>
+            ) : currentDocs.length === 0 ? (
+              <div className="text-center py-12">
+                <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">
+                  {activeTab === 'diet'
+                    ? 'Nessuna dieta caricata ancora'
+                    : 'Nessuna analisi caricata ancora'}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {currentDocs.map((doc) => (
+                  <DocumentCard key={doc.id} doc={doc} onDelete={deleteDocument} />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </motion.div>
       <BottomNav />

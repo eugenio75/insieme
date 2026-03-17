@@ -328,7 +328,34 @@ const Onboarding = () => {
             )}
             {!currentStep.subtitle && <div className="mb-6" />}
 
-            {isWeightInput ? (
+            {isAgeInput ? (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <input
+                    type="number"
+                    min="14"
+                    max="100"
+                    value={ageInput}
+                    onChange={(e) => setAgeInput(e.target.value)}
+                    placeholder="Es: 32"
+                    className="flex-1 px-6 py-4 rounded-xl bg-muted border border-border text-foreground text-lg
+                      focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                      transition-all duration-300 placeholder:text-muted-foreground/50"
+                    autoFocus
+                  />
+                  <span className="text-muted-foreground font-medium text-lg">anni</span>
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleAgeSubmit}
+                  disabled={!ageInput.trim()}
+                  className="w-full py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm
+                    shadow-glow disabled:opacity-40 transition-opacity"
+                >
+                  CONTINUA
+                </motion.button>
+              </div>
+            ) : isWeightInput ? (
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <input

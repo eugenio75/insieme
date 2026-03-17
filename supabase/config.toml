@@ -2,3 +2,6 @@ project_id = "hxdanichnisaqmhniywz"
 
 [functions.health-analysis]
 verify_jwt = false
+
+[functions.ai-coach-chat]
+verify_jwt = false

@@ -332,7 +332,7 @@ const ProfilePage = () => {
                         onClick={() => {
                           if (ageInput.trim()) {
                             setUser({ age: ageInput.trim() });
-                            setTimeout(() => saveProfile(), 100);
+                            void saveProfile({ age: ageInput.trim() });
                           }
                           setEditingField(null);
                         }}

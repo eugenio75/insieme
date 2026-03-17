@@ -144,6 +144,99 @@ const ProfilePage = () => {
           )}
         </AnimatePresence>
 
+        {/* Age edit modal */}
+        <AnimatePresence>
+          {editingAge && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="mt-4 p-5 rounded-2xl glass glass-border border-primary/20"
+            >
+              <p className="text-sm font-medium text-foreground mb-3">Aggiorna la tua età</p>
+              <div className="flex items-center gap-3 mb-3">
+                <input
+                  type="number"
+                  min="14"
+                  max="100"
+                  value={ageInput}
+                  onChange={(e) => setAgeInput(e.target.value)}
+                  placeholder="Es: 32"
+                  className="flex-1 px-5 py-3 rounded-xl bg-muted border border-border text-foreground
+                    focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                    transition-all duration-300 placeholder:text-muted-foreground/50"
+                  autoFocus
+                />
+                <span className="text-muted-foreground">anni</span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    if (ageInput.trim()) {
+                      setUser({ age: ageInput.trim() });
+                      saveProfile();
+                    }
+                    setEditingAge(false);
+                  }}
+                  className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium"
+                >
+                  Salva
+                </button>
+                <button
+                  onClick={() => setEditingAge(false)}
+                  className="px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
+                >
+                  Annulla
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Work type edit modal */}
+        <AnimatePresence>
+          {editingWorkType && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="mt-4 p-5 rounded-2xl glass glass-border border-primary/20"
+            >
+              <p className="text-sm font-medium text-foreground mb-3">Che tipo di lavoro fai?</p>
+              <div className="space-y-2">
+                {[
+                  { label: 'Sedentario (ufficio, smart working)', icon: '💻' },
+                  { label: 'In piedi (negozio, ospedale, scuola)', icon: '🧑‍⚕️' },
+                  { label: 'Fisico (manuale, sport, cantiere)', icon: '🔨' },
+                  { label: 'Misto', icon: '🔄' },
+                ].map((opt) => (
+                  <button
+                    key={opt.label}
+                    onClick={() => {
+                      setUser({ workType: opt.label });
+                      saveProfile();
+                      setEditingWorkType(false);
+                    }}
+                    className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-300
+                      ${user.workType === opt.label 
+                        ? 'glass glass-border border-primary/30' 
+                        : 'glass glass-border hover:border-primary/20'}`}
+                  >
+                    <span className="text-lg">{opt.icon}</span>
+                    <span className="text-sm text-foreground">{opt.label}</span>
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setEditingWorkType(false)}
+                className="mt-3 w-full px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
+              >
+                Annulla
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg text-foreground">

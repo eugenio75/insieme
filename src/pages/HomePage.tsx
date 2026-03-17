@@ -88,9 +88,20 @@ const HomePage = () => {
   // Fetch AI motivational message
   useEffect(() => {
     const fetchMessage = async () => {
-      if (!authUser) { setLoadingMessage(false); return; }
+      if (!authUser) {
+        setLoadingMessage(false);
+        return;
+      }
+
       try {
-        const { data, error } = await supabase.functions.invoke('motivational-message');
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        if (!accessToken) return;
+
+        const { data, error } = await supabase.functions.invoke('motivational-message', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
         if (error) throw error;
         if (data?.message) setAiMessage(data.message);
       } catch (e) {
@@ -99,37 +110,37 @@ const HomePage = () => {
         setLoadingMessage(false);
       }
     };
+
     fetchMessage();
   }, [authUser]);
 
   // Fetch proactive AI coach insight
   useEffect(() => {
     const fetchCoachInsight = async () => {
-      if (!authUser) return;
+      if (!authUser) {
+        setCoachLoading(false);
+        return;
+      }
+
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-coach-chat`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${session.access_token}`,
-            },
-            body: JSON.stringify({ mode: 'proactive' }),
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          if (data?.message) setProactiveCoach(data);
-        }
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        if (!accessToken) return;
+
+        const { data, error } = await supabase.functions.invoke('ai-coach-chat', {
+          body: { mode: 'proactive' },
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (error) throw error;
+        if (data?.message) setProactiveCoach(data);
       } catch (e) {
         console.error('Error fetching coach insight:', e);
       } finally {
         setCoachLoading(false);
       }
     };
+
     fetchCoachInsight();
   }, [authUser]);
 

@@ -27,21 +27,31 @@ const AuthPage = () => {
     setAuthError(null);
     setIsLoggingIn(true);
 
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/auth`,
-      extraParams: {
-        prompt: 'select_account',
-      },
-    });
+    try {
+      console.log('Starting Google OAuth...');
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: `${window.location.origin}/auth`,
+        extraParams: {
+          prompt: 'select_account',
+        },
+      });
 
-    if (result.error) {
-      setAuthError('Accesso non riuscito. Riprova aprendo il link in Safari.');
-      console.error('Login error:', result.error);
-      setIsLoggingIn(false);
-      return;
-    }
+      console.log('OAuth result:', JSON.stringify(result, null, 2));
 
-    if (!result.redirected) {
+      if (result.error) {
+        setAuthError('Accesso non riuscito. Riprova o apri il link in Safari.');
+        console.error('Login error:', result.error);
+        setIsLoggingIn(false);
+        return;
+      }
+
+      if (!result.redirected) {
+        console.log('Not redirected, checking for tokens...');
+        setIsLoggingIn(false);
+      }
+    } catch (e) {
+      console.error('Google login exception:', e);
+      setAuthError('Errore durante il login. Riprova tra qualche secondo.');
       setIsLoggingIn(false);
     }
   };

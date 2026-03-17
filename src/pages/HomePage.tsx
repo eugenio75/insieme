@@ -1,20 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
 import HabitCard from '../components/HabitCard';
-import ProgressRing from '../components/ProgressRing';
 import BottomNav from '../components/BottomNav';
 import { Link, useNavigate } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
-import { getDailyTip } from '@/data/foodTips';
-import { PenLine, X, Bot, ChevronRight } from 'lucide-react';
+import { PenLine, Bot, ChevronRight, Sparkles, TrendingUp, Moon, Flame } from 'lucide-react';
 import FastingTimer from '@/components/FastingTimer';
-import FastingSuggestion from '@/components/FastingSuggestion';
-
-const SOS_COACH_KEY = 'sos_coach_response';
 
 const fallbackMessages = [
   'Ascolta il tuo corpo. Vivi meglio. 🌿',
@@ -27,7 +22,7 @@ const fallbackMessages = [
 const HomePage = () => {
   const { user, weeklyHabits, toggleHabit, currentStreak, getStreakMilestone, weekLabel, weekNumber, totalWeeks, refreshWeeklyHabits } = useAppStore();
   const { user: authUser } = useAuth();
-  useProfile(); // Ensure profile is loaded from DB
+  useProfile();
   const navigate = useNavigate();
   const completedCount = weeklyHabits.filter((h) => h.completed).length;
   const progress = completedCount / weeklyHabits.length;
@@ -35,30 +30,10 @@ const HomePage = () => {
 
   const [aiMessage, setAiMessage] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState(true);
-  const [sosCoach, setSosCoach] = useState<{ message: string; actionTips: string[] } | null>(null);
+  const [lastCheckin, setLastCheckin] = useState<{ mood: number; energy: number; bloating: number; stress: number | null } | null>(null);
+  const [checkedInToday, setCheckedInToday] = useState(false);
   const [proactiveCoach, setProactiveCoach] = useState<{ title: string; message: string; tips: string[]; category: string } | null>(null);
-
-  // Load SOS coach response from localStorage (expires after 24h)
-  useEffect(() => {
-    const stored = localStorage.getItem(SOS_COACH_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
-          setSosCoach(parsed);
-        } else {
-          localStorage.removeItem(SOS_COACH_KEY);
-        }
-      } catch { localStorage.removeItem(SOS_COACH_KEY); }
-    }
-  }, []);
-
-  const dismissSosCoach = () => {
-    setSosCoach(null);
-    localStorage.removeItem(SOS_COACH_KEY);
-  };
-
-  const dailyTip = getDailyTip(user.objective, user.difficulty, user.intolerances);
+  const [smartInsight, setSmartInsight] = useState<{ type: 'tip' | 'fasting' | 'motivation'; icon: string; label: string; title: string; desc: string } | null>(null);
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -67,17 +42,37 @@ const HomePage = () => {
     return 'Buonasera';
   };
 
-  // Fetch check-in signals and refresh habits accordingly
+  // Fetch last check-in + determine if done today
+  useEffect(() => {
+    if (!authUser) return;
+    const fetchCheckin = async () => {
+      const { data } = await supabase
+        .from('daily_checkins')
+        .select('mood, energy, bloating, stress, created_at')
+        .eq('user_id', authUser.id)
+        .order('created_at', { ascending: false })
+        .limit(1);
+      if (data && data.length > 0) {
+        const c = data[0];
+        setLastCheckin({ mood: c.mood, energy: c.energy, bloating: c.bloating, stress: c.stress });
+        const today = new Date().toDateString();
+        const checkinDate = new Date(c.created_at).toDateString();
+        setCheckedInToday(today === checkinDate);
+      }
+    };
+    fetchCheckin();
+  }, [authUser]);
+
+  // Fetch check-in signals for habit refresh
   useEffect(() => {
     if (!authUser) return;
     const fetchSignals = async () => {
-      const since = new Date(Date.now() - 3 * 86400000).toISOString(); // last 3 days
+      const since = new Date(Date.now() - 3 * 86400000).toISOString();
       const { data: checkins } = await supabase
         .from('daily_checkins')
         .select('mood, energy, bloating')
         .eq('user_id', authUser.id)
         .gte('created_at', since);
-      
       if (checkins && checkins.length > 0) {
         const signals = {
           avgMood: checkins.reduce((s, c) => s + c.mood, 0) / checkins.length,
@@ -136,41 +131,105 @@ const HomePage = () => {
     fetchCoachInsight();
   }, [authUser]);
 
+  // Determine smart insight based on check-in data
+  useEffect(() => {
+    if (!lastCheckin) {
+      setSmartInsight({
+        type: 'motivation',
+        icon: '🌿',
+        label: 'PER TE',
+        title: 'Inizia la giornata con consapevolezza',
+        desc: 'Fai il check-in per ricevere consigli personalizzati',
+      });
+      return;
+    }
+    const { mood, energy, bloating, stress } = lastCheckin;
+    if (energy <= 2) {
+      setSmartInsight({
+        type: 'tip',
+        icon: '⚡',
+        label: 'ENERGIA BASSA',
+        title: 'Prova uno snack energizzante',
+        desc: 'Frutta secca, banana o un pugno di mandorle possono aiutarti a ritrovare energia',
+      });
+    } else if (bloating >= 4) {
+      setSmartInsight({
+        type: 'tip',
+        icon: '🫗',
+        label: 'GONFIORE ALTO',
+        title: 'Riduci i cibi fermentabili oggi',
+        desc: 'Evita legumi crudi, latticini e bevande gassate. Prova tisana allo zenzero',
+      });
+    } else if (stress && stress >= 4) {
+      setSmartInsight({
+        type: 'tip',
+        icon: '🧘',
+        label: 'STRESS ELEVATO',
+        title: '5 minuti di respiro profondo',
+        desc: 'La respirazione diaframmatica riduce cortisolo e migliora la digestione',
+      });
+    } else if (mood <= 2) {
+      setSmartInsight({
+        type: 'motivation',
+        icon: '💛',
+        label: 'TI SIAMO VICINI',
+        title: 'Ogni giorno difficile passa',
+        desc: 'Concediti qualcosa che ti fa stare bene. Anche un piccolo gesto conta',
+      });
+    } else {
+      setSmartInsight({
+        type: 'motivation',
+        icon: '✨',
+        label: 'STAI ANDANDO BENE',
+        title: 'Continua così!',
+        desc: 'I tuoi parametri sono positivi. Mantieni le buone abitudini di oggi',
+      });
+    }
+  }, [lastCheckin]);
+
   const displayMessage = aiMessage || fallbackMessages[new Date().getDay() % fallbackMessages.length];
+
+  // Status indicators from last check-in
+  const statusIndicators = useMemo(() => {
+    if (!lastCheckin) return null;
+    const items = [
+      { label: 'Umore', value: lastCheckin.mood, icon: ['😢', '😕', '😐', '🙂', '😄'][lastCheckin.mood - 1] || '😐' },
+      { label: 'Energia', value: lastCheckin.energy, icon: ['🪫', '🔋', '⚡', '💪', '🚀'][lastCheckin.energy - 1] || '⚡' },
+      { label: 'Gonfiore', value: lastCheckin.bloating, icon: lastCheckin.bloating <= 2 ? '✅' : lastCheckin.bloating <= 3 ? '⚠️' : '🔴' },
+    ];
+    if (lastCheckin.stress !== null) {
+      items.push({ label: 'Stress', value: lastCheckin.stress!, icon: lastCheckin.stress! <= 2 ? '😌' : lastCheckin.stress! <= 3 ? '😤' : '🫨' });
+    }
+    return items;
+  }, [lastCheckin]);
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto">
-      <div className="px-6 pt-6">
+      <div className="px-5 pt-6">
         <AppHeader />
 
-        {/* Greeting */}
+        {/* ═══════════════════════════════════════════
+            BLOCCO 1: CRUSCOTTO STATO DEL GIORNO
+        ═══════════════════════════════════════════ */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+          className="mt-2"
         >
-          <h1 className="font-display text-3xl text-foreground">
-            {greeting()}{user.name ? `, ${['maschio', 'male', 'm', 'uomo'].includes((user.sex || '').toLowerCase()) ? 'caro' : 'cara'} ${user.name}` : ''} ☀️
-          </h1>
-        </motion.div>
-
-        {/* AI Motivational Message — prominent card */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.5 }}
-          className="mt-5"
-        >
+          {/* Greeting + AI message */}
           <div className="relative overflow-hidden rounded-2xl gradient-primary p-5 shadow-glow">
             <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
             <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-6 -translate-x-4" />
             <div className="relative">
-              <p className="text-[10px] text-primary-foreground/60 btn-text mb-2">✨ PER TE OGGI</p>
+              <h1 className="font-display text-2xl text-primary-foreground leading-tight">
+                {greeting()}{user.name ? `, ${['maschio', 'male', 'm', 'uomo'].includes((user.sex || '').toLowerCase()) ? 'caro' : 'cara'} ${user.name}` : ''} ☀️
+              </h1>
               <AnimatePresence mode="wait">
                 {loadingMessage ? (
                   <motion.p
                     key="loading"
-                    className="text-sm text-primary-foreground/70 italic font-display"
+                    className="text-sm text-primary-foreground/60 italic font-display mt-2"
                     animate={{ opacity: [0.4, 0.8, 0.4] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                   >
@@ -181,7 +240,7 @@ const HomePage = () => {
                     key="message"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="text-sm text-primary-foreground font-display leading-relaxed"
+                    className="text-sm text-primary-foreground/85 font-display mt-2 leading-relaxed"
                   >
                     {displayMessage}
                   </motion.p>
@@ -189,50 +248,78 @@ const HomePage = () => {
               </AnimatePresence>
             </div>
           </div>
-        </motion.div>
 
-        {/* SOS Coach Response */}
-        <AnimatePresence>
-          {sosCoach && (
-            <motion.div
-              initial={{ opacity: 0, y: 16, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.97 }}
-              transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
-              className="mt-5"
-            >
-              <div className="relative p-5 rounded-2xl bg-primary/5 border-2 border-primary/20 overflow-hidden">
-                <button
-                  onClick={dismissSosCoach}
-                  className="absolute top-3 right-3 w-7 h-7 rounded-full bg-muted/60 flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-                <div className="flex items-start gap-3 pr-6">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-lg">💛</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] text-primary btn-text mb-1">IL TUO COACH È CON TE</p>
-                    <p className="text-sm text-foreground leading-relaxed">{sosCoach.message}</p>
-                    {sosCoach.actionTips?.length > 0 && (
-                      <div className="mt-3 space-y-1.5">
-                        {sosCoach.actionTips.map((tip, i) => (
-                          <div key={i} className="flex items-start gap-2">
-                            <span className="text-primary text-xs mt-0.5">•</span>
-                            <p className="text-xs text-muted-foreground">{tip}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
+          {/* Status row: streak + progress + last check-in indicators */}
+          <div className="mt-4 flex items-center gap-3">
+            {/* Streak + Progress compact */}
+            <div className="flex-1 p-3.5 rounded-2xl glass glass-border flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
+                <span className="text-lg">{milestone?.icon || '🔥'}</span>
               </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xl font-bold text-gradient font-body">{currentStreak}</span>
+                  <span className="text-[11px] text-muted-foreground">
+                    {currentStreak === 1 ? 'giorno' : 'giorni'}
+                  </span>
+                </div>
+                {/* Mini progress bar */}
+                <div className="mt-1.5 h-1.5 rounded-full bg-muted overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full gradient-primary"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress * 100}%` }}
+                    transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
+                  />
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  {completedCount}/{weeklyHabits.length} passi • {weekLabel || `Sett. ${weekNumber}`}
+                </p>
+              </div>
+            </div>
+
+            {/* Check-in status / CTA */}
+            {!checkedInToday ? (
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/checkin')}
+                className="p-3.5 rounded-2xl gradient-warm shadow-soft flex flex-col items-center justify-center gap-1 min-w-[90px]"
+              >
+                <PenLine className="w-5 h-5 text-secondary-foreground" />
+                <span className="text-[10px] btn-text text-secondary-foreground">CHECK-IN</span>
+              </motion.button>
+            ) : (
+              <div className="p-3.5 rounded-2xl glass glass-border flex flex-col items-center justify-center gap-1 min-w-[90px]">
+                <span className="text-lg">✅</span>
+                <span className="text-[10px] btn-text text-muted-foreground">FATTO OGGI</span>
+              </div>
+            )}
+          </div>
+
+          {/* Status indicators from last check-in */}
+          {statusIndicators && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="mt-3 flex gap-2"
+            >
+              {statusIndicators.map((s) => (
+                <div
+                  key={s.label}
+                  className="flex-1 p-2.5 rounded-xl glass glass-border flex flex-col items-center gap-1"
+                >
+                  <span className="text-base">{s.icon}</span>
+                  <span className="text-[9px] text-muted-foreground btn-text">{s.label.toUpperCase()}</span>
+                </div>
+              ))}
             </motion.div>
           )}
-        </AnimatePresence>
+        </motion.div>
 
-        {/* AI Coach Card — proactive insights */}
+        {/* ═══════════════════════════════════════════
+            COACH AI — SEMPRE VISIBILE
+        ═══════════════════════════════════════════ */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -278,63 +365,23 @@ const HomePage = () => {
           </Link>
         </motion.div>
 
-        {/* Fasting Timer */}
-        <FastingTimer />
-
-        {/* Progress Ring */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.25, duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-          className="flex justify-center my-8"
-        >
-          <ProgressRing progress={progress} />
-        </motion.div>
-
-        {/* Streak Counter */}
-        {currentStreak > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
-            className="mb-6 p-4 rounded-2xl glass glass-border flex items-center gap-4"
-          >
-            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
-              <span className="text-xl">{milestone?.icon || '🔥'}</span>
-            </div>
-            <div className="flex-1">
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-gradient font-body">{currentStreak}</span>
-                <span className="text-sm text-muted-foreground">
-                  {currentStreak === 1 ? 'giorno' : 'giorni'} di fila
-                </span>
-              </div>
-              {milestone && (
-                <p className="text-xs text-primary mt-0.5 font-medium">{milestone.message}</p>
-              )}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Daily Steps */}
+        {/* ═══════════════════════════════════════════
+            BLOCCO 2: AZIONI DI OGGI
+        ═══════════════════════════════════════════ */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.35 }}
+          transition={{ delay: 0.3 }}
+          className="mt-6"
         >
-          <div className="flex items-baseline justify-between mb-4">
-            <h2 className="font-display text-lg text-foreground">I tuoi passi di oggi</h2>
-            <span className="text-xs text-muted-foreground font-medium">
-              {weekLabel || `Settimana ${weekNumber}`} {weekNumber <= totalWeeks ? '' : '🔄'}
-            </span>
-          </div>
-          <div className="flex flex-col gap-3">
+          <h2 className="font-display text-lg text-foreground mb-3">I tuoi passi di oggi</h2>
+          <div className="flex flex-col gap-2.5">
             {weeklyHabits.map((habit, i) => (
               <motion.div
                 key={habit.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 + i * 0.1, duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.35 + i * 0.08, duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
               >
                 <HabitCard
                   title={habit.title}
@@ -347,73 +394,56 @@ const HomePage = () => {
           </div>
         </motion.div>
 
-        {/* Check-in CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.4 }}
-          className="mt-8"
-        >
-          <motion.button
-            whileTap={{ scale: 0.98 }}
-            onClick={() => navigate('/checkin')}
-            className="w-full p-5 rounded-2xl gradient-warm shadow-soft flex items-center justify-center gap-3"
-          >
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-              <PenLine className="w-5 h-5 text-secondary-foreground" />
-            </div>
-            <div className="text-left">
-              <p className="btn-text text-sm text-secondary-foreground">COME TI SENTI ORA?</p>
-              <p className="text-xs mt-0.5 text-secondary-foreground/70">3 domande veloci ⏱️</p>
-            </div>
-          </motion.button>
-        </motion.div>
+        {/* Fasting Timer (only if enabled) */}
+        <FastingTimer />
 
-        {/* Daily Food Tip — styled card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.75, duration: 0.4 }}
-          className="mt-5"
-        >
-          <Link to="/nutrition" className="block">
-            <div className="p-5 rounded-2xl bg-accent glass-border hover:border-primary/20 transition-all duration-300">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">{dailyTip.icon}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] text-accent-foreground/50 btn-text mb-1">💡 CONSIGLIO DEL GIORNO</p>
-                  <p className="text-sm font-medium text-accent-foreground">{dailyTip.title}</p>
-                  <p className="text-xs text-accent-foreground/70 mt-1 line-clamp-2">{dailyTip.description}</p>
+        {/* ═══════════════════════════════════════════
+            BLOCCO 3: INSIGHT INTELLIGENTE (1 sola card)
+        ═══════════════════════════════════════════ */}
+        {smartInsight && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="mt-6"
+          >
+            <h2 className="font-display text-lg text-foreground mb-3">Per te oggi</h2>
+            <Link to={smartInsight.type === 'tip' ? '/nutrition' : '/checkin'} className="block">
+              <div className="p-5 rounded-2xl bg-accent glass-border hover:border-primary/20 transition-all duration-300">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">{smartInsight.icon}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] text-accent-foreground/50 btn-text mb-1">💡 {smartInsight.label}</p>
+                    <p className="text-sm font-medium text-accent-foreground">{smartInsight.title}</p>
+                    <p className="text-xs text-accent-foreground/70 mt-1 leading-relaxed">{smartInsight.desc}</p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground mt-1 flex-shrink-0" />
                 </div>
               </div>
-            </div>
-          </Link>
-        </motion.div>
-
-        {/* Fasting Suggestion — gentle weekly nudge */}
-        <FastingSuggestion />
+            </Link>
+          </motion.div>
+        )}
 
         {/* Together Card */}
         {user.mode === 'together' && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.85, duration: 0.4 }}
+            transition={{ delay: 0.6, duration: 0.4 }}
             className="mt-5"
           >
-            <Link to="/together" className="block p-5 rounded-2xl glass glass-border">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl animate-pulse-gentle">❤️</span>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Insieme a {user.partnerName || 'qualcuno di speciale'}
-                    </p>
-                    <p className="text-xs text-muted-foreground">Tocca per inviare supporto</p>
-                  </div>
+            <Link to="/together" className="block p-4 rounded-2xl glass glass-border">
+              <div className="flex items-center gap-3">
+                <span className="text-xl animate-pulse-gentle">❤️</span>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">
+                    Insieme a {user.partnerName || 'qualcuno di speciale'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Tocca per inviare supporto</p>
                 </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </div>
             </Link>
           </motion.div>

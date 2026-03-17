@@ -100,6 +100,7 @@ DEVI restituire un JSON con questa struttura:
 ${profileContext}
 
 IMPORTANTE: Non fare diagnosi definitive, ma segnala valori fuori norma e le loro implicazioni nutrizionali.
+CRITICO: Sii MOLTO SPECIFICO nella lista "foods_to_reduce" - elenca i SINGOLI ALIMENTI concreti da evitare (es: "marmellata", "pane bianco", "miele", "succhi di frutta") non solo categorie generiche. Questo è fondamentale perché l'app usa questa lista per avvisare l'utente quando un pasto suggerito contiene cibi incompatibili.
 
 DEVI restituire un JSON con questa struttura:
 {
@@ -115,8 +116,8 @@ DEVI restituire un JSON con questa struttura:
   ],
   "risk_factors": ["fattori di rischio identificati"],
   "dietary_recommendations": ["raccomandazioni alimentari specifiche"],
-  "foods_to_increase": ["cibi da aumentare con motivo"],
-  "foods_to_reduce": ["cibi da ridurre con motivo"],
+  "foods_to_increase": ["cibi SPECIFICI da aumentare con motivo (es: 'Salmone e pesce azzurro - omega 3 per ridurre trigliceridi')"],
+  "foods_to_reduce": ["cibi SPECIFICI da ridurre con motivo (es: 'Marmellata e miele - zuccheri semplici che alzano la glicemia', 'Pane bianco - alto indice glicemico', 'Succhi di frutta - zuccheri concentrati')"],
   "prevention_tips": ["suggerimenti preventivi per patologie a rischio"],
   "meal_plan": [
     {

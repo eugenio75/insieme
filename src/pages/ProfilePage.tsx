@@ -287,7 +287,7 @@ const ProfilePage = () => {
                       <button
                         onClick={() => {
                           setUser({ weight: weightInput || undefined });
-                          setTimeout(() => saveProfile(), 100);
+                          void saveProfile({ weight: weightInput || undefined });
                           setEditingField(null);
                         }}
                         className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium"

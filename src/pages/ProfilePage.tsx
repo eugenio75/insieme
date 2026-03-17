@@ -60,7 +60,7 @@ const modeOptions = [
 type EditingField = null | 'objective' | 'pace' | 'activity' | 'difficulty' | 'sex' | 'weight' | 'age' | 'workType' | 'mode';
 
 const ProfilePage = () => {
-  const { user, checkIns, weeklyHabits, toggleIntolerance, addCustomIntolerance, removeCustomIntolerance, setUser } = useAppStore();
+  const { user, checkIns, weeklyHabits, setUser } = useAppStore();
   const { saveProfile } = useProfile();
   const { signOut } = useAuth();
   const completedHabits = weeklyHabits.filter((h) => h.completed).length;
@@ -77,11 +77,13 @@ const ProfilePage = () => {
 
   const handleAddCustom = () => {
     const trimmed = customInput.trim();
-    if (trimmed && !user.customIntolerances.includes(trimmed) && !user.intolerances.includes(trimmed)) {
-      addCustomIntolerance(trimmed);
-      setCustomInput('');
-      setShowCustomInput(false);
-    }
+    if (!trimmed || user.customIntolerances.includes(trimmed) || user.intolerances.includes(trimmed)) return;
+
+    const nextCustomIntolerances = [...user.customIntolerances, trimmed];
+    setUser({ customIntolerances: nextCustomIntolerances });
+    void saveProfile({ customIntolerances: nextCustomIntolerances });
+    setCustomInput('');
+    setShowCustomInput(false);
   };
 
   const openEditor = (field: EditingField) => {
@@ -98,14 +100,17 @@ const ProfilePage = () => {
   };
 
   const handleSingleSelect = (field: string, value: string, storeValue?: string) => {
-    setUser({ [field]: storeValue || value });
-    setTimeout(() => saveProfile(), 100);
+    const nextValue = storeValue || value;
+    const patch = { [field]: nextValue } as any;
+    setUser(patch);
+    void saveProfile(patch);
     setEditingField(null);
   };
 
   const handleMultiSelectSave = (field: string) => {
-    setUser({ [field]: multiSelections.join(', ') });
-    setTimeout(() => saveProfile(), 100);
+    const patch = { [field]: multiSelections.join(', ') } as any;
+    setUser(patch);
+    void saveProfile(patch);
     setEditingField(null);
   };
 

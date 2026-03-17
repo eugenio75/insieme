@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
 import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } from '../data/foodTips';
-import { getTodayPlan, getWeeklyPlan, Meal, DayPlan } from '../data/mealPlans';
+import { getTodayPlan, getWeeklyPlan, Meal, DayPlan, HealthConstraints } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
 import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer, Sparkles, Stethoscope } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
@@ -213,22 +213,50 @@ const NutritionPage = () => {
   const { config: fastingConfig, getStatus } = useFasting();
   const { medicalDocs, dietDocs } = useHealthDocuments();
 
-  // Extract health-based insights for meal warnings
-  const healthWarnings = (() => {
+  // Extract health-based insights and constraints
+  const healthData = (() => {
     const latestMed = medicalDocs.find(d => d.status === 'completed' && d.ai_analysis);
     const latestDiet = dietDocs.find(d => d.status === 'completed' && d.ai_analysis);
     const medAnalysis = latestMed?.ai_analysis as any;
     const dietAnalysis = latestDiet?.ai_analysis as any;
+    
+    const foodsToReduce = medAnalysis?.foods_to_reduce || [];
+    const foodsToIncrease = medAnalysis?.foods_to_increase || [];
+    const abnormalValues = medAnalysis?.values?.filter((v: any) => v.status !== 'normal') || [];
+    
+    // Detect glycemic risk from values or risk factors
+    const riskFactors = medAnalysis?.risk_factors || [];
+    const allText = [...foodsToReduce, ...riskFactors, ...(medAnalysis?.dietary_recommendations || [])].join(' ').toLowerCase();
+    const hasGlycemicRisk = abnormalValues.some((v: any) => {
+      const name = (v.name || '').toLowerCase();
+      return name.includes('glicem') || name.includes('glucos') || name.includes('hba1c') || name.includes('insulin') || name.includes('glicata');
+    }) || allText.includes('glicem') || allText.includes('diabete') || allText.includes('insulin') || allText.includes('glucos');
+    
+    const hasCholesterolRisk = abnormalValues.some((v: any) => {
+      const name = (v.name || '').toLowerCase();
+      return name.includes('colesterol') || name.includes('ldl') || name.includes('trigliceri');
+    });
+
     return {
-      foodsToReduce: medAnalysis?.foods_to_reduce || [],
-      foodsToIncrease: medAnalysis?.foods_to_increase || [],
+      foodsToReduce,
+      foodsToIncrease,
       dietaryRecommendations: medAnalysis?.dietary_recommendations || [],
       hasDiet: !!latestDiet,
       dietMeals: dietAnalysis?.meals || [],
       fusionTips: dietAnalysis?.fusion_tips || [],
-      abnormalValues: medAnalysis?.values?.filter((v: any) => v.status !== 'normal') || [],
+      abnormalValues,
+      hasGlycemicRisk,
+      hasCholesterolRisk,
     };
   })();
+
+  // Build health constraints for meal plan
+  const healthConstraints: HealthConstraints | undefined = (healthData.hasGlycemicRisk || healthData.hasCholesterolRisk) ? {
+    foodsToReduce: healthData.foodsToReduce,
+    foodsToIncrease: healthData.foodsToIncrease,
+    hasGlycemicRisk: healthData.hasGlycemicRisk,
+    hasCholesterolRisk: healthData.hasCholesterolRisk,
+  } : undefined;
 
   // Load patterns when component mounts
   useEffect(() => {
@@ -244,7 +272,7 @@ const NutritionPage = () => {
   const dailyTip = getDailyTip(user.objective, user.difficulty, user.intolerances);
   const intoleranceTips = getIntoleranceTips(user.intolerances);
   const allRecipes = getAllRecipes();
-  const weekPlan = getWeeklyPlan(user.objective, user.activity, user.sex, user.age);
+  const weekPlan = getWeeklyPlan(user.objective, user.activity, user.sex, user.age, healthConstraints);
   const selectedDayPlan = weekPlan[selectedDay];
 
   // Determine which meals are outside the eating window
@@ -343,38 +371,48 @@ const NutritionPage = () => {
               </div>
             )}
 
-            {/* Health-based warnings from medical analyses */}
-            {(healthWarnings.abnormalValues.length > 0 || healthWarnings.hasDiet) && (
+            {/* Health-based info from medical analyses */}
+            {(healthData.abnormalValues.length > 0 || healthData.hasDiet) && (
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-5 space-y-3"
               >
-                {healthWarnings.abnormalValues.length > 0 && (
-                  <div className="p-4 rounded-2xl bg-secondary/5 border border-secondary/10">
+                {healthData.hasGlycemicRisk && (
+                  <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
                     <div className="flex items-center gap-2 mb-2">
-                      <Stethoscope className="w-4 h-4 text-secondary" />
-                      <p className="text-xs font-medium text-foreground">In base alle tue analisi</p>
+                      <Stethoscope className="w-4 h-4 text-primary" />
+                      <p className="text-xs font-medium text-foreground">Piano adattato alle tue analisi 💛</p>
                     </div>
-                    <div className="space-y-1.5">
-                      {healthWarnings.foodsToReduce.slice(0, 3).map((f: string, i: number) => (
-                        <p key={`r${i}`} className="text-xs text-foreground">⛔ {f}</p>
-                      ))}
-                      {healthWarnings.foodsToIncrease.slice(0, 3).map((f: string, i: number) => (
-                        <p key={`i${i}`} className="text-xs text-foreground">✅ {f}</p>
-                      ))}
-                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      I pasti sono stati scelti per mantenere la glicemia stabile, con cibi a basso indice glicemico, proteine e grassi buoni.
+                    </p>
                     <Link to="/health" className="text-[10px] text-primary font-medium mt-2 block">Vedi panoramica completa →</Link>
                   </div>
                 )}
 
-                {healthWarnings.hasDiet && healthWarnings.fusionTips.length > 0 && (
+                {!healthData.hasGlycemicRisk && healthData.abnormalValues.length > 0 && (
+                  <div className="p-4 rounded-2xl bg-accent border border-primary/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Stethoscope className="w-4 h-4 text-primary" />
+                      <p className="text-xs font-medium text-foreground">In base alle tue analisi</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      {healthData.foodsToIncrease.slice(0, 3).map((f: string, i: number) => (
+                        <p key={`i${i}`} className="text-xs text-foreground">✅ {f}</p>
+                      ))}
+                    </div>
+                    <Link to="/health" className="text-[10px] text-primary font-medium mt-2 block">Vedi dettagli →</Link>
+                  </div>
+                )}
+
+                {healthData.hasDiet && healthData.fusionTips.length > 0 && (
                   <div className="p-4 rounded-2xl bg-accent border border-primary/10">
                     <div className="flex items-center gap-2 mb-2">
                       <Sparkles className="w-4 h-4 text-primary" />
                       <p className="text-xs font-medium text-foreground">Dalla dieta del tuo dietologo</p>
                     </div>
-                    {healthWarnings.fusionTips.slice(0, 2).map((t: string, i: number) => (
+                    {healthData.fusionTips.slice(0, 2).map((t: string, i: number) => (
                       <p key={i} className="text-xs text-accent-foreground mb-1">🔄 {t}</p>
                     ))}
                   </div>
@@ -428,29 +466,12 @@ const NutritionPage = () => {
                   .map((meal, i) => {
                     const finding = checkMeal(meal.title, meal.description);
                     const outsideWindow = isMealOutsideWindow(meal.type);
-                    
-                    // Cross-reference meal with health document data (foods_to_reduce)
-                    const mealText = `${meal.title} ${meal.description}`.toLowerCase();
-                    const healthConflict = healthWarnings.foodsToReduce.find((food: string) => {
-                      const foodLower = food.toLowerCase();
-                      // Match key terms from the food-to-reduce string against meal content
-                      const keywords = foodLower.split(/[\s,()]+/).filter((w: string) => w.length > 3);
-                      return keywords.some((kw: string) => mealText.includes(kw));
-                    });
-                    // Also check for sugar/glycemic conflicts by keyword matching
-                    const sugarKeywords = ['marmellata', 'miele', 'zucchero', 'sciroppo', 'dolce', 'ciambellone', 'biscotti', 'torta', 'nutella', 'crema di nocciole', 'succo di frutta'];
-                    const hasSugarConflict = healthWarnings.foodsToReduce.some((f: string) => {
-                      const fl = f.toLowerCase();
-                      return (fl.includes('zuccher') || fl.includes('glicem') || fl.includes('dolci') || fl.includes('diabete') || fl.includes('glucosio') || fl.includes('carboidrati semplici'));
-                    }) && sugarKeywords.some(kw => mealText.includes(kw));
 
                     const warning = outsideWindow
                       ? `⏱️ Questo pasto è fuori dalla tua finestra alimentare (${fastingConfig.protocol})`
-                      : (healthConflict || hasSugarConflict)
-                        ? `⚠️ In base alle tue analisi, ${hasSugarConflict ? 'meglio ridurre zuccheri semplici' : 'attenzione a questo pasto'}. Prova la versione alternativa o sostituisci con opzioni a basso indice glicemico.`
-                        : finding
-                          ? `${finding.food} potrebbe causare ${finding.issue === 'gonfiore' ? 'gonfiore' : finding.issue === 'energia_bassa' ? 'calo di energia' : 'disagio'}. Prova la versione alternativa!`
-                          : null;
+                      : finding
+                        ? `${finding.food} potrebbe causare ${finding.issue === 'gonfiore' ? 'gonfiore' : finding.issue === 'energia_bassa' ? 'calo di energia' : 'disagio'}. Prova la versione alternativa!`
+                        : null;
                     // Enhance meal description when fasting is enabled and meal is within window
                     const fastingEnhancements: Record<string, string> = {
                       'colazione': '💪 Potenzia: aggiungi uovo sodo, avocado o burro di arachidi per più energie.',

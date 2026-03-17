@@ -136,13 +136,17 @@ DEVI restituire un JSON con questa struttura:
       { role: "user", content }
     ];
 
-    // If we have file content and it's an image, use vision
+    // If we have file content, attach it with correct MIME type
     if (fileContent && !manualContent) {
+      const inlineData = {
+        type: "image_url" as const,
+        image_url: { url: `data:${fileMimeType};base64,${fileContent}` }
+      };
       messages[1] = {
         role: "user",
         content: [
           { type: "text", text: `Analizza questo documento ${docType === 'diet' ? 'di dieta' : 'di analisi mediche'}:` },
-          { type: "image_url", image_url: { url: `data:image/jpeg;base64,${fileContent}` } }
+          inlineData
         ]
       };
     }

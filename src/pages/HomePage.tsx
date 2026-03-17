@@ -8,7 +8,7 @@ import AppHeader from '../components/AppHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
-import { PenLine, Bot, ChevronRight, Sparkles, TrendingUp, Moon, Flame } from 'lucide-react';
+import { PenLine, Bot, ChevronRight, Sparkles, TrendingUp, Moon, Flame, MessageCircle } from 'lucide-react';
 import FastingTimer from '@/components/FastingTimer';
 
 const fallbackMessages = [
@@ -189,17 +189,40 @@ const HomePage = () => {
 
   const displayMessage = aiMessage || fallbackMessages[new Date().getDay() % fallbackMessages.length];
 
-  // Status indicators from last check-in
+  // Status indicators mapped to actual check-in labels
   const statusIndicators = useMemo(() => {
     if (!lastCheckin) return null;
+
+    const moodMap: Record<number, { label: string; icon: string }> = {
+      5: { label: 'Serena', icon: '😊' },
+      4: { label: 'Calma', icon: '😌' },
+      3: { label: 'Così così', icon: '😐' },
+      2: { label: 'Stanca', icon: '😔' },
+      1: { label: 'Difficile', icon: '😢' },
+    };
+    const energyMap: Record<number, { label: string; icon: string }> = {
+      5: { label: 'Alta', icon: '⚡' },
+      4: { label: 'Buona', icon: '✨' },
+      3: { label: 'Nella media', icon: '➡️' },
+      2: { label: 'Bassa', icon: '🔋' },
+      1: { label: 'Molto bassa', icon: '😴' },
+    };
+    const bloatingMap: Record<number, { label: string; icon: string }> = {
+      1: { label: 'Nessuno', icon: '🌿' },
+      2: { label: 'Leggero', icon: '🫧' },
+      3: { label: 'Moderato', icon: '💨' },
+      4: { label: 'Forte', icon: '😣' },
+    };
+
+    const mood = moodMap[lastCheckin.mood] || moodMap[3];
+    const energy = energyMap[lastCheckin.energy] || energyMap[3];
+    const bloating = bloatingMap[lastCheckin.bloating] || bloatingMap[1];
+
     const items = [
-      { label: 'Umore', value: lastCheckin.mood, icon: ['😢', '😕', '😐', '🙂', '😄'][lastCheckin.mood - 1] || '😐' },
-      { label: 'Energia', value: lastCheckin.energy, icon: ['🪫', '🔋', '⚡', '💪', '🚀'][lastCheckin.energy - 1] || '⚡' },
-      { label: 'Gonfiore', value: lastCheckin.bloating, icon: lastCheckin.bloating <= 2 ? '✅' : lastCheckin.bloating <= 3 ? '⚠️' : '🔴' },
+      { label: mood.label, icon: mood.icon, category: 'Umore' },
+      { label: energy.label, icon: energy.icon, category: 'Energia' },
+      { label: bloating.label, icon: bloating.icon, category: 'Gonfiore' },
     ];
-    if (lastCheckin.stress !== null) {
-      items.push({ label: 'Stress', value: lastCheckin.stress!, icon: lastCheckin.stress! <= 2 ? '😌' : lastCheckin.stress! <= 3 ? '😤' : '🫨' });
-    }
     return items;
   }, [lastCheckin]);
 
@@ -306,11 +329,12 @@ const HomePage = () => {
             >
               {statusIndicators.map((s) => (
                 <div
-                  key={s.label}
+                  key={s.category}
                   className="flex-1 p-2.5 rounded-xl glass glass-border flex flex-col items-center gap-1"
                 >
                   <span className="text-base">{s.icon}</span>
-                  <span className="text-[9px] text-muted-foreground btn-text">{s.label.toUpperCase()}</span>
+                  <span className="text-[10px] text-foreground font-medium">{s.label}</span>
+                  <span className="text-[8px] text-muted-foreground">{s.category}</span>
                 </div>
               ))}
             </motion.div>
@@ -318,7 +342,7 @@ const HomePage = () => {
         </motion.div>
 
         {/* ═══════════════════════════════════════════
-            COACH AI + INSIGHT UNIFICATO
+            COACH AI — CARD COMPATTA CON CTA CHAT
         ═══════════════════════════════════════════ */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -326,56 +350,45 @@ const HomePage = () => {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="mt-5"
         >
-          <Link to="/coach" className="block">
-            <div className="relative overflow-hidden p-4 rounded-2xl glass glass-border hover:border-primary/30 transition-all duration-300">
+          <div className="relative overflow-hidden rounded-2xl glass glass-border">
+            {/* Coach content */}
+            <div className="p-4 pb-3">
               <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0">
-                  {proactiveCoach ? (
-                    <span className="text-lg">{smartInsight?.icon || '🤖'}</span>
-                  ) : (
-                    <Bot className="w-5 h-5 text-primary-foreground" />
-                  )}
+                <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-5 h-5 text-primary-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
+                  <p className="text-[10px] text-primary btn-text mb-0.5">IL TUO COACH AI</p>
                   {proactiveCoach ? (
                     <>
-                      <p className="text-[10px] text-primary btn-text mb-1">
-                        {smartInsight?.label ? `💡 ${smartInsight.label}` : '🤖 IL TUO COACH AI'}
-                      </p>
-                      <p className="text-sm font-medium text-foreground">{proactiveCoach.title}</p>
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{proactiveCoach.message}</p>
-                      {proactiveCoach.tips?.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {proactiveCoach.tips.slice(0, 2).map((tip, i) => (
-                            <span key={i} className="text-[10px] px-2 py-1 rounded-full bg-primary/10 text-primary">
-                              {tip.length > 40 ? tip.slice(0, 37) + '...' : tip}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      <p className="text-sm font-medium text-foreground leading-snug">{proactiveCoach.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{proactiveCoach.message}</p>
                     </>
                   ) : smartInsight ? (
                     <>
-                      <p className="text-[10px] text-primary btn-text mb-1">💡 {smartInsight.label}</p>
-                      <p className="text-sm font-medium text-foreground">{smartInsight.title}</p>
+                      <p className="text-sm font-medium text-foreground leading-snug">{smartInsight.title}</p>
                       <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{smartInsight.desc}</p>
                     </>
                   ) : (
                     <>
-                      <p className="text-[10px] text-primary btn-text mb-1">🤖 IL TUO COACH AI</p>
-                      <p className="text-sm font-medium text-foreground">Chiedimi qualsiasi cosa</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Conosco le tue analisi, la tua dieta e i tuoi progressi
-                      </p>
+                      <p className="text-sm font-medium text-foreground leading-snug">Pronto ad aiutarti</p>
+                      <p className="text-xs text-muted-foreground mt-1">Conosco le tue analisi, la tua dieta e i tuoi progressi</p>
                     </>
                   )}
-                  <p className="text-[10px] text-primary mt-2 btn-text flex items-center gap-1">
-                    Chatta col coach <ChevronRight className="w-3 h-3" />
-                  </p>
                 </div>
               </div>
             </div>
-          </Link>
+
+            {/* CTA chat — visually distinct, always visible */}
+            <Link
+              to="/coach"
+              className="flex items-center justify-center gap-2 py-3 px-4 bg-primary/10 hover:bg-primary/15 transition-colors border-t border-border/50"
+            >
+              <MessageCircle className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-primary">Chatta con il tuo Coach</span>
+              <ChevronRight className="w-4 h-4 text-primary" />
+            </Link>
+          </div>
         </motion.div>
 
         {/* ═══════════════════════════════════════════

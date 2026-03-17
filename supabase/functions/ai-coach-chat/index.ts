@@ -80,6 +80,8 @@ serve(async (req) => {
     // ===== BUILD CONTEXT STRING =====
     const name = profile?.name || "utente";
     const sex = profile?.sex || "";
+    const sexLower = sex.toLowerCase();
+    const isFemale = ["donna", "femmina", "female", "f"].includes(sexLower);
     const age = profile?.age || "";
 
     let context = `PROFILO UTENTE:

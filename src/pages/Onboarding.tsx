@@ -132,6 +132,7 @@ const Onboarding = () => {
   const [customInput, setCustomInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [weightInput, setWeightInput] = useState('');
+  const [ageInput, setAgeInput] = useState('');
   const { setUser, completeOnboarding } = useAppStore();
   const { saveProfile } = useProfile();
   const navigate = useNavigate();

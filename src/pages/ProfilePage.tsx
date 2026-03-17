@@ -399,7 +399,13 @@ const ProfilePage = () => {
                     <motion.button
                       key={intolerance}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => { toggleIntolerance(intolerance); setTimeout(() => saveProfile(), 100); }}
+                      onClick={() => {
+                        const nextIntolerances = isSelected
+                          ? user.intolerances.filter((i) => i !== intolerance)
+                          : [...user.intolerances, intolerance];
+                        setUser({ intolerances: nextIntolerances });
+                        void saveProfile({ intolerances: nextIntolerances });
+                      }}
                       className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300
                         ${isSelected ? 'glass glass-border border-primary/30' : 'glass glass-border'}`}
                     >

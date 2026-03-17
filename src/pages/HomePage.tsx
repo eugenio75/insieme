@@ -107,6 +107,35 @@ const HomePage = () => {
     fetchMessage();
   }, [authUser]);
 
+  // Fetch proactive AI coach insight
+  useEffect(() => {
+    const fetchCoachInsight = async () => {
+      if (!authUser) return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-coach-chat`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ mode: 'proactive' }),
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.message) setProactiveCoach(data);
+        }
+      } catch (e) {
+        console.error('Error fetching coach insight:', e);
+      }
+    };
+    fetchCoachInsight();
+  }, [authUser]);
+
   const displayMessage = aiMessage || fallbackMessages[new Date().getDay() % fallbackMessages.length];
 
   return (

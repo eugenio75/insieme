@@ -32,8 +32,9 @@ serve(async (req) => {
 
     // Get file content if uploaded
     let fileContent = "";
+    let fileMimeType = "image/jpeg";
     if (!manualContent) {
-      const { data: doc } = await supabase.from("health_documents").select("file_path").eq("id", documentId).single();
+      const { data: doc } = await supabase.from("health_documents").select("file_path, file_name").eq("id", documentId).single();
       if (doc?.file_path) {
         const { data: fileData } = await supabase.storage.from("health-documents").download(doc.file_path);
         if (fileData) {
@@ -44,6 +45,13 @@ serve(async (req) => {
             binary += String.fromCharCode(bytes[i]);
           }
           fileContent = btoa(binary);
+          
+          // Detect MIME type from file extension
+          const fileName = (doc.file_name || doc.file_path || "").toLowerCase();
+          if (fileName.endsWith(".pdf")) fileMimeType = "application/pdf";
+          else if (fileName.endsWith(".png")) fileMimeType = "image/png";
+          else if (fileName.endsWith(".webp")) fileMimeType = "image/webp";
+          else if (fileName.endsWith(".heic")) fileMimeType = "image/heic";
         }
       }
     }

@@ -11,7 +11,7 @@ const Index = () => {
   const navigate = useNavigate();
 
   // Load profile from DB when authenticated
-  const { profileLoading } = useProfile();
+  const { profileLoading, profileError, retryProfileLoad } = useProfile();
 
   useEffect(() => {
     if (loading || profileLoading) return;
@@ -25,13 +25,32 @@ const Index = () => {
     // Logged in + onboarded → home
     if (profile.onboarded) {
       navigate('/home');
+      return;
     }
-  }, [authUser, profile.onboarded, loading, profileLoading, navigate]);
+
+    // If backend timed out, don't mis-route user to onboarding
+    if (profileError) return;
+  }, [authUser, profile.onboarded, loading, profileLoading, profileError, navigate]);
 
   if (loading || profileLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <span className="text-4xl animate-pulse">🌿</span>
+      </div>
+    );
+  }
+
+  if (authUser && profileError && !profile.onboarded) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-8 max-w-lg mx-auto text-center gap-4">
+        <span className="text-4xl">🔄</span>
+        <p className="text-sm text-muted-foreground">Sto recuperando il tuo profilo, un attimo…</p>
+        <button
+          onClick={retryProfileLoad}
+          className="px-6 py-3 rounded-2xl bg-primary text-primary-foreground btn-text text-xs"
+        >
+          Riprova ora
+        </button>
       </div>
     );
   }

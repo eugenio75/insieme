@@ -186,8 +186,8 @@ ${context}
 REGOLE:
 - Rispondi SOLO con JSON valido: { "title": "...", "message": "...", "tips": ["..."], "category": "..." }
 - title: Titolo breve e accattivante (max 5 parole)
-- message: Consiglio personalizzato basato sui DATI REALI (2-3 frasi). Cita valori specifici delle analisi o pattern dei check-in.
-- tips: 2-3 azioni concrete per OGGI
+- message: Consiglio personalizzato breve (1-2 frasi). NON citare MAI numeri, valori o risultati delle analisi mediche. Parla in modo semplice e concreto.
+- tips: 2 azioni concrete e brevi per OGGI (max 6-8 parole ciascuna)
 - category: "nutrition" | "health" | "wellness" | "motivation"
 
 PRIORITÀ:

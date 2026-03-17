@@ -1,1 +1,4 @@
 project_id = "hxdanichnisaqmhniywz"
+
+[functions.health-analysis]
+verify_jwt = false

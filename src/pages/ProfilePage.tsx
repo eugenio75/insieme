@@ -70,27 +70,27 @@ const ProfilePage = () => {
           {[
             { label: 'Obiettivo', value: user.objective || '—' },
             { label: 'Modalità', value: user.mode === 'together' ? 'Insieme' : 'Da sola' },
-            { label: 'Peso', value: user.weight ? `${user.weight} kg` : '—', editable: true },
+            { label: 'Peso', value: user.weight ? `${user.weight} kg` : '—', editKey: 'weight' },
+            { label: 'Età', value: user.age ? `${user.age} anni` : '—', editKey: 'age' },
+            { label: 'Lavoro', value: user.workType || '—', editKey: 'workType' },
             { label: 'Ritmo', value: user.pace || '—' },
             { label: 'Attività', value: user.activity || '—' },
-            { label: 'Lavoro', value: user.workType || '—' },
             { label: 'Difficoltà principale', value: user.difficulty || '—' },
-            { label: 'Età', value: user.age || '—' },
             { label: 'Genere', value: user.sex || '—' },
           ].map((item) => (
             <div
               key={item.label}
               className="flex items-center justify-between p-4 rounded-2xl glass glass-border cursor-default"
               onClick={() => {
-                if ((item as any).editable && item.label === 'Peso') {
-                  setEditingWeight(true);
-                }
+                if (item.editKey === 'weight') setEditingWeight(true);
+                if (item.editKey === 'age') setEditingAge(true);
+                if (item.editKey === 'workType') setEditingWorkType(true);
               }}
             >
               <span className="text-sm text-muted-foreground">{item.label}</span>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-foreground">{item.value}</span>
-                {(item as any).editable && (
+                {item.editKey && (
                   <span className="text-xs text-primary cursor-pointer">✏️</span>
                 )}
               </div>

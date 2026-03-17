@@ -37,10 +37,13 @@ serve(async (req) => {
       if (doc?.file_path) {
         const { data: fileData } = await supabase.storage.from("health-documents").download(doc.file_path);
         if (fileData) {
-          // Convert to base64 for AI analysis
           const arrayBuffer = await fileData.arrayBuffer();
-          const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-          fileContent = base64;
+          const bytes = new Uint8Array(arrayBuffer);
+          let binary = "";
+          for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          fileContent = btoa(binary);
         }
       }
     }

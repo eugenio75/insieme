@@ -69,7 +69,7 @@ const HealthPage = () => {
     setUploading(false);
   };
 
-  const currentDocs = activeTab === 'diet' ? dietDocs : medicalDocs;
+  const currentDocs = activeTab === 'diet' ? dietDocs : activeTab === 'medical' ? medicalDocs : [];
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-lg mx-auto px-6 pt-6">

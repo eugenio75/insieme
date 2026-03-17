@@ -425,7 +425,11 @@ const ProfilePage = () => {
                   >
                     <span className="text-sm font-medium text-foreground">⚠️ {ci}</span>
                     <button
-                      onClick={() => { removeCustomIntolerance(ci); setTimeout(() => saveProfile(), 100); }}
+                      onClick={() => {
+                        const nextCustomIntolerances = user.customIntolerances.filter((item) => item !== ci);
+                        setUser({ customIntolerances: nextCustomIntolerances });
+                        void saveProfile({ customIntolerances: nextCustomIntolerances });
+                      }}
                       className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center"
                     >
                       <X className="w-3 h-3 text-muted-foreground" />

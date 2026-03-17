@@ -428,11 +428,29 @@ const NutritionPage = () => {
                   .map((meal, i) => {
                     const finding = checkMeal(meal.title, meal.description);
                     const outsideWindow = isMealOutsideWindow(meal.type);
+                    
+                    // Cross-reference meal with health document data (foods_to_reduce)
+                    const mealText = `${meal.title} ${meal.description}`.toLowerCase();
+                    const healthConflict = healthWarnings.foodsToReduce.find((food: string) => {
+                      const foodLower = food.toLowerCase();
+                      // Match key terms from the food-to-reduce string against meal content
+                      const keywords = foodLower.split(/[\s,()]+/).filter((w: string) => w.length > 3);
+                      return keywords.some((kw: string) => mealText.includes(kw));
+                    });
+                    // Also check for sugar/glycemic conflicts by keyword matching
+                    const sugarKeywords = ['marmellata', 'miele', 'zucchero', 'sciroppo', 'dolce', 'ciambellone', 'biscotti', 'torta', 'nutella', 'crema di nocciole', 'succo di frutta'];
+                    const hasSugarConflict = healthWarnings.foodsToReduce.some((f: string) => {
+                      const fl = f.toLowerCase();
+                      return (fl.includes('zuccher') || fl.includes('glicem') || fl.includes('dolci') || fl.includes('diabete') || fl.includes('glucosio') || fl.includes('carboidrati semplici'));
+                    }) && sugarKeywords.some(kw => mealText.includes(kw));
+
                     const warning = outsideWindow
                       ? `⏱️ Questo pasto è fuori dalla tua finestra alimentare (${fastingConfig.protocol})`
-                      : finding
-                        ? `${finding.food} potrebbe causare ${finding.issue === 'gonfiore' ? 'gonfiore' : finding.issue === 'energia_bassa' ? 'calo di energia' : 'disagio'}. Prova la versione alternativa!`
-                        : null;
+                      : (healthConflict || hasSugarConflict)
+                        ? `⚠️ In base alle tue analisi, ${hasSugarConflict ? 'meglio ridurre zuccheri semplici' : 'attenzione a questo pasto'}. Prova la versione alternativa o sostituisci con opzioni a basso indice glicemico.`
+                        : finding
+                          ? `${finding.food} potrebbe causare ${finding.issue === 'gonfiore' ? 'gonfiore' : finding.issue === 'energia_bassa' ? 'calo di energia' : 'disagio'}. Prova la versione alternativa!`
+                          : null;
                     // Enhance meal description when fasting is enabled and meal is within window
                     const fastingEnhancements: Record<string, string> = {
                       'colazione': '💪 Potenzia: aggiungi uovo sodo, avocado o burro di arachidi per più energie.',

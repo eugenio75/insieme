@@ -213,22 +213,50 @@ const NutritionPage = () => {
   const { config: fastingConfig, getStatus } = useFasting();
   const { medicalDocs, dietDocs } = useHealthDocuments();
 
-  // Extract health-based insights for meal warnings
-  const healthWarnings = (() => {
+  // Extract health-based insights and constraints
+  const healthData = (() => {
     const latestMed = medicalDocs.find(d => d.status === 'completed' && d.ai_analysis);
     const latestDiet = dietDocs.find(d => d.status === 'completed' && d.ai_analysis);
     const medAnalysis = latestMed?.ai_analysis as any;
     const dietAnalysis = latestDiet?.ai_analysis as any;
+    
+    const foodsToReduce = medAnalysis?.foods_to_reduce || [];
+    const foodsToIncrease = medAnalysis?.foods_to_increase || [];
+    const abnormalValues = medAnalysis?.values?.filter((v: any) => v.status !== 'normal') || [];
+    
+    // Detect glycemic risk from values or risk factors
+    const riskFactors = medAnalysis?.risk_factors || [];
+    const allText = [...foodsToReduce, ...riskFactors, ...(medAnalysis?.dietary_recommendations || [])].join(' ').toLowerCase();
+    const hasGlycemicRisk = abnormalValues.some((v: any) => {
+      const name = (v.name || '').toLowerCase();
+      return name.includes('glicem') || name.includes('glucos') || name.includes('hba1c') || name.includes('insulin') || name.includes('glicata');
+    }) || allText.includes('glicem') || allText.includes('diabete') || allText.includes('insulin') || allText.includes('glucos');
+    
+    const hasCholesterolRisk = abnormalValues.some((v: any) => {
+      const name = (v.name || '').toLowerCase();
+      return name.includes('colesterol') || name.includes('ldl') || name.includes('trigliceri');
+    });
+
     return {
-      foodsToReduce: medAnalysis?.foods_to_reduce || [],
-      foodsToIncrease: medAnalysis?.foods_to_increase || [],
+      foodsToReduce,
+      foodsToIncrease,
       dietaryRecommendations: medAnalysis?.dietary_recommendations || [],
       hasDiet: !!latestDiet,
       dietMeals: dietAnalysis?.meals || [],
       fusionTips: dietAnalysis?.fusion_tips || [],
-      abnormalValues: medAnalysis?.values?.filter((v: any) => v.status !== 'normal') || [],
+      abnormalValues,
+      hasGlycemicRisk,
+      hasCholesterolRisk,
     };
   })();
+
+  // Build health constraints for meal plan
+  const healthConstraints: HealthConstraints | undefined = (healthData.hasGlycemicRisk || healthData.hasCholesterolRisk) ? {
+    foodsToReduce: healthData.foodsToReduce,
+    foodsToIncrease: healthData.foodsToIncrease,
+    hasGlycemicRisk: healthData.hasGlycemicRisk,
+    hasCholesterolRisk: healthData.hasCholesterolRisk,
+  } : undefined;
 
   // Load patterns when component mounts
   useEffect(() => {
@@ -244,7 +272,7 @@ const NutritionPage = () => {
   const dailyTip = getDailyTip(user.objective, user.difficulty, user.intolerances);
   const intoleranceTips = getIntoleranceTips(user.intolerances);
   const allRecipes = getAllRecipes();
-  const weekPlan = getWeeklyPlan(user.objective, user.activity, user.sex, user.age);
+  const weekPlan = getWeeklyPlan(user.objective, user.activity, user.sex, user.age, healthConstraints);
   const selectedDayPlan = weekPlan[selectedDay];
 
   // Determine which meals are outside the eating window

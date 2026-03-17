@@ -64,6 +64,26 @@ const HomePage = () => {
     fetchCheckin();
   }, [authUser]);
 
+  // Check if user has at least one partnership (used as resilient fallback for Insieme section)
+  useEffect(() => {
+    if (!authUser) return;
+
+    const fetchPartnership = async () => {
+      const { data, error } = await supabase
+        .from('partnerships')
+        .select('id')
+        .or(`user_id.eq.${authUser.id},partner_id.eq.${authUser.id}`)
+        .limit(1);
+
+      if (!error && data && data.length > 0) {
+        setHasPartnership(true);
+      } else {
+        setHasPartnership(false);
+      }
+    };
+
+    fetchPartnership();
+
   // Fetch check-in signals for habit refresh
   useEffect(() => {
     if (!authUser) return;

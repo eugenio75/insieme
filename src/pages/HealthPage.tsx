@@ -373,6 +373,7 @@ const HealthPage = () => {
             ))}
           </div>
         )}
+        )}
       </motion.div>
       <BottomNav />
     </div>

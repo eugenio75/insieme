@@ -10,6 +10,7 @@ const TOGETHER_LAST_VISIT_KEY = 'together_last_visit';
 const tabs = [
   { path: '/home', icon: Home, label: 'Home' },
   { path: '/nutrition', icon: Utensils, label: 'Cibo' },
+  { path: '/health', icon: Stethoscope, label: 'Salute' },
   { path: '/progress', icon: BarChart3, label: 'Risultati' },
   { path: '/together', icon: Heart, label: 'Insieme' },
 ];

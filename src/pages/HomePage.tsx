@@ -36,6 +36,7 @@ const HomePage = () => {
   const [aiMessage, setAiMessage] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState(true);
   const [sosCoach, setSosCoach] = useState<{ message: string; actionTips: string[] } | null>(null);
+  const [proactiveCoach, setProactiveCoach] = useState<{ title: string; message: string; tips: string[]; category: string } | null>(null);
 
   // Load SOS coach response from localStorage (expires after 24h)
   useEffect(() => {

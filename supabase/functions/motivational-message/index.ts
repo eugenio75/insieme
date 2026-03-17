@@ -23,15 +23,17 @@ serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) throw new Error("Unauthorized");
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) throw new Error("Unauthorized");
+    const userId = claimsData.claims.sub as string;
 
     // Fetch recent check-ins (last 7 days)
     const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
     const { data: checkins } = await supabase
       .from("daily_checkins")
       .select("mood, energy, bloating, created_at")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("created_at", weekAgo)
       .order("created_at", { ascending: false })
       .limit(20);
@@ -40,7 +42,7 @@ serve(async (req) => {
     const { data: profile } = await supabase
       .from("profiles")
       .select("name, objective, current_streak, difficulty, sex")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .single();
 
     const name = profile?.name || "";

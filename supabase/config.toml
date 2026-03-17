@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.ai-coach-chat]
 verify_jwt = false
+
+[functions.motivational-message]
+verify_jwt = false

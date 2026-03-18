@@ -46,7 +46,7 @@ serve(async (req) => {
     const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
     const { data: checkins } = await supabase
       .from("daily_checkins")
-      .select("mood, energy, bloating, stress, sleep_hours, foods_eaten, created_at")
+      .select("mood, energy, bloating, stress, sleep_hours, foods_eaten, plan_adherence, plan_foods_followed, off_plan_foods, created_at")
       .eq("user_id", user.id)
       .gte("created_at", weekAgo)
       .order("created_at", { ascending: false })
@@ -104,6 +104,12 @@ serve(async (req) => {
       const avgBloating = (checkins.reduce((s, c) => s + c.bloating, 0) / checkins.length).toFixed(1);
       const latestCheckin = checkins[0];
       
+      // Plan adherence stats
+      const adherenceCheckins = checkins.filter(c => c.plan_adherence);
+      const fullAdherence = adherenceCheckins.filter(c => c.plan_adherence === 'full').length;
+      const partialAdherence = adherenceCheckins.filter(c => c.plan_adherence === 'partial').length;
+      const noAdherence = adherenceCheckins.filter(c => c.plan_adherence === 'none').length;
+
       context += `\nCHECK-IN RECENTI (ultimi 7 giorni, ${checkins.length} check-in):
 - Umore medio: ${avgMood}/5
 - Energia media: ${avgEnergy}/5
@@ -112,6 +118,11 @@ serve(async (req) => {
       if (latestCheckin.stress) context += `, stress ${latestCheckin.stress}/4`;
       if (latestCheckin.sleep_hours) context += `, sonno ${latestCheckin.sleep_hours}h`;
       if (latestCheckin.foods_eaten?.length) context += `\n- Cibi recenti: ${latestCheckin.foods_eaten.join(", ")}`;
+      if (latestCheckin.plan_adherence) context += `\n- Ultima aderenza al piano: ${latestCheckin.plan_adherence}`;
+      if (latestCheckin.off_plan_foods?.length) context += `\n- Cibi fuori piano: ${latestCheckin.off_plan_foods.join(", ")}`;
+      if (adherenceCheckins.length > 0) {
+        context += `\n- Aderenza al piano (${adherenceCheckins.length} giorni): completa ${fullAdherence}, parziale ${partialAdherence}, nessuna ${noAdherence}`;
+      }
       context += "\n";
     }
 

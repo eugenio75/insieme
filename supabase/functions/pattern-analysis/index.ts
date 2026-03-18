@@ -29,7 +29,7 @@ serve(async (req) => {
     // Fetch all check-ins
     const { data: checkins } = await supabase
       .from("daily_checkins")
-      .select("mood, energy, bloating, foods_eaten, sleep_hours, stress, created_at")
+      .select("mood, energy, bloating, foods_eaten, sleep_hours, stress, plan_adherence, plan_foods_followed, off_plan_foods, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(200);
@@ -60,6 +60,9 @@ serve(async (req) => {
     const dataForAI = checkins.map(c => ({
       date: c.created_at,
       foods: c.foods_eaten,
+      plan_adherence: c.plan_adherence,
+      plan_foods_followed: c.plan_foods_followed,
+      off_plan_foods: c.off_plan_foods,
       bloating: c.bloating,
       energy: c.energy,
       mood: c.mood,
@@ -109,6 +112,9 @@ LINEE GUIDA NUTRIZIONALI OBBLIGATORIE:
 - NON contare calorie esplicitamente nei suggerimenti (filosofia non-dieta)
 
 ANALIZZA questi pattern nei check-in:
+- ADERENZA AL PIANO: correlazione tra plan_adherence (full/partial/none) e benessere (umore, energia, gonfiore). Es: "Nei giorni in cui segui il piano, la tua energia è più alta"
+- CIBI FUORI PIANO: quali off_plan_foods si correlano con sintomi negativi
+- CIBI DEL PIANO: quali plan_foods_followed si correlano con benessere positivo
 - Cibi consumati e sintomi (gonfiore, energia bassa, umore)
 - Combinazioni di cibi nello stesso giorno e reazioni
 - Ore di sonno e fame/energia/umore del giorno dopo
@@ -118,7 +124,7 @@ REGOLE OUTPUT:
 - Rispondi SOLO con JSON valido
 - Formato: { "patterns": [...], "foodFindings": [...], "dietSuggestions": [...] }
 
-PATTERN: { "type": "sleep_hunger"|"sleep_energy"|"stress_eating"|"food_combo"|"meal_timing"|"stress_bloating", "title": "titolo breve", "description": "spiegazione gentile e pratica", "icon": "emoji", "correlation": 0.0-1.0, "actionTip": "consiglio concreto adattato a sesso/età/attività" }
+PATTERN: { "type": "plan_adherence"|"off_plan_impact"|"sleep_hunger"|"sleep_energy"|"stress_eating"|"food_combo"|"meal_timing"|"stress_bloating", "title": "titolo breve", "description": "spiegazione gentile e pratica", "icon": "emoji", "correlation": 0.0-1.0, "actionTip": "consiglio concreto adattato a sesso/età/attività" }
 
 FOOD FINDINGS: { "food": "nome", "issue": "gonfiore|energia_bassa|umore_basso", "correlation": 0.0-1.0, "description": "breve spiegazione", "icon": "emoji" }
 

@@ -46,6 +46,9 @@ export type Database = {
           foods_eaten: string[] | null
           id: string
           mood: number
+          off_plan_foods: string[] | null
+          plan_adherence: string | null
+          plan_foods_followed: string[] | null
           sleep_hours: number | null
           stress: number | null
           user_id: string
@@ -57,6 +60,9 @@ export type Database = {
           foods_eaten?: string[] | null
           id?: string
           mood: number
+          off_plan_foods?: string[] | null
+          plan_adherence?: string | null
+          plan_foods_followed?: string[] | null
           sleep_hours?: number | null
           stress?: number | null
           user_id: string
@@ -68,6 +74,9 @@ export type Database = {
           foods_eaten?: string[] | null
           id?: string
           mood?: number
+          off_plan_foods?: string[] | null
+          plan_adherence?: string | null
+          plan_foods_followed?: string[] | null
           sleep_hours?: number | null
           stress?: number | null
           user_id?: string

@@ -152,6 +152,20 @@ const CheckIn = () => {
     setSaving(true);
     try {
       if (authUser) {
+        // Calculate plan adherence
+        const planFoodLabels = planFoods.map(f => f.label);
+        const planFoodsFollowed = foods.filter(f => planFoodLabels.includes(f));
+        const offPlanFoods = foods.filter(f => !planFoodLabels.includes(f));
+        
+        let planAdherence = 'none';
+        if (planFoodLabels.length > 0) {
+          const ratio = planFoodsFollowed.length / planFoodLabels.length;
+          if (ratio >= 0.8) planAdherence = 'full';
+          else if (ratio > 0) planAdherence = 'partial';
+        } else if (foods.length === 0) {
+          planAdherence = null as any; // no data
+        }
+
         const insertData: any = {
           user_id: authUser.id,
           mood,
@@ -159,6 +173,9 @@ const CheckIn = () => {
           bloating,
           foods_eaten: foods,
           stress,
+          plan_adherence: planAdherence,
+          plan_foods_followed: planFoodsFollowed,
+          off_plan_foods: offPlanFoods,
         };
         if (sleepHours !== null) insertData.sleep_hours = sleepHours;
 

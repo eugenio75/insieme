@@ -20,6 +20,9 @@ interface UserProfile {
   bloodPressureSystolic?: string;
   bloodPressureDiastolic?: string;
   bodyFrame?: string;
+  region?: string;
+  province?: string;
+  city?: string;
 }
 
 interface Habit {

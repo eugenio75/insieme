@@ -41,6 +41,14 @@ serve(async (req) => {
       .eq("user_id", user.id)
       .single();
 
+    // Fetch habit completions
+    const { data: habitCompletions } = await supabase
+      .from("habit_completions")
+      .select("habit_id, habit_title, completed_at")
+      .eq("user_id", user.id)
+      .order("completed_at", { ascending: false })
+      .limit(200);
+
     if (!checkins || checkins.length < 10) {
       return new Response(JSON.stringify({
         patterns: [],
@@ -55,6 +63,14 @@ serve(async (req) => {
 
     const totalCheckins = checkins.length;
     const confidence = totalCheckins < 20 ? "bassa" : totalCheckins < 40 ? "media" : "alta";
+
+    // Group habits by date
+    const habitsByDate: Record<string, string[]> = {};
+    (habitCompletions || []).forEach((h: any) => {
+      const d = h.completed_at;
+      if (!habitsByDate[d]) habitsByDate[d] = [];
+      habitsByDate[d].push(h.habit_title);
+    });
 
     // Prepare data for AI
     const dataForAI = checkins.map(c => ({

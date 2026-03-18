@@ -14,7 +14,7 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const profileContext = userProfile ? `
-    a user:
+Profilo utente:
 - Obiettivo: ${userProfile.objective || 'non specificato'}
 - Intolleranze: ${[...(userProfile.intolerances || []), ...(userProfile.customIntolerances || [])].join(', ') || 'nessuna'}
 - Età: ${userProfile.age || 'non specificata'}

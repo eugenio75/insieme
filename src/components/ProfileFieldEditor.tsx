@@ -146,6 +146,11 @@ const fieldConfigs: FieldConfig[] = [
     min: '40',
     max: '140',
   },
+  {
+    key: 'location',
+    label: 'Dove vivi',
+    type: 'location',
+  },
 ];
 
 const ProfileFieldEditor = () => {

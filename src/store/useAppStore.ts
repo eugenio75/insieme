@@ -151,10 +151,36 @@ export const useAppStore = create<AppState>((set, get) => {
     },
     toggleHabit: (id) =>
       set((s) => {
+        const habit = s.weeklyHabits.find(h => h.id === id);
         const updated = s.weeklyHabits.map((h) =>
           h.id === id ? { ...h, completed: !h.completed } : h
         );
         saveCompletedHabits(updated.filter(h => h.completed).map(h => h.id));
+        
+        // Persist to DB asynchronously
+        if (habit) {
+          supabase.auth.getUser().then(({ data: authData }) => {
+            if (!authData?.user) return;
+            const userId = authData.user.id;
+            if (!habit.completed) {
+              // Was unchecked, now checking → insert
+              supabase.from('habit_completions').insert({
+                user_id: userId,
+                habit_id: id,
+                habit_title: habit.title,
+                completed_at: getDateStr(new Date()),
+              } as any).then(() => {});
+            } else {
+              // Was checked, now unchecking → delete
+              supabase.from('habit_completions').delete()
+                .eq('user_id', userId)
+                .eq('habit_id', id)
+                .eq('completed_at', getDateStr(new Date()))
+                .then(() => {});
+            }
+          });
+        }
+        
         return { weeklyHabits: updated };
       }),
     addCheckIn: (data) =>

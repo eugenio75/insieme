@@ -41,6 +41,7 @@ export const useProfile = () => {
           workType: (data as any).work_type || '',
           bloodPressureSystolic: (data as any).blood_pressure_systolic ? String((data as any).blood_pressure_systolic) : '',
           bloodPressureDiastolic: (data as any).blood_pressure_diastolic ? String((data as any).blood_pressure_diastolic) : '',
+          bodyFrame: (data as any).body_frame || '',
           onboarded: !!(data.objective && data.name),
         });
         setTimeout(() => refreshWeeklyHabits(), 0);

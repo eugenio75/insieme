@@ -5,6 +5,7 @@ import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } f
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan, HealthConstraints } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
 import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer, Sparkles, Stethoscope } from 'lucide-react';
+import MealActions from '@/components/MealActions';
 import AppHeader from '../components/AppHeader';
 import { useFoodFindings } from '@/hooks/useFoodFindings';
 import { usePatternAnalysis } from '@/hooks/useFoodFindings';

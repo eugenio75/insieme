@@ -38,6 +38,8 @@ export const useProfile = () => {
           partnerName: data.partner_name || '',
           weight: (data as any).weight ? String((data as any).weight) : '',
           workType: (data as any).work_type || '',
+          bloodPressureSystolic: (data as any).blood_pressure_systolic ? String((data as any).blood_pressure_systolic) : '',
+          bloodPressureDiastolic: (data as any).blood_pressure_diastolic ? String((data as any).blood_pressure_diastolic) : '',
           onboarded: !!(data.objective && data.name),
         });
         setTimeout(() => refreshWeeklyHabits(), 0);

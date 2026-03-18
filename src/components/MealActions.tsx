@@ -72,10 +72,22 @@ const MealActions = ({ meal, healthConstraints, onMealSwap }: MealActionsProps) 
   };
 
   const handleNotAvailable = async () => {
-    const result = await callMealSwap('not_available');
-    if (result) {
-      onMealSwap(result);
-      toast.success('Ecco cosa puoi fare con la dispensa! 🏠');
+    if (expandedIngredient) {
+      // Replace just the selected ingredient with pantry alternatives
+      const result = await callMealSwap('not_available_ingredient', { ingredient: expandedIngredient });
+      if (result) {
+        onMealSwap(result);
+        setExpandedIngredient(null);
+        setAiAlternatives(null);
+        toast.success(`${expandedIngredient} sostituito con la dispensa! 🏠`);
+      }
+    } else {
+      // No ingredient selected → regenerate whole meal with pantry items
+      const result = await callMealSwap('not_available');
+      if (result) {
+        onMealSwap(result);
+        toast.success('Ecco cosa puoi fare con la dispensa! 🏠');
+      }
     }
   };
 

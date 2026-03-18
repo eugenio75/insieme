@@ -125,7 +125,7 @@ export const analyzeProgress = (
   // --- Weight analysis (if tracked) ---
   if (current.weight !== null && previous.weight !== null) {
     const diff = current.weight - previous.weight;
-    const weeksOfData = sorted.length;
+    const periodsCount = periods.length;
 
     if (wantsWeightLoss) {
       if (diff > 0.5) {
@@ -136,9 +136,9 @@ export const analyzeProgress = (
           description: `Hai preso ${diff.toFixed(1)} kg nelle ultime 2 settimane. Il piano alimentare verrà reso più leggero: porzioni ridotte a cena, meno carboidrati serali e più verdure.`,
           applied: true,
         });
-      } else if (diff >= 0 && diff <= 0.5 && weeksOfData >= 3) {
-        // Stalling — weight not moving for multiple weeks
-        const thirdLast = sorted[sorted.length - 3];
+      } else if (diff >= 0 && diff <= 0.5 && periodsCount >= 3) {
+        // Stalling — weight not moving for multiple periods
+        const thirdLast = periods[periods.length - 3];
         const longTermDiff = thirdLast.weight !== null ? current.weight - thirdLast.weight : null;
         if (longTermDiff !== null && longTermDiff >= 0) {
           adjustments.push({

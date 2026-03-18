@@ -4,13 +4,16 @@ import { useAppStore } from '../store/useAppStore';
 import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } from '../data/foodTips';
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan, HealthConstraints } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
-import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer, Sparkles, Stethoscope } from 'lucide-react';
+import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer, Sparkles, Stethoscope, TrendingDown, TrendingUp } from 'lucide-react';
 import MealActions from '@/components/MealActions';
 import AppHeader from '../components/AppHeader';
 import { useFoodFindings } from '@/hooks/useFoodFindings';
 import { usePatternAnalysis } from '@/hooks/useFoodFindings';
 import { useFasting } from '@/hooks/useFasting';
 import { useHealthDocuments } from '@/hooks/useHealthDocuments';
+import { getDietAdaptation, DietAdaptation } from '@/data/adaptationLogic';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'react-router-dom';
 
 type Tab = 'piano' | 'consigli' | 'ricette' | 'gonfiore';
@@ -134,9 +137,10 @@ const TipCard = ({ tip, delay = 0 }: { tip: FoodTip; delay?: number }) => (
   </motion.div>
 );
 
-const MealCard = ({ meal, delay = 0, warning, dimmed, healthConstraints, onMealSwap }: { 
+const MealCard = ({ meal, delay = 0, warning, dimmed, healthConstraints, dietAdaptation, onMealSwap }: { 
   meal: Meal; delay?: number; warning?: string | null; dimmed?: boolean;
   healthConstraints?: HealthConstraints;
+  dietAdaptation?: DietAdaptation | null;
   onMealSwap?: (mealType: string, newMeal: Partial<Meal>) => void;
 }) => (
   <motion.div
@@ -166,6 +170,7 @@ const MealCard = ({ meal, delay = 0, warning, dimmed, healthConstraints, onMealS
           <MealActions
             meal={meal}
             healthConstraints={healthConstraints}
+            dietAdaptation={dietAdaptation}
             onMealSwap={(newMeal) => onMealSwap(meal.type, newMeal)}
           />
         )}
@@ -216,8 +221,10 @@ const DaySelector = ({
 
 const NutritionPage = () => {
   const { user } = useAppStore();
+  const { user: authUser } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('piano');
   const [swappedMeals, setSwappedMeals] = useState<Record<string, Record<string, Partial<Meal>>>>({});
+  const [dietAdaptation, setDietAdaptation] = useState<DietAdaptation | null>(null);
 
   const handleMealSwap = (dayIdx: number, mealType: string, newMeal: Partial<Meal>) => {
     setSwappedMeals(prev => ({
@@ -232,6 +239,28 @@ const NutritionPage = () => {
   const { analysis, load: loadPatterns, loaded: patternsLoaded } = usePatternAnalysis();
   const { config: fastingConfig, getStatus } = useFasting();
   const { medicalDocs, dietDocs } = useHealthDocuments();
+
+  // Load weekly check-in data for diet adaptation
+  useEffect(() => {
+    if (!authUser) return;
+    const loadWeeklyData = async () => {
+      const { data } = await supabase
+        .from('weekly_checkins')
+        .select('week_number, weight, bloating, energy')
+        .eq('user_id', authUser.id)
+        .order('week_number', { ascending: true });
+      if (data && data.length >= 2) {
+        const mapped = data.map(d => ({
+          week_number: d.week_number,
+          weight: d.weight ? Number(d.weight) : null,
+          bloating: d.bloating,
+          energy: d.energy,
+        }));
+        setDietAdaptation(getDietAdaptation(mapped, user.objective));
+      }
+    };
+    loadWeeklyData();
+  }, [authUser, user.objective]);
 
   // Extract health-based insights and constraints
   const healthData = (() => {
@@ -489,6 +518,35 @@ const NutritionPage = () => {
               onSelectDay={setSelectedDay}
             />
 
+            {/* Weekly adaptation banner */}
+            {dietAdaptation && dietAdaptation.weeklyTrend !== 'neutral' && dietAdaptation.summary && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`mb-4 p-4 rounded-2xl border ${
+                  dietAdaptation.weeklyTrend === 'improving' 
+                    ? 'bg-green-500/5 border-green-500/20' 
+                    : dietAdaptation.weeklyTrend === 'worsening'
+                      ? 'bg-secondary/5 border-secondary/20'
+                      : 'bg-primary/5 border-primary/15'
+                }`}
+              >
+                <div className="flex items-start gap-2.5">
+                  <span className="text-lg mt-0.5">
+                    {dietAdaptation.weeklyTrend === 'improving' ? '📈' : dietAdaptation.weeklyTrend === 'worsening' ? '📊' : '🔄'}
+                  </span>
+                  <div>
+                    <p className="text-xs font-medium text-foreground mb-0.5">
+                      {dietAdaptation.weeklyTrend === 'improving' ? 'Il piano sta funzionando!' : 
+                       dietAdaptation.weeklyTrend === 'worsening' ? 'Piano adattato ai tuoi risultati' :
+                       'Piano ricalibrato'}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">{dietAdaptation.summary}</p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             {selectedDayPlan && (
               <div className="space-y-3">
                 <h3 className="font-display text-base text-foreground">
@@ -532,6 +590,7 @@ const NutritionPage = () => {
                         warning={warning}
                         dimmed={outsideWindow}
                         healthConstraints={healthConstraints}
+                        dietAdaptation={dietAdaptation}
                         onMealSwap={(mealType, newMeal) => handleMealSwap(selectedDay, mealType, newMeal)}
                       />
                     );

@@ -58,9 +58,11 @@ export const analyzeProgress = (
 ): Adjustment[] => {
   if (data.length < 2) return [];
 
-  const sorted = [...data].sort((a, b) => a.week_number - b.week_number);
-  const current = sorted[sorted.length - 1];
-  const previous = sorted[sorted.length - 2];
+  const periods = groupBiweekly(data);
+  if (periods.length < 2) return [];
+
+  const current = periods[periods.length - 1];
+  const previous = periods[periods.length - 2];
 
   const adjustments: Adjustment[] = [];
   const lower = objective.toLowerCase();

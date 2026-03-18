@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
 import { useProfile } from '@/hooks/useProfile';
+import { regioni, provincePerRegione } from '@/data/italianLocations';
 
 type FieldConfig = {
   key: string;

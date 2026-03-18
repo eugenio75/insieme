@@ -135,6 +135,26 @@ serve(async (req) => {
       context += "\n";
     }
 
+    // Habit completions context
+    if (habitCompletions && habitCompletions.length > 0) {
+      const habitsByDate: Record<string, string[]> = {};
+      habitCompletions.forEach((h: any) => {
+        if (!habitsByDate[h.completed_at]) habitsByDate[h.completed_at] = [];
+        habitsByDate[h.completed_at].push(h.habit_title);
+      });
+      const totalDays = Object.keys(habitsByDate).length;
+      const avgPerDay = (habitCompletions.length / totalDays).toFixed(1);
+      context += `\nABITUDINI COMPLETATE (ultimi 14 giorni, ${totalDays} giorni attivi):
+- Media: ${avgPerDay} abitudini/giorno su 4
+- Totale completate: ${habitCompletions.length}`;
+      // Show last 3 days
+      const recentDays = Object.entries(habitsByDate).slice(0, 3);
+      recentDays.forEach(([date, habits]) => {
+        context += `\n- ${date}: ${habits.join(", ")}`;
+      });
+      context += "\n";
+    }
+
     // Health documents context
     if (healthDocs && healthDocs.length > 0) {
       const dietDocs = healthDocs.filter(d => d.doc_type === "diet");

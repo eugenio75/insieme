@@ -71,6 +71,8 @@ export const useProfile = () => {
         partner_name: state.partnerName || '',
         weight: state.weight ? parseFloat(state.weight) : null,
         work_type: state.workType || '',
+        blood_pressure_systolic: state.bloodPressureSystolic ? parseInt(state.bloodPressureSystolic) : null,
+        blood_pressure_diastolic: state.bloodPressureDiastolic ? parseInt(state.bloodPressureDiastolic) : null,
       } as any)
       .eq('user_id', user.id);
   };

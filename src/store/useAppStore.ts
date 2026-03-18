@@ -16,6 +16,8 @@ interface UserProfile {
   sex?: string;
   weight?: string;
   workType?: string;
+  bloodPressureSystolic?: string;
+  bloodPressureDiastolic?: string;
 }
 
 interface Habit {

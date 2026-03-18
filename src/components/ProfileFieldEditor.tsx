@@ -159,6 +159,9 @@ const ProfileFieldEditor = () => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [multiSelections, setMultiSelections] = useState<string[]>([]);
+  const [locRegion, setLocRegion] = useState('');
+  const [locProvince, setLocProvince] = useState('');
+  const [locCity, setLocCity] = useState('');
 
   const getDisplayValue = (config: FieldConfig): string => {
     const val = (user as any)[config.key];

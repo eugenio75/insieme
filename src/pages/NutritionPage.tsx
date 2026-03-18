@@ -133,7 +133,11 @@ const TipCard = ({ tip, delay = 0 }: { tip: FoodTip; delay?: number }) => (
   </motion.div>
 );
 
-const MealCard = ({ meal, delay = 0, warning, dimmed }: { meal: Meal; delay?: number; warning?: string | null; dimmed?: boolean }) => (
+const MealCard = ({ meal, delay = 0, warning, dimmed, healthConstraints, onMealSwap }: { 
+  meal: Meal; delay?: number; warning?: string | null; dimmed?: boolean;
+  healthConstraints?: HealthConstraints;
+  onMealSwap?: (mealType: string, newMeal: Partial<Meal>) => void;
+}) => (
   <motion.div
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: dimmed ? 0.5 : 1, y: 0 }}
@@ -159,6 +163,13 @@ const MealCard = ({ meal, delay = 0, warning, dimmed }: { meal: Meal; delay?: nu
         {meal.simpleVariant && <SimpleVariantBadge variant={meal.simpleVariant} />}
         {meal.ingredients && meal.ingredients.length > 0 && (
           <SubstitutionPanel ingredients={meal.ingredients} />
+        )}
+        {!dimmed && onMealSwap && (
+          <MealActions
+            meal={meal}
+            healthConstraints={healthConstraints}
+            onMealSwap={(newMeal) => onMealSwap(meal.type, newMeal)}
+          />
         )}
       </div>
     </div>

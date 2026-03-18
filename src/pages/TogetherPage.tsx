@@ -341,7 +341,7 @@ const TogetherPage = () => {
                           <div className="flex-1">
                             <span className="text-sm font-medium text-foreground">{displayText}</span>
                             <p className="text-[10px] text-muted-foreground">
-                              {new Date(badge.created_at).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}
+                              {new Date(badge.created_at).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                             </p>
                           </div>
                         </motion.div>

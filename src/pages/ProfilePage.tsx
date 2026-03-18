@@ -12,6 +12,22 @@ import { useWeightTracking } from '@/hooks/useWeightTracking';
 
 const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
 
+const calcBMI = (weightKg?: string, heightCm?: string) => {
+  const w = parseFloat(weightKg || '');
+  const h = parseFloat(heightCm || '');
+  if (!w || !h || h < 100) return null;
+  const hm = h / 100;
+  const bmi = w / (hm * hm);
+  let category: string;
+  let emoji: string;
+  let color: string;
+  if (bmi < 18.5) { category = 'Sottopeso'; emoji = '⚠️'; color = 'text-yellow-600 dark:text-yellow-400'; }
+  else if (bmi < 25) { category = 'Normopeso'; emoji = '✅'; color = 'text-green-600 dark:text-green-400'; }
+  else if (bmi < 30) { category = 'Sovrappeso'; emoji = '⚡'; color = 'text-secondary'; }
+  else { category = 'Obesità'; emoji = '🔴'; color = 'text-destructive'; }
+  return { bmi: Math.round(bmi * 10) / 10, category, emoji, color };
+};
+
 const WeightTracker = () => {
   const { entries, loading, logWeight, getTrend } = useWeightTracking();
   const [weightInput, setWeightInput] = useState('');

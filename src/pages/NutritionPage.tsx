@@ -5,6 +5,7 @@ import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } f
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan, HealthConstraints } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
 import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer, Sparkles, Stethoscope } from 'lucide-react';
+import MealActions from '@/components/MealActions';
 import AppHeader from '../components/AppHeader';
 import { useFoodFindings } from '@/hooks/useFoodFindings';
 import { usePatternAnalysis } from '@/hooks/useFoodFindings';
@@ -133,7 +134,11 @@ const TipCard = ({ tip, delay = 0 }: { tip: FoodTip; delay?: number }) => (
   </motion.div>
 );
 
-const MealCard = ({ meal, delay = 0, warning, dimmed }: { meal: Meal; delay?: number; warning?: string | null; dimmed?: boolean }) => (
+const MealCard = ({ meal, delay = 0, warning, dimmed, healthConstraints, onMealSwap }: { 
+  meal: Meal; delay?: number; warning?: string | null; dimmed?: boolean;
+  healthConstraints?: HealthConstraints;
+  onMealSwap?: (mealType: string, newMeal: Partial<Meal>) => void;
+}) => (
   <motion.div
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: dimmed ? 0.5 : 1, y: 0 }}
@@ -159,6 +164,13 @@ const MealCard = ({ meal, delay = 0, warning, dimmed }: { meal: Meal; delay?: nu
         {meal.simpleVariant && <SimpleVariantBadge variant={meal.simpleVariant} />}
         {meal.ingredients && meal.ingredients.length > 0 && (
           <SubstitutionPanel ingredients={meal.ingredients} />
+        )}
+        {!dimmed && onMealSwap && (
+          <MealActions
+            meal={meal}
+            healthConstraints={healthConstraints}
+            onMealSwap={(newMeal) => onMealSwap(meal.type, newMeal)}
+          />
         )}
       </div>
     </div>
@@ -208,6 +220,17 @@ const DaySelector = ({
 const NutritionPage = () => {
   const { user } = useAppStore();
   const [activeTab, setActiveTab] = useState<Tab>('piano');
+  const [swappedMeals, setSwappedMeals] = useState<Record<string, Record<string, Partial<Meal>>>>({});
+
+  const handleMealSwap = (dayIdx: number, mealType: string, newMeal: Partial<Meal>) => {
+    setSwappedMeals(prev => ({
+      ...prev,
+      [dayIdx]: {
+        ...(prev[dayIdx] || {}),
+        [mealType]: newMeal,
+      },
+    }));
+  };
   const { checkMeal } = useFoodFindings();
   const { analysis, load: loadPatterns, loaded: patternsLoaded } = usePatternAnalysis();
   const { config: fastingConfig, getStatus } = useFasting();
@@ -463,7 +486,13 @@ const NutritionPage = () => {
                   )}
                 </h3>
                 {selectedDayPlan.meals
-                  .map((meal, i) => {
+                  .map((baseMeal, i) => {
+                    // Apply swapped meal if exists
+                    const swapped = swappedMeals[selectedDay]?.[baseMeal.type];
+                    const meal: Meal = swapped
+                      ? { ...baseMeal, title: swapped.title || baseMeal.title, description: swapped.description || baseMeal.description, icon: swapped.icon || baseMeal.icon }
+                      : baseMeal;
+
                     const finding = checkMeal(meal.title, meal.description);
                     const outsideWindow = isMealOutsideWindow(meal.type);
 
@@ -483,7 +512,17 @@ const NutritionPage = () => {
                     const enhancedMeal = (fastingConfig.enabled && !outsideWindow) 
                       ? { ...meal, description: meal.description + ' ' + (fastingEnhancements[meal.type] || '') }
                       : meal;
-                    return <MealCard key={meal.type} meal={enhancedMeal} delay={i * 0.06} warning={warning} dimmed={outsideWindow} />;
+                    return (
+                      <MealCard
+                        key={meal.type}
+                        meal={enhancedMeal}
+                        delay={i * 0.06}
+                        warning={warning}
+                        dimmed={outsideWindow}
+                        healthConstraints={healthConstraints}
+                        onMealSwap={(mealType, newMeal) => handleMealSwap(selectedDay, mealType, newMeal)}
+                      />
+                    );
                   })}
               </div>
             )}

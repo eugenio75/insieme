@@ -137,9 +137,10 @@ const TipCard = ({ tip, delay = 0 }: { tip: FoodTip; delay?: number }) => (
   </motion.div>
 );
 
-const MealCard = ({ meal, delay = 0, warning, dimmed, healthConstraints, onMealSwap }: { 
+const MealCard = ({ meal, delay = 0, warning, dimmed, healthConstraints, dietAdaptation, onMealSwap }: { 
   meal: Meal; delay?: number; warning?: string | null; dimmed?: boolean;
   healthConstraints?: HealthConstraints;
+  dietAdaptation?: DietAdaptation | null;
   onMealSwap?: (mealType: string, newMeal: Partial<Meal>) => void;
 }) => (
   <motion.div

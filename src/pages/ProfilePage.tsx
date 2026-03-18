@@ -5,11 +5,157 @@ import { useProfile } from '@/hooks/useProfile';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import { useAuth } from '@/hooks/useAuth';
-import { Plus, X, LogOut } from 'lucide-react';
+import { Plus, X, LogOut, TrendingDown, TrendingUp, Minus, Scale } from 'lucide-react';
 import FastingSettings from '@/components/FastingSettings';
 import ProfileFieldEditor from '@/components/ProfileFieldEditor';
+import { useWeightTracking } from '@/hooks/useWeightTracking';
 
 const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
+
+const WeightTracker = () => {
+  const { entries, loading, logWeight, getTrend } = useWeightTracking();
+  const [weightInput, setWeightInput] = useState('');
+  const [showHistory, setShowHistory] = useState(false);
+
+  const trend = getTrend();
+
+  const handleLog = () => {
+    const w = parseFloat(weightInput);
+    if (w && w > 20 && w < 300) {
+      logWeight(w);
+      setWeightInput('');
+    }
+  };
+
+  const trendIcon = trend.trend === 'losing' ? '📉' : trend.trend === 'gaining' ? '📈' : trend.trend === 'stable' ? '➡️' : '⚖️';
+  const trendLabel = trend.trend === 'losing' ? 'In calo' : trend.trend === 'gaining' ? 'In aumento' : trend.trend === 'stable' ? 'Stabile' : '';
+  const trendColor = trend.trend === 'losing' ? 'text-green-600 dark:text-green-400' : trend.trend === 'gaining' ? 'text-secondary' : 'text-muted-foreground';
+
+  return (
+    <div className="mt-8">
+      <h2 className="font-display text-lg text-foreground mb-4 flex items-center gap-2">
+        <Scale className="w-5 h-5 text-primary" />
+        Traccia il peso
+      </h2>
+
+      {/* Current weight & trend */}
+      {trend.currentWeight !== null && (
+        <div className="flex gap-3 mb-4">
+          <div className="flex-1 p-4 rounded-2xl glass glass-border text-center">
+            <p className="text-2xl font-bold text-gradient font-body">{trend.currentWeight.toFixed(1)}</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Peso attuale (kg)</p>
+          </div>
+          {trend.lastTwoWeeksChange !== null && (
+            <div className="flex-1 p-4 rounded-2xl glass glass-border text-center">
+              <p className={`text-2xl font-bold font-body ${trendColor}`}>
+                {trend.lastTwoWeeksChange > 0 ? '+' : ''}{trend.lastTwoWeeksChange.toFixed(1)}
+              </p>
+              <p className="text-[10px] text-muted-foreground mt-1">Ultime 2 settimane</p>
+            </div>
+          )}
+          {trend.totalChange !== null && entries.length >= 3 && (
+            <div className="flex-1 p-4 rounded-2xl glass glass-border text-center">
+              <p className={`text-2xl font-bold font-body ${trend.totalChange <= 0 ? 'text-green-600 dark:text-green-400' : 'text-secondary'}`}>
+                {trend.totalChange > 0 ? '+' : ''}{trend.totalChange.toFixed(1)}
+              </p>
+              <p className="text-[10px] text-muted-foreground mt-1">Totale</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Trend badge */}
+      {trend.trend !== 'unknown' && (
+        <div className={`mb-4 px-4 py-2.5 rounded-xl ${
+          trend.trend === 'losing' ? 'bg-green-500/10 border border-green-500/20' :
+          trend.trend === 'gaining' ? 'bg-secondary/10 border border-secondary/20' :
+          'bg-muted/60 border border-border'
+        }`}>
+          <p className="text-xs">
+            <span className="mr-1.5">{trendIcon}</span>
+            <span className={`font-medium ${trendColor}`}>{trendLabel}</span>
+            <span className="text-muted-foreground ml-1">
+              {trend.trend === 'losing' ? '— Il piano sta funzionando!' :
+               trend.trend === 'gaining' ? '— Il piano verrà adattato automaticamente.' :
+               '— Il peso è stabile.'}
+            </span>
+          </p>
+        </div>
+      )}
+
+      {/* Log weight input */}
+      <div className="flex gap-2 mb-3">
+        <input
+          type="number"
+          step="0.1"
+          value={weightInput}
+          onChange={(e) => setWeightInput(e.target.value)}
+          placeholder={trend.currentWeight ? `Ultimo: ${trend.currentWeight.toFixed(1)} kg` : 'Es: 65.5'}
+          onKeyDown={(e) => e.key === 'Enter' && handleLog()}
+          className="flex-1 px-4 py-3 rounded-xl bg-muted border border-border text-foreground text-sm
+            focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+            transition-all duration-300 placeholder:text-muted-foreground/50"
+        />
+        <button
+          onClick={handleLog}
+          disabled={!weightInput.trim()}
+          className="px-5 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium
+            disabled:opacity-40 transition-opacity"
+        >
+          Salva
+        </button>
+      </div>
+      <p className="text-[10px] text-muted-foreground/60 px-1 mb-3">
+        Pesati alla stessa ora per dati più precisi. Puoi registrare il peso ogni giorno.
+      </p>
+
+      {/* History toggle */}
+      {entries.length > 0 && (
+        <>
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className="text-xs text-primary font-medium mb-2"
+          >
+            {showHistory ? 'Nascondi storico' : `Vedi storico (${entries.length} registrazioni)`}
+          </button>
+          <AnimatePresence>
+            {showHistory && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
+                  {entries.slice(0, 20).map((entry, i) => {
+                    const prev = i < entries.length - 1 ? entries[i + 1] : null;
+                    const diff = prev ? entry.weight - prev.weight : null;
+                    const date = new Date(entry.logged_at);
+                    return (
+                      <div key={entry.id} className="flex items-center justify-between px-3 py-2 rounded-xl bg-muted/40 text-xs">
+                        <span className="text-muted-foreground">
+                          {date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-foreground">{entry.weight.toFixed(1)} kg</span>
+                          {diff !== null && (
+                            <span className={`text-[10px] ${diff < 0 ? 'text-green-600 dark:text-green-400' : diff > 0 ? 'text-secondary' : 'text-muted-foreground'}`}>
+                              {diff > 0 ? '+' : ''}{diff.toFixed(1)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
+    </div>
+  );
+};
 
 const ProfilePage = () => {
   const { user, checkIns, weeklyHabits, toggleIntolerance, addCustomIntolerance, removeCustomIntolerance, setUser } = useAppStore();
@@ -63,6 +209,9 @@ const ProfilePage = () => {
           Il tuo percorso
         </h2>
         <ProfileFieldEditor />
+
+        {/* Weight Tracker */}
+        <WeightTracker />
 
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">

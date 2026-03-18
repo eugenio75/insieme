@@ -235,12 +235,12 @@ export const getDietAdaptation = (
             adaptation.reducePortions = true;
             adaptation.lessCarbsDinner = true;
             adaptation.moreProtein = true;
-            adaptation.summary = 'Peso fermo da più settimane: piano ricalibrato con più proteine e cene leggere.';
+            adaptation.summary = 'Peso fermo da più di un mese: piano ricalibrato con più proteine e cene leggere.';
           }
         }
       } else if (diff < -0.3) {
         adaptation.weeklyTrend = 'improving';
-        adaptation.summary = `Peso -${Math.abs(diff).toFixed(1)}kg: il piano funziona, continuiamo così.`;
+        adaptation.summary = `Peso -${Math.abs(diff).toFixed(1)}kg in 2 settimane: il piano funziona, continuiamo così.`;
       }
     }
   }

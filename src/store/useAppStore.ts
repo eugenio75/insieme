@@ -176,8 +176,12 @@ export const useAppStore = create<AppState>((set, get) => {
       const { user } = get();
       const startDate = undefined;
       const result = getInitialHabits(user.objective, startDate, signals);
+      const savedIds = getSavedCompletedHabits();
       set({
-        weeklyHabits: result.habits,
+        weeklyHabits: result.habits.map(h => ({
+          ...h,
+          completed: savedIds.includes(h.id),
+        })),
         weekLabel: result.weekLabel,
         weekNumber: result.weekNumber,
         totalWeeks: result.totalWeeks,

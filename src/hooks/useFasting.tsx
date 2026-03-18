@@ -128,11 +128,18 @@ export const useFasting = () => {
     if (data) setActiveSession(data as any);
   }, [authUser, config]);
 
-  const endSession = useCallback(async (completed: boolean) => {
+  const endSession = useCallback(async (forcedCompleted?: boolean) => {
     if (!authUser || !activeSession) return;
+
+    const endedAt = new Date();
+    const startedAt = new Date(activeSession.started_at);
+    const elapsedHours = (endedAt.getTime() - startedAt.getTime()) / 3600000;
+    const meetsTarget = elapsedHours >= activeSession.target_hours;
+    const completed = typeof forcedCompleted === 'boolean' ? forcedCompleted : meetsTarget;
+
     await supabase
       .from('fasting_sessions')
-      .update({ ended_at: new Date().toISOString(), completed } as any)
+      .update({ ended_at: endedAt.toISOString(), completed } as any)
       .eq('id', activeSession.id);
     setActiveSession(null);
     // Refresh sessions

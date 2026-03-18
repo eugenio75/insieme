@@ -31,6 +31,25 @@ interface WeeklyData {
 }
 
 /**
+ * Groups weekly data into 2-week (biweekly) periods and averages them.
+ */
+const groupBiweekly = (data: WeeklyData[]): { weight: number | null; bloating: number; energy: number }[] => {
+  const sorted = [...data].sort((a, b) => a.week_number - b.week_number);
+  const periods: { weight: number | null; bloating: number; energy: number }[] = [];
+
+  for (let i = 0; i < sorted.length; i += 2) {
+    const chunk = sorted.slice(i, i + 2);
+    const weights = chunk.filter(c => c.weight !== null).map(c => c.weight!);
+    periods.push({
+      weight: weights.length > 0 ? weights[weights.length - 1] : null, // use latest weight in the period
+      bloating: Math.round(chunk.reduce((s, c) => s + c.bloating, 0) / chunk.length),
+      energy: Math.round(chunk.reduce((s, c) => s + c.energy, 0) / chunk.length),
+    });
+  }
+  return periods;
+};
+
+/**
  * Compares last 2 weeks of data and generates adjustments.
  */
 export const analyzeProgress = (
@@ -39,9 +58,11 @@ export const analyzeProgress = (
 ): Adjustment[] => {
   if (data.length < 2) return [];
 
-  const sorted = [...data].sort((a, b) => a.week_number - b.week_number);
-  const current = sorted[sorted.length - 1];
-  const previous = sorted[sorted.length - 2];
+  const periods = groupBiweekly(data);
+  if (periods.length < 2) return [];
+
+  const current = periods[periods.length - 1];
+  const previous = periods[periods.length - 2];
 
   const adjustments: Adjustment[] = [];
   const lower = objective.toLowerCase();
@@ -104,7 +125,7 @@ export const analyzeProgress = (
   // --- Weight analysis (if tracked) ---
   if (current.weight !== null && previous.weight !== null) {
     const diff = current.weight - previous.weight;
-    const weeksOfData = sorted.length;
+    const periodsCount = periods.length;
 
     if (wantsWeightLoss) {
       if (diff > 0.5) {
@@ -112,19 +133,19 @@ export const analyzeProgress = (
           type: 'nutrition',
           icon: '⚖️',
           title: 'Peso in aumento — adattiamo il piano',
-          description: `Hai preso ${diff.toFixed(1)} kg questa settimana. Il piano alimentare verrà reso più leggero: porzioni ridotte a cena, meno carboidrati serali e più verdure. Non ti preoccupare, ci ricalibriamo.`,
+          description: `Hai preso ${diff.toFixed(1)} kg nelle ultime 2 settimane. Il piano alimentare verrà reso più leggero: porzioni ridotte a cena, meno carboidrati serali e più verdure.`,
           applied: true,
         });
-      } else if (diff >= 0 && diff <= 0.5 && weeksOfData >= 3) {
-        // Stalling — weight not moving for multiple weeks
-        const thirdLast = sorted[sorted.length - 3];
+      } else if (diff >= 0 && diff <= 0.5 && periodsCount >= 3) {
+        // Stalling — weight not moving for multiple periods
+        const thirdLast = periods[periods.length - 3];
         const longTermDiff = thirdLast.weight !== null ? current.weight - thirdLast.weight : null;
         if (longTermDiff !== null && longTermDiff >= 0) {
           adjustments.push({
             type: 'nutrition',
             icon: '📉',
             title: 'Peso fermo — serve un cambio',
-            description: 'Il peso non scende da più settimane. Questa settimana il piano sarà più strutturato: porzioni calibrate, cene leggere a base di proteine e verdure, e spuntini ridotti.',
+            description: 'Il peso non scende da più di un mese. Il piano sarà più strutturato: porzioni calibrate, cene leggere a base di proteine e verdure, e spuntini ridotti.',
             applied: true,
           });
         }
@@ -133,7 +154,7 @@ export const analyzeProgress = (
           type: 'general',
           icon: '🎉',
           title: 'Ottimo progresso sul peso!',
-          description: `Hai perso ${Math.abs(diff).toFixed(1)} kg questa settimana. Il piano funziona, continuiamo così!`,
+          description: `Hai perso ${Math.abs(diff).toFixed(1)} kg nelle ultime 2 settimane. Il piano funziona, continuiamo così!`,
           applied: false,
         });
       }
@@ -183,9 +204,11 @@ export const getDietAdaptation = (
 
   if (data.length < 2) return defaults;
 
-  const sorted = [...data].sort((a, b) => a.week_number - b.week_number);
-  const current = sorted[sorted.length - 1];
-  const previous = sorted[sorted.length - 2];
+  const periods = groupBiweekly(data);
+  if (periods.length < 2) return defaults;
+
+  const current = periods[periods.length - 1];
+  const previous = periods[periods.length - 2];
 
   const lower = objective.toLowerCase();
   const wantsWeightLoss = lower.includes('peso') || lower.includes('legger') || lower.includes('sgonfi') || lower.includes('dimagr');
@@ -202,22 +225,22 @@ export const getDietAdaptation = (
         adaptation.lighterDinners = true;
         adaptation.lessCarbsDinner = true;
         adaptation.moreVegetables = true;
-        adaptation.summary = `Peso +${diff.toFixed(1)}kg: piano reso più leggero con porzioni ridotte e cene proteiche.`;
+        adaptation.summary = `Peso +${diff.toFixed(1)}kg in 2 settimane: piano reso più leggero con porzioni ridotte e cene proteiche.`;
       } else if (diff >= -0.2 && diff <= 0.3) {
-        // Check if stalling across multiple weeks
-        if (sorted.length >= 3) {
-          const thirdLast = sorted[sorted.length - 3];
+        // Check if stalling across multiple periods
+        if (periods.length >= 3) {
+          const thirdLast = periods[periods.length - 3];
           if (thirdLast.weight !== null && current.weight - thirdLast.weight >= 0) {
             adaptation.weeklyTrend = 'stalling';
             adaptation.reducePortions = true;
             adaptation.lessCarbsDinner = true;
             adaptation.moreProtein = true;
-            adaptation.summary = 'Peso fermo da più settimane: piano ricalibrato con più proteine e cene leggere.';
+            adaptation.summary = 'Peso fermo da più di un mese: piano ricalibrato con più proteine e cene leggere.';
           }
         }
       } else if (diff < -0.3) {
         adaptation.weeklyTrend = 'improving';
-        adaptation.summary = `Peso -${Math.abs(diff).toFixed(1)}kg: il piano funziona, continuiamo così.`;
+        adaptation.summary = `Peso -${Math.abs(diff).toFixed(1)}kg in 2 settimane: il piano funziona, continuiamo così.`;
       }
     }
   }
@@ -244,9 +267,11 @@ export const getHabitAdjustments = (
 ): { extraHydration: boolean; moreMovement: boolean; lighterDinner: boolean } => {
   if (data.length < 2) return { extraHydration: false, moreMovement: false, lighterDinner: false };
 
-  const sorted = [...data].sort((a, b) => a.week_number - b.week_number);
-  const current = sorted[sorted.length - 1];
-  const previous = sorted[sorted.length - 2];
+  const periods = groupBiweekly(data);
+  if (periods.length < 2) return { extraHydration: false, moreMovement: false, lighterDinner: false };
+
+  const current = periods[periods.length - 1];
+  const previous = periods[periods.length - 2];
 
   return {
     extraHydration: current.bloating >= 3 && previous.bloating >= 3,

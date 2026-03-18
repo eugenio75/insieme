@@ -51,8 +51,10 @@ ${userProfile.bloodPressureSystolic || userProfile.bloodPressureDiastolic ? `- P
         ? ' (IPOTENSIONE - idratarsi bene, pasti piccoli e frequenti, un po\' più di sale è ok)'
         : ' (nella norma)'
 }` : ''}
+- Stagione attuale: ${(() => { const m = new Date().getMonth(); return m < 2 || m === 11 ? 'inverno' : m < 5 ? 'primavera' : m < 8 ? 'estate' : 'autunno'; })()}, mese: ${new Date().toLocaleString('it-IT', { month: 'long' })}
+- PREFERISCI (senza obbligo) ingredienti di stagione per questo periodo dell'anno: frutta e verdura fresche del mese corrente.
 ${userProfile.region ? `- Zona: ${userProfile.city ? userProfile.city + ', ' : ''}${userProfile.province ? userProfile.province + ', ' : ''}${userProfile.region}
-- IMPORTANTE: Suggerisci prodotti locali e di stagione tipici di questa zona d'Italia. Privilegia ingredienti freschi, a km zero e della tradizione culinaria regionale.` : ''}
+- PREFERISCI (senza obbligo) prodotti locali, ricette e tradizioni culinarie tipiche di questa zona. Non è un vincolo rigido: se la ricetta lo richiede, usa pure ingredienti non locali. L'idea è dare un tocco regionale quando possibile.` : ''}
 IMPORTANTE: Adatta SEMPRE i pasti al BMI dell'utente. Per sovrappeso/obesità: porzioni più piccole, meno carboidrati, più proteine e verdure.
 `;
     })() : '';

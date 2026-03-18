@@ -44,6 +44,7 @@ const MealActions = ({ meal, healthConstraints, dietAdaptation, onMealSwap }: Me
             activity: user.activity,
             workType: user.workType,
             difficulty: user.difficulty,
+            weight: user.weight,
             bloodPressureSystolic: user.bloodPressureSystolic,
             bloodPressureDiastolic: user.bloodPressureDiastolic,
           },

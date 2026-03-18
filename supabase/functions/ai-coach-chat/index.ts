@@ -46,7 +46,7 @@ serve(async (req) => {
     const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
     const { data: checkins } = await supabase
       .from("daily_checkins")
-      .select("mood, energy, bloating, stress, sleep_hours, foods_eaten, created_at")
+      .select("mood, energy, bloating, stress, sleep_hours, foods_eaten, plan_adherence, plan_foods_followed, off_plan_foods, created_at")
       .eq("user_id", user.id)
       .gte("created_at", weekAgo)
       .order("created_at", { ascending: false })

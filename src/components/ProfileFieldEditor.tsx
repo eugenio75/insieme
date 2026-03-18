@@ -242,12 +242,12 @@ const ProfileFieldEditor = () => {
             </div>
           </div>
 
-          {/* Show "Struttura corporea" after weight field */}
-          {config.key === 'weight' && bmiData && (
+          {/* Show BMI after bodyFrame field */}
+          {config.key === 'bodyFrame' && bmiData && (
             <div className="flex items-center justify-between p-4 rounded-2xl glass glass-border mt-2">
-              <span className="text-sm text-muted-foreground">Struttura corporea</span>
+              <span className="text-sm text-muted-foreground">BMI calcolato</span>
               <span className="text-sm font-medium text-foreground">
-                {bmiData.emoji} {bmiData.category} (BMI {bmiData.bmi})
+                {bmiData.emoji} {bmiData.category} ({bmiData.bmi})
               </span>
             </div>
           )}

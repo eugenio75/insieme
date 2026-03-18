@@ -226,6 +226,41 @@ const ProfilePage = () => {
         </h2>
         <ProfileFieldEditor />
 
+        {/* BMI indicator */}
+        {(() => {
+          const bmiData = calcBMI(user.weight, user.height);
+          if (!bmiData) return null;
+          return (
+            <div className="mt-4 mb-2 p-4 rounded-2xl glass glass-border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Indice di Massa Corporea (BMI)</p>
+                  <p className="text-2xl font-bold text-gradient font-body">{bmiData.bmi}</p>
+                </div>
+                <div className={`px-3 py-1.5 rounded-xl ${
+                  bmiData.category === 'Normopeso' ? 'bg-green-500/10' :
+                  bmiData.category === 'Sovrappeso' ? 'bg-secondary/10' :
+                  bmiData.category === 'Obesità' ? 'bg-destructive/10' :
+                  'bg-yellow-500/10'
+                }`}>
+                  <span className={`text-sm font-medium ${bmiData.color}`}>
+                    {bmiData.emoji} {bmiData.category}
+                  </span>
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-2">
+                {bmiData.category === 'Normopeso' 
+                  ? 'Il tuo peso è nella norma. Il piano punta al benessere generale.'
+                  : bmiData.category === 'Sovrappeso'
+                  ? 'Il piano è adattato per favorire un calo graduale e sostenibile.'
+                  : bmiData.category === 'Obesità'
+                  ? 'Il piano è calibrato per un percorso sicuro e progressivo.'
+                  : 'Il piano include un supporto per raggiungere un peso sano.'}
+              </p>
+            </div>
+          );
+        })()}
+
         {/* Weight Tracker */}
         <WeightTracker />
 

@@ -37,6 +37,8 @@ ${userProfile.bloodPressureSystolic || userProfile.bloodPressureDiastolic ? `- P
 Vincoli medici:
 - Rischio glicemico: ${healthConstraints.hasGlycemicRisk ? 'SÌ - evita zuccheri semplici, preferisci basso IG' : 'no'}
 - Rischio colesterolo: ${healthConstraints.hasCholesterolRisk ? 'SÌ - limita grassi saturi' : 'no'}
+- Ipertensione: ${healthConstraints.hasHypertension ? 'SÌ - RIDURRE SALE, insaccati, cibi conservati, formaggi stagionati. Aumentare potassio (banane, verdure a foglia, legumi)' : 'no'}
+- Ipotensione: ${healthConstraints.hasHypotension ? 'SÌ - idratarsi bene, pasti piccoli e frequenti, un po\' di sale è consentito' : 'no'}
 - Alimenti da ridurre: ${healthConstraints.foodsToReduce?.join(', ') || 'nessuno'}
 - Alimenti da aumentare: ${healthConstraints.foodsToIncrease?.join(', ') || 'nessuno'}
 ` : '';

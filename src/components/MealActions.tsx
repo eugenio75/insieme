@@ -48,6 +48,7 @@ const MealActions = ({ meal, healthConstraints, dietAdaptation, onMealSwap }: Me
             bloodPressureDiastolic: user.bloodPressureDiastolic,
           },
           healthConstraints,
+          dietAdaptation: dietAdaptation || undefined,
           ...extra,
         },
       });

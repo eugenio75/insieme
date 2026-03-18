@@ -171,7 +171,9 @@ const lightPlan: DayPlan[] = [
         ],
         simpleVariant: { title: 'Senza frullatore?', description: 'Banana schiacciata con yogurt e miele. Stessa energia.' },
       },
-      { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🍊', title: 'Agrume di stagione', description: 'Arancia, mandarino o pompelmo. Vitamina C naturale.' },
+      { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🍊', title: 'Agrume di stagione', description: 'Arancia, mandarino o pompelmo. Vitamina C naturale.',
+        simpleVariant: { title: 'Alternativa', description: 'Una mela o qualche noce. Semplice e veloce.' },
+      },
       { type: 'pranzo', typeLabel: 'Pranzo', icon: '🍝', title: 'Pasta ceci e rosmarino', description: 'Un piatto unico, saziante e ricco di proteine vegetali.',
         ingredients: [
           { name: 'Ceci', substitutes: ['Lenticchie', 'Fagioli', 'Piselli'] },

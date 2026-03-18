@@ -165,7 +165,11 @@ const ProfileFieldEditor = () => {
 
   const getDisplayValue = (config: FieldConfig): string => {
     const val = (user as any)[config.key];
-    if (!val) return '—';
+    if (!val && config.key !== 'location') return '—';
+    if (config.key === 'location') {
+      const parts = [user.city, user.province, user.region].filter(Boolean);
+      return parts.length > 0 ? parts.join(', ') : '—';
+    }
     if (config.key === 'mode') return val === 'together' ? 'Insieme' : 'Da sola';
     if (config.key === 'bodyFrame') {
       const map: Record<string, string> = { esile: 'Esile', media: 'Media', robusta: 'Robusta' };

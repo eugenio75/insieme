@@ -29,7 +29,7 @@ serve(async (req) => {
     // Fetch all check-ins
     const { data: checkins } = await supabase
       .from("daily_checkins")
-      .select("mood, energy, bloating, foods_eaten, sleep_hours, stress, created_at")
+      .select("mood, energy, bloating, foods_eaten, sleep_hours, stress, plan_adherence, plan_foods_followed, off_plan_foods, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(200);

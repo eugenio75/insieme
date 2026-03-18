@@ -148,6 +148,7 @@ const ProfileFieldEditor = () => {
     const val = (user as any)[config.key];
     if (!val) return '—';
     if (config.key === 'mode') return val === 'together' ? 'Insieme' : 'Da sola';
+    if (config.key === 'height') return `${val} cm`;
     if (config.key === 'weight') return `${val} kg`;
     if (config.key === 'age') return `${val} anni`;
     if (config.key === 'bloodPressureSystolic' || config.key === 'bloodPressureDiastolic') return `${val} mmHg`;

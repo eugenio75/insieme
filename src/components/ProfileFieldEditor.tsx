@@ -187,8 +187,8 @@ const ProfileFieldEditor = () => {
   };
 
   const handleNumberSave = (config: FieldConfig) => {
-    if (config.key === 'weight') {
-      setUser({ weight: inputValue || undefined });
+    if (config.key === 'weight' || config.key === 'height') {
+      setUser({ [config.key]: inputValue || undefined });
     } else {
       setUser({ [config.key]: inputValue.trim() || undefined });
     }

@@ -71,6 +71,7 @@ export const useProfile = () => {
         sex: state.sex,
         partner_name: state.partnerName || '',
         weight: state.weight ? parseFloat(state.weight) : null,
+        height: state.height ? parseFloat(state.height) : null,
         work_type: state.workType || '',
         blood_pressure_systolic: state.bloodPressureSystolic ? parseInt(state.bloodPressureSystolic) : null,
         blood_pressure_diastolic: state.bloodPressureDiastolic ? parseInt(state.bloodPressureDiastolic) : null,

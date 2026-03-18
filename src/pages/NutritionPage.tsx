@@ -486,7 +486,13 @@ const NutritionPage = () => {
                   )}
                 </h3>
                 {selectedDayPlan.meals
-                  .map((meal, i) => {
+                  .map((baseMeal, i) => {
+                    // Apply swapped meal if exists
+                    const swapped = swappedMeals[selectedDay]?.[baseMeal.type];
+                    const meal: Meal = swapped
+                      ? { ...baseMeal, title: swapped.title || baseMeal.title, description: swapped.description || baseMeal.description, icon: swapped.icon || baseMeal.icon }
+                      : baseMeal;
+
                     const finding = checkMeal(meal.title, meal.description);
                     const outsideWindow = isMealOutsideWindow(meal.type);
 
@@ -506,7 +512,17 @@ const NutritionPage = () => {
                     const enhancedMeal = (fastingConfig.enabled && !outsideWindow) 
                       ? { ...meal, description: meal.description + ' ' + (fastingEnhancements[meal.type] || '') }
                       : meal;
-                    return <MealCard key={meal.type} meal={enhancedMeal} delay={i * 0.06} warning={warning} dimmed={outsideWindow} />;
+                    return (
+                      <MealCard
+                        key={meal.type}
+                        meal={enhancedMeal}
+                        delay={i * 0.06}
+                        warning={warning}
+                        dimmed={outsideWindow}
+                        healthConstraints={healthConstraints}
+                        onMealSwap={(mealType, newMeal) => handleMealSwap(selectedDay, mealType, newMeal)}
+                      />
+                    );
                   })}
               </div>
             )}

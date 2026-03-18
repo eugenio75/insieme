@@ -198,6 +198,8 @@ export type Database = {
         Row: {
           activity: string | null
           age: string | null
+          blood_pressure_diastolic: number | null
+          blood_pressure_systolic: number | null
           created_at: string
           current_streak: number | null
           custom_intolerances: string[] | null
@@ -223,6 +225,8 @@ export type Database = {
         Insert: {
           activity?: string | null
           age?: string | null
+          blood_pressure_diastolic?: number | null
+          blood_pressure_systolic?: number | null
           created_at?: string
           current_streak?: number | null
           custom_intolerances?: string[] | null
@@ -248,6 +252,8 @@ export type Database = {
         Update: {
           activity?: string | null
           age?: string | null
+          blood_pressure_diastolic?: number | null
+          blood_pressure_systolic?: number | null
           created_at?: string
           current_streak?: number | null
           custom_intolerances?: string[] | null

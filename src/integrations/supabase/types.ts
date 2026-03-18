@@ -200,6 +200,7 @@ export type Database = {
           age: string | null
           blood_pressure_diastolic: number | null
           blood_pressure_systolic: number | null
+          body_frame: string | null
           created_at: string
           current_streak: number | null
           custom_intolerances: string[] | null
@@ -228,6 +229,7 @@ export type Database = {
           age?: string | null
           blood_pressure_diastolic?: number | null
           blood_pressure_systolic?: number | null
+          body_frame?: string | null
           created_at?: string
           current_streak?: number | null
           custom_intolerances?: string[] | null
@@ -256,6 +258,7 @@ export type Database = {
           age?: string | null
           blood_pressure_diastolic?: number | null
           blood_pressure_systolic?: number | null
+          body_frame?: string | null
           created_at?: string
           current_streak?: number | null
           custom_intolerances?: string[] | null

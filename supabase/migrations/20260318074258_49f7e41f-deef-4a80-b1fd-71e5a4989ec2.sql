@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN body_frame text DEFAULT NULL;

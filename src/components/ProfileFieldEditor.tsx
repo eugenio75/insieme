@@ -56,6 +56,16 @@ const fieldConfigs: FieldConfig[] = [
     step: '0.1',
   },
   {
+    key: 'bodyFrame',
+    label: 'Struttura corporea',
+    type: 'select',
+    options: [
+      { label: 'Esile', icon: '🦴', value: 'esile' },
+      { label: 'Media', icon: '🧍', value: 'media' },
+      { label: 'Robusta', icon: '💪', value: 'robusta' },
+    ],
+  },
+  {
     key: 'age',
     label: 'Età',
     type: 'number',
@@ -148,6 +158,10 @@ const ProfileFieldEditor = () => {
     const val = (user as any)[config.key];
     if (!val) return '—';
     if (config.key === 'mode') return val === 'together' ? 'Insieme' : 'Da sola';
+    if (config.key === 'bodyFrame') {
+      const map: Record<string, string> = { esile: 'Esile', media: 'Media', robusta: 'Robusta' };
+      return map[val] || val;
+    }
     if (config.key === 'height') return `${val} cm`;
     if (config.key === 'weight') return `${val} kg`;
     if (config.key === 'age') return `${val} anni`;
@@ -228,12 +242,12 @@ const ProfileFieldEditor = () => {
             </div>
           </div>
 
-          {/* Show "Struttura corporea" after weight field */}
-          {config.key === 'weight' && bmiData && (
+          {/* Show BMI after bodyFrame field */}
+          {config.key === 'bodyFrame' && bmiData && (
             <div className="flex items-center justify-between p-4 rounded-2xl glass glass-border mt-2">
-              <span className="text-sm text-muted-foreground">Struttura corporea</span>
+              <span className="text-sm text-muted-foreground">BMI calcolato</span>
               <span className="text-sm font-medium text-foreground">
-                {bmiData.emoji} {bmiData.category} (BMI {bmiData.bmi})
+                {bmiData.emoji} {bmiData.category} ({bmiData.bmi})
               </span>
             </div>
           )}

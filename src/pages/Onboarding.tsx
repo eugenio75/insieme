@@ -94,6 +94,14 @@ const steps = [
     ],
   },
   {
+    question: 'Quanto sei alta/o?',
+    subtitle: 'Ci aiuta a calcolare il tuo indice di massa corporea.',
+    key: 'height',
+    multiSelect: false,
+    isHeightInput: true,
+    options: [],
+  },
+  {
     question: 'Qual è il tuo peso attuale?',
     subtitle: 'Opzionale. Ci aiuta a monitorare i tuoi progressi.',
     key: 'weight',
@@ -132,6 +140,7 @@ const Onboarding = () => {
   const [customInput, setCustomInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [weightInput, setWeightInput] = useState('');
+  const [heightInput, setHeightInput] = useState('');
   const [ageInput, setAgeInput] = useState('');
   const { setUser, completeOnboarding } = useAppStore();
   const { saveProfile } = useProfile();
@@ -231,11 +240,24 @@ const Onboarding = () => {
   const isMultiSelect = currentStep?.multiSelect;
   const hasCustomInput = (currentStep as any)?.hasCustomInput;
   const isWeightInput = (currentStep as any)?.isWeightInput;
+  const isHeightInput = (currentStep as any)?.isHeightInput;
   const isAgeInput = (currentStep as any)?.isAgeInput;
 
   const handleAgeSubmit = async () => {
     if (!ageInput.trim()) return;
     setUser({ age: ageInput.trim() });
+    if (step < steps.length - 1) {
+      setStep(step + 1);
+    } else {
+      completeOnboarding();
+      await saveProfile();
+      navigate('/home');
+    }
+  };
+
+  const handleHeightSubmit = async () => {
+    if (!heightInput.trim()) return;
+    setUser({ height: heightInput.trim() });
     if (step < steps.length - 1) {
       setStep(step + 1);
     } else {
@@ -349,6 +371,33 @@ const Onboarding = () => {
                   whileTap={{ scale: 0.98 }}
                   onClick={handleAgeSubmit}
                   disabled={!ageInput.trim()}
+                  className="w-full py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm
+                    shadow-glow disabled:opacity-40 transition-opacity"
+                >
+                  CONTINUA
+                </motion.button>
+              </div>
+            ) : isHeightInput ? (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <input
+                    type="number"
+                    min="100"
+                    max="220"
+                    value={heightInput}
+                    onChange={(e) => setHeightInput(e.target.value)}
+                    placeholder="Es: 165"
+                    className="flex-1 px-6 py-4 rounded-xl bg-muted border border-border text-foreground text-lg
+                      focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                      transition-all duration-300 placeholder:text-muted-foreground/50"
+                    autoFocus
+                  />
+                  <span className="text-muted-foreground font-medium text-lg">cm</span>
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleHeightSubmit}
+                  disabled={!heightInput.trim()}
                   className="w-full py-4 rounded-2xl gradient-primary text-primary-foreground btn-text text-sm
                     shadow-glow disabled:opacity-40 transition-opacity"
                 >

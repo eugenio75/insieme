@@ -15,6 +15,7 @@ interface UserProfile {
   age?: string;
   sex?: string;
   weight?: string;
+  height?: string;
   workType?: string;
   bloodPressureSystolic?: string;
   bloodPressureDiastolic?: string;

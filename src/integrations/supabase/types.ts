@@ -208,6 +208,7 @@ export type Database = {
           fasting_hours: number | null
           fasting_protocol: string | null
           fasting_start_hour: number | null
+          height: number | null
           id: string
           intolerances: string[] | null
           last_check_in_date: string | null
@@ -235,6 +236,7 @@ export type Database = {
           fasting_hours?: number | null
           fasting_protocol?: string | null
           fasting_start_hour?: number | null
+          height?: number | null
           id?: string
           intolerances?: string[] | null
           last_check_in_date?: string | null
@@ -262,6 +264,7 @@ export type Database = {
           fasting_hours?: number | null
           fasting_protocol?: string | null
           fasting_start_hour?: number | null
+          height?: number | null
           id?: string
           intolerances?: string[] | null
           last_check_in_date?: string | null

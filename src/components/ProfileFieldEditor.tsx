@@ -39,6 +39,15 @@ const fieldConfigs: FieldConfig[] = [
     ],
   },
   {
+    key: 'height',
+    label: 'Altezza',
+    type: 'number',
+    unit: 'cm',
+    placeholder: 'Es: 165',
+    min: '100',
+    max: '220',
+  },
+  {
     key: 'weight',
     label: 'Peso',
     type: 'number',
@@ -139,6 +148,7 @@ const ProfileFieldEditor = () => {
     const val = (user as any)[config.key];
     if (!val) return '—';
     if (config.key === 'mode') return val === 'together' ? 'Insieme' : 'Da sola';
+    if (config.key === 'height') return `${val} cm`;
     if (config.key === 'weight') return `${val} kg`;
     if (config.key === 'age') return `${val} anni`;
     if (config.key === 'bloodPressureSystolic' || config.key === 'bloodPressureDiastolic') return `${val} mmHg`;
@@ -177,8 +187,8 @@ const ProfileFieldEditor = () => {
   };
 
   const handleNumberSave = (config: FieldConfig) => {
-    if (config.key === 'weight') {
-      setUser({ weight: inputValue || undefined });
+    if (config.key === 'weight' || config.key === 'height') {
+      setUser({ [config.key]: inputValue || undefined });
     } else {
       setUser({ [config.key]: inputValue.trim() || undefined });
     }

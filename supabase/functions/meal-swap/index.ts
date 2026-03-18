@@ -13,7 +13,24 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const profileContext = userProfile ? `
+    const profileContext = userProfile ? (() => {
+      // Calculate BMI
+      const w = parseFloat(userProfile.weight || '');
+      const h = parseFloat(userProfile.height || '');
+      let bmiInfo = '';
+      if (w && h && h > 100) {
+        const hm = h / 100;
+        const bmi = w / (hm * hm);
+        const bmiRounded = Math.round(bmi * 10) / 10;
+        let bmiCategory = '';
+        if (bmi < 18.5) bmiCategory = 'SOTTOPESO - aumentare leggermente le porzioni, includere grassi buoni e carboidrati complessi';
+        else if (bmi < 25) bmiCategory = 'NORMOPESO - mantenere equilibrio attuale';
+        else if (bmi < 30) bmiCategory = 'SOVRAPPESO - ridurre porzioni gradualmente, preferire proteine e verdure, limitare carboidrati raffinati e grassi saturi';
+        else bmiCategory = 'OBESITÀ - porzioni controllate, eliminare zuccheri semplici, massimizzare verdure e proteine magre, evitare fritti e ultra-processati';
+        bmiInfo = `- BMI: ${bmiRounded} (${bmiCategory})`;
+      }
+
+      return `
 Profilo utente:
 - Obiettivo: ${userProfile.objective || 'non specificato'}
 - Intolleranze: ${[...(userProfile.intolerances || []), ...(userProfile.customIntolerances || [])].join(', ') || 'nessuna'}
@@ -23,6 +40,8 @@ Profilo utente:
 - Lavoro: ${userProfile.workType || 'non specificato'}
 - Difficoltà: ${userProfile.difficulty || 'non specificata'}
 ${userProfile.weight ? `- Peso attuale: ${userProfile.weight} kg` : ''}
+${userProfile.height ? `- Altezza: ${userProfile.height} cm` : ''}
+${bmiInfo}
 ${userProfile.bloodPressureSystolic || userProfile.bloodPressureDiastolic ? `- Pressione arteriosa media: ${userProfile.bloodPressureSystolic || '?'}/${userProfile.bloodPressureDiastolic || '?'} mmHg${
   parseInt(userProfile.bloodPressureSystolic) >= 140 || parseInt(userProfile.bloodPressureDiastolic) >= 90 
     ? ' (IPERTENSIONE - ridurre sodio, insaccati, cibi conservati; aumentare potassio, verdure, frutta)'
@@ -32,7 +51,9 @@ ${userProfile.bloodPressureSystolic || userProfile.bloodPressureDiastolic ? `- P
         ? ' (IPOTENSIONE - idratarsi bene, pasti piccoli e frequenti, un po\' più di sale è ok)'
         : ' (nella norma)'
 }` : ''}
-` : '';
+IMPORTANTE: Adatta SEMPRE i pasti al BMI dell'utente. Per sovrappeso/obesità: porzioni più piccole, meno carboidrati, più proteine e verdure.
+`;
+    })() : '';
 
     const healthContext = healthConstraints ? `
 Vincoli medici:

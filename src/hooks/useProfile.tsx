@@ -42,6 +42,9 @@ export const useProfile = () => {
           bloodPressureSystolic: (data as any).blood_pressure_systolic ? String((data as any).blood_pressure_systolic) : '',
           bloodPressureDiastolic: (data as any).blood_pressure_diastolic ? String((data as any).blood_pressure_diastolic) : '',
           bodyFrame: (data as any).body_frame || '',
+          region: (data as any).region || '',
+          province: (data as any).province || '',
+          city: (data as any).city || '',
           onboarded: !!(data.objective && data.name),
         });
         setTimeout(() => refreshWeeklyHabits(), 0);
@@ -77,6 +80,9 @@ export const useProfile = () => {
         blood_pressure_systolic: state.bloodPressureSystolic ? parseInt(state.bloodPressureSystolic) : null,
         blood_pressure_diastolic: state.bloodPressureDiastolic ? parseInt(state.bloodPressureDiastolic) : null,
         body_frame: state.bodyFrame || null,
+        region: state.region || null,
+        province: state.province || null,
+        city: state.city || null,
       } as any)
       .eq('user_id', user.id);
   };

@@ -201,6 +201,7 @@ export type Database = {
           blood_pressure_diastolic: number | null
           blood_pressure_systolic: number | null
           body_frame: string | null
+          city: string | null
           created_at: string
           current_streak: number | null
           custom_intolerances: string[] | null
@@ -218,6 +219,8 @@ export type Database = {
           objective: string | null
           pace: string | null
           partner_name: string | null
+          province: string | null
+          region: string | null
           sex: string | null
           updated_at: string
           user_id: string
@@ -230,6 +233,7 @@ export type Database = {
           blood_pressure_diastolic?: number | null
           blood_pressure_systolic?: number | null
           body_frame?: string | null
+          city?: string | null
           created_at?: string
           current_streak?: number | null
           custom_intolerances?: string[] | null
@@ -247,6 +251,8 @@ export type Database = {
           objective?: string | null
           pace?: string | null
           partner_name?: string | null
+          province?: string | null
+          region?: string | null
           sex?: string | null
           updated_at?: string
           user_id: string
@@ -259,6 +265,7 @@ export type Database = {
           blood_pressure_diastolic?: number | null
           blood_pressure_systolic?: number | null
           body_frame?: string | null
+          city?: string | null
           created_at?: string
           current_streak?: number | null
           custom_intolerances?: string[] | null
@@ -276,6 +283,8 @@ export type Database = {
           objective?: string | null
           pace?: string | null
           partner_name?: string | null
+          province?: string | null
+          region?: string | null
           sex?: string | null
           updated_at?: string
           user_id?: string

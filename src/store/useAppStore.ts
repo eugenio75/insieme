@@ -185,14 +185,21 @@ export const useAppStore = create<AppState>((set, get) => {
     },
     setWeeklyHabits: (habits) => set({ weeklyHabits: habits }),
     refreshWeeklyHabits: (signals) => {
-      const { user } = get();
+      const { user, weeklyHabits: currentHabits } = get();
       const startDate = undefined;
       const result = getInitialHabits(user.objective, startDate, signals);
       const savedIds = getSavedCompletedHabits();
+      // Also preserve completed state from current in-memory habits
+      const currentCompletedIds = currentHabits.filter(h => h.completed).map(h => h.id);
+      const allCompletedIds = [...new Set([...savedIds, ...currentCompletedIds])];
+      // Re-save to localStorage to keep in sync
+      if (allCompletedIds.length > 0) {
+        saveCompletedHabits(allCompletedIds);
+      }
       set({
         weeklyHabits: result.habits.map(h => ({
           ...h,
-          completed: savedIds.includes(h.id),
+          completed: allCompletedIds.includes(h.id),
         })),
         weekLabel: result.weekLabel,
         weekNumber: result.weekNumber,

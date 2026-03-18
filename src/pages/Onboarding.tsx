@@ -94,6 +94,14 @@ const steps = [
     ],
   },
   {
+    question: 'Quanto sei alta/o?',
+    subtitle: 'Ci aiuta a calcolare il tuo indice di massa corporea.',
+    key: 'height',
+    multiSelect: false,
+    isHeightInput: true,
+    options: [],
+  },
+  {
     question: 'Qual è il tuo peso attuale?',
     subtitle: 'Opzionale. Ci aiuta a monitorare i tuoi progressi.',
     key: 'weight',

@@ -231,11 +231,11 @@ export const useFasting = () => {
         }, 0) / completed.length
       : 0;
 
-    // Streak — group completed sessions by date, then count consecutive days
+    // Streak — group completed sessions by completion date (ended_at), then count consecutive days
     let streak = 0;
     const completedDates = new Set(
       completed.map(s => {
-        const d = new Date(s.started_at);
+        const d = new Date(s.ended_at || s.started_at);
         d.setHours(0, 0, 0, 0);
         return d.getTime();
       })

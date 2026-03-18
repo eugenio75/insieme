@@ -219,8 +219,10 @@ const DaySelector = ({
 
 const NutritionPage = () => {
   const { user } = useAppStore();
+  const { user: authUser } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('piano');
   const [swappedMeals, setSwappedMeals] = useState<Record<string, Record<string, Partial<Meal>>>>({});
+  const [dietAdaptation, setDietAdaptation] = useState<DietAdaptation | null>(null);
 
   const handleMealSwap = (dayIdx: number, mealType: string, newMeal: Partial<Meal>) => {
     setSwappedMeals(prev => ({
@@ -235,6 +237,28 @@ const NutritionPage = () => {
   const { analysis, load: loadPatterns, loaded: patternsLoaded } = usePatternAnalysis();
   const { config: fastingConfig, getStatus } = useFasting();
   const { medicalDocs, dietDocs } = useHealthDocuments();
+
+  // Load weekly check-in data for diet adaptation
+  useEffect(() => {
+    if (!authUser) return;
+    const loadWeeklyData = async () => {
+      const { data } = await supabase
+        .from('weekly_checkins')
+        .select('week_number, weight, bloating, energy')
+        .eq('user_id', authUser.id)
+        .order('week_number', { ascending: true });
+      if (data && data.length >= 2) {
+        const mapped = data.map(d => ({
+          week_number: d.week_number,
+          weight: d.weight ? Number(d.weight) : null,
+          bloating: d.bloating,
+          energy: d.energy,
+        }));
+        setDietAdaptation(getDietAdaptation(mapped, user.objective));
+      }
+    };
+    loadWeeklyData();
+  }, [authUser, user.objective]);
 
   // Extract health-based insights and constraints
   const healthData = (() => {

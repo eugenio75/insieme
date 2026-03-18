@@ -33,7 +33,21 @@ const getStressLevels = (sex?: string) => {
     { label: m ? 'Un po\' stressato' : 'Un po\' stressata', icon: '😤', value: 3 },
     { label: m ? 'Molto stressato' : 'Molto stressata', icon: '🤯', value: 4 },
   ];
-};
+const energyLevels = [
+  { label: 'Alta', icon: '⚡', value: 5 },
+  { label: 'Buona', icon: '✨', value: 4 },
+  { label: 'Nella media', icon: '➡️', value: 3 },
+  { label: 'Bassa', icon: '🔋', value: 2 },
+  { label: 'Molto bassa', icon: '😴', value: 1 },
+];
+
+const bloatingLevels = [
+  { label: 'Nessuno', icon: '🌿', value: 1 },
+  { label: 'Leggero', icon: '🫧', value: 2 },
+  { label: 'Moderato', icon: '💨', value: 3 },
+  { label: 'Forte', icon: '😣', value: 4 },
+];
+
 
 const sleepOptions = [
   { label: 'Meno di 5 ore', icon: '😵', value: 4 },

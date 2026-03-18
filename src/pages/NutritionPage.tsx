@@ -220,6 +220,17 @@ const DaySelector = ({
 const NutritionPage = () => {
   const { user } = useAppStore();
   const [activeTab, setActiveTab] = useState<Tab>('piano');
+  const [swappedMeals, setSwappedMeals] = useState<Record<string, Record<string, Partial<Meal>>>>({});
+
+  const handleMealSwap = (dayIdx: number, mealType: string, newMeal: Partial<Meal>) => {
+    setSwappedMeals(prev => ({
+      ...prev,
+      [dayIdx]: {
+        ...(prev[dayIdx] || {}),
+        [mealType]: newMeal,
+      },
+    }));
+  };
   const { checkMeal } = useFoodFindings();
   const { analysis, load: loadPatterns, loaded: patternsLoaded } = usePatternAnalysis();
   const { config: fastingConfig, getStatus } = useFasting();

@@ -202,7 +202,9 @@ const lightPlan: DayPlan[] = [
         ],
         simpleVariant: { title: 'Più classico', description: 'Fette biscottate con marmellata e caffè. Il sabato si fa come si vuole.' },
       },
-      { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🥝', title: 'Macedonia veloce', description: 'Taglia 2-3 frutti che hai. Un po\' di limone sopra.' },
+      { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🥝', title: 'Macedonia veloce', description: 'Taglia 2-3 frutti che hai. Un po\' di limone sopra.',
+        simpleVariant: { title: 'Alternativa', description: 'Un singolo frutto o uno yogurt. Zero preparazione.' },
+      },
       { type: 'pranzo', typeLabel: 'Pranzo', icon: '🍕', title: 'Piadina con verdure', description: 'Piadina con rucola, pomodoro, mozzarella. Sabato un po\' speciale.',
         ingredients: [
           { name: 'Piadina', substitutes: ['Pane', 'Tortilla', 'Focaccia'] },

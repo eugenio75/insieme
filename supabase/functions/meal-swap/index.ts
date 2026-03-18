@@ -62,6 +62,13 @@ Richiesta dell'utente: "${request}"
 
 Modifica il pasto secondo la richiesta. Rispondi con un JSON: {"title": "...", "description": "...", "icon": "${meal.icon}"}
 Solo il JSON, nient'altro.`;
+    } else if (action === 'not_available_ingredient') {
+      systemPrompt += `\nL'utente non ha un ingrediente specifico e nemmeno le alternative proposte. Modifica il pasto sostituendo solo quell'ingrediente con qualcosa di comune da dispensa.`;
+      userPrompt = `Pasto: "${meal.title}" - ${meal.description}
+L'utente non ha "${ingredient}" e non ha nessuna delle alternative comuni.
+Modifica il pasto sostituendo SOLO "${ingredient}" con un ingrediente molto comune da dispensa italiana (uova, tonno, legumi in scatola, pasta, riso, pane, olio, formaggio, verdure base...).
+Il resto del pasto deve rimanere uguale. Rispondi con un JSON: {"title": "...", "description": "...", "icon": "${meal.icon}"}
+Solo il JSON, nient'altro.`;
     } else if (action === 'not_available') {
       systemPrompt += `\nL'utente non ha gli ingredienti per questo pasto. Suggerisci un'alternativa con ingredienti comuni da dispensa.`;
       userPrompt = `L'utente non ha gli ingredienti per: "${meal.title}" - ${meal.description}

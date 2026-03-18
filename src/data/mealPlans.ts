@@ -302,8 +302,10 @@ const healthReplacements: Record<string, Meal[]> = {
       simpleVariant: { title: 'Alternative', description: 'Un pezzo di formaggio stagionato o bastoncini di finocchio.' },
     },
     { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🥒', title: 'Verdura cruda e hummus', description: 'Carote, finocchi o cetrioli con un po\' di hummus.',
+      simpleVariant: { title: 'Alternativa', description: 'Finocchi o cetrioli con olio EVO e sale, se non hai hummus.' },
     },
     { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🍏', title: 'Mela verde con burro di mandorle', description: 'La mela verde ha meno zuccheri. Con un po\' di burro di mandorle è perfetta.',
+      simpleVariant: { title: 'Alternativa', description: 'Mela verde con una manciata di noci o mandorle intere.' },
     },
   ],
   merenda_lowgi: [
@@ -311,10 +313,13 @@ const healthReplacements: Record<string, Meal[]> = {
       ingredients: [
         { name: 'Mandorle', substitutes: ['Noci', 'Nocciole', 'Semi di zucca'] },
       ],
+      simpleVariant: { title: 'Alternativa', description: 'Yogurt greco bianco con cannella, senza zuccheri aggiunti.' },
     },
     { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🧀', title: 'Formaggio e noci', description: 'Un pezzetto di parmigiano con qualche noce. Saziante e senza picchi.',
+      simpleVariant: { title: 'Alternativa', description: 'Ricotta o yogurt greco con semi misti.' },
     },
     { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🫐', title: 'Yogurt greco con frutti di bosco', description: 'Yogurt bianco con mirtilli o lamponi. I frutti di bosco hanno pochi zuccheri.',
+      simpleVariant: { title: 'Alternativa', description: 'Skyr bianco con semi di chia o qualche noce.' },
     },
   ],
 };

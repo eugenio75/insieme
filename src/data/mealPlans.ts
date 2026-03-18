@@ -68,7 +68,9 @@ const lightPlan: DayPlan[] = [
           { name: 'Marmellata', substitutes: ['Miele', 'Crema di nocciole (poca)', 'Frutta fresca'] },
         ],
       },
-      { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🍊', title: 'Spremuta o frutto', description: 'Un\'arancia spremuta o un frutto intero. Quello che preferisci.' },
+      { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🍊', title: 'Spremuta o frutto', description: 'Un\'arancia spremuta o un frutto intero. Quello che preferisci.',
+        simpleVariant: { title: 'Alternativa', description: 'Qualche grissino o crackers con un bicchiere d\'acqua.' },
+      },
       { type: 'pranzo', typeLabel: 'Pranzo', icon: '🥗', title: 'Insalata di riso leggera', description: 'Riso freddo con pomodorini, olive, tonno e un filo d\'olio.',
         ingredients: [
           { name: 'Tonno', substitutes: ['Mozzarella', 'Uovo sodo', 'Ceci in scatola', 'Feta'] },

@@ -7,7 +7,7 @@ import { regioni, provincePerRegione } from '@/data/italianLocations';
 type FieldConfig = {
   key: string;
   label: string;
-  type: 'select' | 'multiSelect' | 'number';
+  type: 'select' | 'multiSelect' | 'number' | 'text' | 'location';
   options?: { label: string; icon: string; value?: string }[];
   unit?: string;
   placeholder?: string;

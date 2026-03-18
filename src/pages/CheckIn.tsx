@@ -9,37 +9,31 @@ import AppHeader from '../components/AppHeader';
 import { toast } from 'sonner';
 import { getTodayPlan } from '@/data/mealPlans';
 
-const moods = [
-  { label: 'Serena', icon: '😊', value: 5 },
-  { label: 'Calma', icon: '😌', value: 4 },
-  { label: 'Così così', icon: '😐', value: 3 },
-  { label: 'Affamata', icon: '🍽️', value: 2 },
-  { label: 'Assonnata', icon: '😴', value: 2 },
-  { label: 'Stanca', icon: '😔', value: 2 },
-  { label: 'Difficile', icon: '😢', value: 1 },
-];
+const isMale = (sex: string | undefined) => 
+  ['maschio', 'male', 'm', 'uomo'].includes((sex || '').toLowerCase());
 
-const energyLevels = [
-  { label: 'Alta', icon: '⚡', value: 5 },
-  { label: 'Buona', icon: '✨', value: 4 },
-  { label: 'Nella media', icon: '➡️', value: 3 },
-  { label: 'Bassa', icon: '🔋', value: 2 },
-  { label: 'Molto bassa', icon: '😴', value: 1 },
-];
+const getMoods = (sex?: string) => {
+  const m = isMale(sex);
+  return [
+    { label: m ? 'Sereno' : 'Serena', icon: '😊', value: 5 },
+    { label: m ? 'Calmo' : 'Calma', icon: '😌', value: 4 },
+    { label: 'Così così', icon: '😐', value: 3 },
+    { label: m ? 'Affamato' : 'Affamata', icon: '🍽️', value: 2 },
+    { label: m ? 'Assonnato' : 'Assonnata', icon: '😴', value: 2 },
+    { label: m ? 'Stanco' : 'Stanca', icon: '😔', value: 2 },
+    { label: 'Difficile', icon: '😢', value: 1 },
+  ];
+};
 
-const bloatingLevels = [
-  { label: 'Nessuno', icon: '🌿', value: 1 },
-  { label: 'Leggero', icon: '🫧', value: 2 },
-  { label: 'Moderato', icon: '💨', value: 3 },
-  { label: 'Forte', icon: '😣', value: 4 },
-];
-
-const stressLevels = [
-  { label: 'Molto rilassata', icon: '🧘', value: 1 },
-  { label: 'Tranquilla', icon: '😌', value: 2 },
-  { label: 'Un po\' stressata', icon: '😤', value: 3 },
-  { label: 'Molto stressata', icon: '🤯', value: 4 },
-];
+const getStressLevels = (sex?: string) => {
+  const m = isMale(sex);
+  return [
+    { label: m ? 'Molto rilassato' : 'Molto rilassata', icon: '🧘', value: 1 },
+    { label: m ? 'Tranquillo' : 'Tranquilla', icon: '😌', value: 2 },
+    { label: m ? 'Un po\' stressato' : 'Un po\' stressata', icon: '😤', value: 3 },
+    { label: m ? 'Molto stressato' : 'Molto stressata', icon: '🤯', value: 4 },
+  ];
+};
 
 const sleepOptions = [
   { label: 'Meno di 5 ore', icon: '😵', value: 4 },

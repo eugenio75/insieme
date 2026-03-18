@@ -22,6 +22,7 @@ Profilo utente:
 - Attività: ${userProfile.activity || 'non specificata'}
 - Lavoro: ${userProfile.workType || 'non specificato'}
 - Difficoltà: ${userProfile.difficulty || 'non specificata'}
+${userProfile.weight ? `- Peso attuale: ${userProfile.weight} kg` : ''}
 ${userProfile.bloodPressureSystolic || userProfile.bloodPressureDiastolic ? `- Pressione arteriosa media: ${userProfile.bloodPressureSystolic || '?'}/${userProfile.bloodPressureDiastolic || '?'} mmHg${
   parseInt(userProfile.bloodPressureSystolic) >= 140 || parseInt(userProfile.bloodPressureDiastolic) >= 90 
     ? ' (IPERTENSIONE - ridurre sodio, insaccati, cibi conservati; aumentare potassio, verdure, frutta)'

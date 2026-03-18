@@ -14,7 +14,7 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const profileContext = userProfile ? `
-Profilo utente:
+    a user:
 - Obiettivo: ${userProfile.objective || 'non specificato'}
 - Intolleranze: ${[...(userProfile.intolerances || []), ...(userProfile.customIntolerances || [])].join(', ') || 'nessuna'}
 - Età: ${userProfile.age || 'non specificata'}
@@ -22,6 +22,15 @@ Profilo utente:
 - Attività: ${userProfile.activity || 'non specificata'}
 - Lavoro: ${userProfile.workType || 'non specificato'}
 - Difficoltà: ${userProfile.difficulty || 'non specificata'}
+${userProfile.bloodPressureSystolic || userProfile.bloodPressureDiastolic ? `- Pressione arteriosa media: ${userProfile.bloodPressureSystolic || '?'}/${userProfile.bloodPressureDiastolic || '?'} mmHg${
+  parseInt(userProfile.bloodPressureSystolic) >= 140 || parseInt(userProfile.bloodPressureDiastolic) >= 90 
+    ? ' (IPERTENSIONE - ridurre sodio, insaccati, cibi conservati; aumentare potassio, verdure, frutta)'
+    : parseInt(userProfile.bloodPressureSystolic) >= 130 || parseInt(userProfile.bloodPressureDiastolic) >= 85
+      ? ' (PRE-IPERTENSIONE - moderare il sodio, preferire cibi freschi)'
+      : parseInt(userProfile.bloodPressureSystolic) <= 90 || parseInt(userProfile.bloodPressureDiastolic) <= 60
+        ? ' (IPOTENSIONE - idratarsi bene, pasti piccoli e frequenti, un po\' più di sale è ok)'
+        : ' (nella norma)'
+}` : ''}
 ` : '';
 
     const healthContext = healthConstraints ? `

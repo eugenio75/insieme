@@ -160,11 +160,22 @@ export const useAppStore = create<AppState>((set, get) => {
     addCheckIn: (data) =>
       set((s) => {
         const newStreak = calcStreak(s.lastCheckInDate, s.currentStreak);
+        const newDate = getDateStr(new Date());
+        // Persist streak to DB asynchronously
+        supabase.auth.getUser().then(({ data: authData }) => {
+          if (authData?.user) {
+            supabase
+              .from('profiles')
+              .update({ current_streak: newStreak, last_check_in_date: newDate } as any)
+              .eq('user_id', authData.user.id)
+              .then(() => {});
+          }
+        });
         return {
           checkIns: [...s.checkIns, data],
           todayCheckedIn: true,
           currentStreak: newStreak,
-          lastCheckInDate: getDateStr(new Date()),
+          lastCheckInDate: newDate,
         };
       }),
     getStreakMilestone: () => {

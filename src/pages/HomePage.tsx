@@ -193,11 +193,12 @@ const HomePage = () => {
   const statusIndicators = useMemo(() => {
     if (!lastCheckin) return null;
 
+    const male = ['maschio', 'male', 'm', 'uomo'].includes((user.sex || '').toLowerCase());
     const moodMap: Record<number, { label: string; icon: string }> = {
-      5: { label: 'Serena', icon: '😊' },
-      4: { label: 'Calma', icon: '😌' },
+      5: { label: male ? 'Sereno' : 'Serena', icon: '😊' },
+      4: { label: male ? 'Calmo' : 'Calma', icon: '😌' },
       3: { label: 'Così così', icon: '😐' },
-      2: { label: 'Stanca', icon: '😔' },
+      2: { label: male ? 'Stanco' : 'Stanca', icon: '😔' },
       1: { label: 'Difficile', icon: '😢' },
     };
     const energyMap: Record<number, { label: string; icon: string }> = {

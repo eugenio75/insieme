@@ -205,7 +205,7 @@ const ProfilePage = () => {
           Profilo
         </h1>
         <p className="text-muted-foreground text-sm mb-8">
-          Ciao, {user.name || 'cara'} 💛
+          Ciao, {user.name || (['maschio', 'male', 'm', 'uomo'].includes((user.sex || '').toLowerCase()) ? 'caro' : 'cara')} 💛
         </p>
 
         {/* Stats */}

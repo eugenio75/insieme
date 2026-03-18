@@ -115,7 +115,9 @@ const lightPlan: DayPlan[] = [
           { name: 'Basilico', substitutes: ['Origano', 'Prezzemolo', 'Niente'] },
         ],
       },
-      { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🍪', title: 'Biscotti secchi e tè', description: '3-4 biscotti con una tazza di tè o tisana.' },
+      { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🍪', title: 'Biscotti secchi e tè', description: '3-4 biscotti con una tazza di tè o tisana.',
+        simpleVariant: { title: 'Alternativa', description: 'Frutta secca mista o uno yogurt con un po\' di cannella.' },
+      },
       { type: 'cena', typeLabel: 'Cena', icon: '🌙', title: 'Pesce al forno con patate', description: 'Filetto di pesce bianco con patate e rosmarino.',
         ingredients: [
           { name: 'Pesce bianco', substitutes: ['Petto di pollo', 'Uova', 'Tofu', 'Legumi'] },

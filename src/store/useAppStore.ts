@@ -92,6 +92,25 @@ const streakMilestones: StreakMilestone[] = [
 
 const getDateStr = (d: Date) => d.toISOString().split('T')[0];
 
+const COMPLETED_HABITS_KEY = 'completed_habits';
+
+const getSavedCompletedHabits = (): string[] => {
+  try {
+    const raw = localStorage.getItem(COMPLETED_HABITS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (parsed.date === getDateStr(new Date())) {
+      return parsed.ids || [];
+    }
+    localStorage.removeItem(COMPLETED_HABITS_KEY);
+    return [];
+  } catch { return []; }
+};
+
+const saveCompletedHabits = (ids: string[]) => {
+  localStorage.setItem(COMPLETED_HABITS_KEY, JSON.stringify({ date: getDateStr(new Date()), ids }));
+};
+
 const calcStreak = (lastDate: string | null, currentStreak: number): number => {
   if (!lastDate) return 1;
   const today = getDateStr(new Date());
@@ -130,11 +149,13 @@ export const useAppStore = create<AppState>((set, get) => {
       get().refreshWeeklyHabits();
     },
     toggleHabit: (id) =>
-      set((s) => ({
-        weeklyHabits: s.weeklyHabits.map((h) =>
+      set((s) => {
+        const updated = s.weeklyHabits.map((h) =>
           h.id === id ? { ...h, completed: !h.completed } : h
-        ),
-      })),
+        );
+        saveCompletedHabits(updated.filter(h => h.completed).map(h => h.id));
+        return { weeklyHabits: updated };
+      }),
     addCheckIn: (data) =>
       set((s) => {
         const newStreak = calcStreak(s.lastCheckInDate, s.currentStreak);
@@ -155,8 +176,12 @@ export const useAppStore = create<AppState>((set, get) => {
       const { user } = get();
       const startDate = undefined;
       const result = getInitialHabits(user.objective, startDate, signals);
+      const savedIds = getSavedCompletedHabits();
       set({
-        weeklyHabits: result.habits,
+        weeklyHabits: result.habits.map(h => ({
+          ...h,
+          completed: savedIds.includes(h.id),
+        })),
         weekLabel: result.weekLabel,
         weekNumber: result.weekNumber,
         totalWeeks: result.totalWeeks,

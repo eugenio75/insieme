@@ -60,6 +60,9 @@ serve(async (req) => {
     const dataForAI = checkins.map(c => ({
       date: c.created_at,
       foods: c.foods_eaten,
+      plan_adherence: c.plan_adherence,
+      plan_foods_followed: c.plan_foods_followed,
+      off_plan_foods: c.off_plan_foods,
       bloating: c.bloating,
       energy: c.energy,
       mood: c.mood,

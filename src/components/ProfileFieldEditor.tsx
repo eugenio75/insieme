@@ -39,6 +39,15 @@ const fieldConfigs: FieldConfig[] = [
     ],
   },
   {
+    key: 'height',
+    label: 'Altezza',
+    type: 'number',
+    unit: 'cm',
+    placeholder: 'Es: 165',
+    min: '100',
+    max: '220',
+  },
+  {
     key: 'weight',
     label: 'Peso',
     type: 'number',

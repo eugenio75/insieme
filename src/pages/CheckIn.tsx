@@ -33,6 +33,8 @@ const getStressLevels = (sex?: string) => {
     { label: m ? 'Un po\' stressato' : 'Un po\' stressata', icon: '😤', value: 3 },
     { label: m ? 'Molto stressato' : 'Molto stressata', icon: '🤯', value: 4 },
   ];
+};
+
 const energyLevels = [
   { label: 'Alta', icon: '⚡', value: 5 },
   { label: 'Buona', icon: '✨', value: 4 },

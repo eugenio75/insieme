@@ -106,7 +106,9 @@ const lightPlan: DayPlan[] = [
         ],
         simpleVariant: { title: 'Più semplice', description: 'Latte caldo con biscotti e un frutto. Classico e perfetto.' },
       },
-      { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🍌', title: 'Banana', description: 'Veloce, nutriente, sempre disponibile.' },
+      { type: 'spuntino_mattina', typeLabel: 'Spuntino', icon: '🍌', title: 'Banana', description: 'Veloce, nutriente, sempre disponibile.',
+        simpleVariant: { title: 'Alternativa', description: 'Una mela o qualche mandorla. Quello che hai in casa.' },
+      },
       { type: 'pranzo', typeLabel: 'Pranzo', icon: '🍝', title: 'Pasta al pomodoro fresco', description: 'Pasta con pomodoro, basilico e un filo d\'olio. Semplice e buona.',
         ingredients: [
           { name: 'Pomodoro fresco', substitutes: ['Passata di pomodoro', 'Pomodori pelati', 'Pesto'] },

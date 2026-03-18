@@ -77,6 +77,15 @@ serve(async (req) => {
       .order("started_at", { ascending: false })
       .limit(10);
 
+    // 6. Habit completions (last 14 days)
+    const twoWeeksAgo = new Date(Date.now() - 14 * 86400000).toISOString().split('T')[0];
+    const { data: habitCompletions } = await supabase
+      .from("habit_completions")
+      .select("habit_title, completed_at")
+      .eq("user_id", user.id)
+      .gte("completed_at", twoWeeksAgo)
+      .order("completed_at", { ascending: false });
+
     // ===== BUILD CONTEXT STRING =====
     const name = profile?.name || "utente";
     const sex = profile?.sex || "";

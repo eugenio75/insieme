@@ -231,33 +231,27 @@ export const useFasting = () => {
         }, 0) / completed.length
       : 0;
 
-    // Streak — count consecutive calendar days with fasting activity (completed or active)
+    // Streak — count consecutive days based on completion days + active session elapsed days
     let streak = 0;
     const fastingDates = new Set<number>();
 
-    const addDateRangeToSet = (startISO: string, endISO: string) => {
-      const start = new Date(startISO);
-      const end = new Date(endISO);
-      start.setHours(0, 0, 0, 0);
-      end.setHours(0, 0, 0, 0);
-
-      const cursor = new Date(start);
-      while (cursor.getTime() <= end.getTime()) {
-        fastingDates.add(cursor.getTime());
-        cursor.setDate(cursor.getDate() + 1);
-      }
-    };
-
     completed.forEach((s) => {
-      if (s.ended_at) {
-        addDateRangeToSet(s.started_at, s.ended_at);
-      } else {
-        addDateRangeToSet(s.started_at, s.started_at);
-      }
+      const completionDate = new Date(s.ended_at || s.started_at);
+      completionDate.setHours(0, 0, 0, 0);
+      fastingDates.add(completionDate.getTime());
     });
 
     if (activeSession) {
-      addDateRangeToSet(activeSession.started_at, new Date().toISOString());
+      const started = new Date(activeSession.started_at);
+      const now = new Date();
+      const activeDays = Math.max(1, Math.floor((now.getTime() - started.getTime()) / 86400000) + 1);
+      const today = new Date(now);
+      today.setHours(0, 0, 0, 0);
+
+      for (let i = 0; i < Math.min(activeDays, 60); i++) {
+        const activeDay = new Date(today.getTime() - i * 86400000);
+        fastingDates.add(activeDay.getTime());
+      }
     }
 
     const today = new Date();

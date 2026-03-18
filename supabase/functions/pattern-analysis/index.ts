@@ -139,12 +139,13 @@ ANALIZZA questi pattern nei check-in:
 - Combinazioni di cibi nello stesso giorno e reazioni
 - Ore di sonno e fame/energia/umore del giorno dopo
 - Stress e scelte alimentari o sintomi
+- ABITUDINI COMPLETATE: correlazione tra habits_completed e benessere. Es: "Nei giorni in cui cammini 15 min, energia +1.2" o "Quando bevi 1.5L acqua, gonfiore -0.8"
 
 REGOLE OUTPUT:
 - Rispondi SOLO con JSON valido
 - Formato: { "patterns": [...], "foodFindings": [...], "dietSuggestions": [...] }
 
-PATTERN: { "type": "plan_adherence"|"off_plan_impact"|"sleep_hunger"|"sleep_energy"|"stress_eating"|"food_combo"|"meal_timing"|"stress_bloating", "title": "titolo breve", "description": "spiegazione gentile e pratica", "icon": "emoji", "correlation": 0.0-1.0, "actionTip": "consiglio concreto adattato a sesso/età/attività" }
+PATTERN: { "type": "plan_adherence"|"off_plan_impact"|"habit_impact"|"sleep_hunger"|"sleep_energy"|"stress_eating"|"food_combo"|"meal_timing"|"stress_bloating", "title": "titolo breve", "description": "spiegazione gentile e pratica", "icon": "emoji", "correlation": 0.0-1.0, "actionTip": "consiglio concreto adattato a sesso/età/attività" }
 
 FOOD FINDINGS: { "food": "nome", "issue": "gonfiore|energia_bassa|umore_basso", "correlation": 0.0-1.0, "description": "breve spiegazione", "icon": "emoji" }
 

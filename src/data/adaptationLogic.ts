@@ -145,7 +145,7 @@ export const analyzeProgress = (
             type: 'nutrition',
             icon: '📉',
             title: 'Peso fermo — serve un cambio',
-            description: 'Il peso non scende da più settimane. Questa settimana il piano sarà più strutturato: porzioni calibrate, cene leggere a base di proteine e verdure, e spuntini ridotti.',
+            description: 'Il peso non scende da più di un mese. Il piano sarà più strutturato: porzioni calibrate, cene leggere a base di proteine e verdure, e spuntini ridotti.',
             applied: true,
           });
         }
@@ -154,7 +154,7 @@ export const analyzeProgress = (
           type: 'general',
           icon: '🎉',
           title: 'Ottimo progresso sul peso!',
-          description: `Hai perso ${Math.abs(diff).toFixed(1)} kg questa settimana. Il piano funziona, continuiamo così!`,
+          description: `Hai perso ${Math.abs(diff).toFixed(1)} kg nelle ultime 2 settimane. Il piano funziona, continuiamo così!`,
           applied: false,
         });
       }

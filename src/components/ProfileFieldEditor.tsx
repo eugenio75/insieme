@@ -391,6 +391,86 @@ const ProfileFieldEditor = () => {
                 </div>
               </motion.div>
             )}
+
+            {editingField === config.key && config.type === 'location' && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="mt-2 p-5 rounded-2xl glass glass-border border-primary/20"
+              >
+                <p className="text-sm font-medium text-foreground mb-3">
+                  Dove vivi?
+                </p>
+                {/* Regione */}
+                <label className="text-xs text-muted-foreground mb-1 block">Regione</label>
+                <select
+                  value={locRegion}
+                  onChange={(e) => { setLocRegion(e.target.value); setLocProvince(''); }}
+                  className="w-full px-4 py-3 rounded-xl bg-muted border border-border text-foreground text-sm mb-3
+                    focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-300"
+                >
+                  <option value="">Seleziona regione...</option>
+                  {regioni.map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+
+                {/* Provincia */}
+                {locRegion && (
+                  <>
+                    <label className="text-xs text-muted-foreground mb-1 block">Provincia</label>
+                    <select
+                      value={locProvince}
+                      onChange={(e) => setLocProvince(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl bg-muted border border-border text-foreground text-sm mb-3
+                        focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-300"
+                    >
+                      <option value="">Seleziona provincia...</option>
+                      {(provincePerRegione[locRegion] || []).map((p) => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </>
+                )}
+
+                {/* Città */}
+                {locProvince && (
+                  <>
+                    <label className="text-xs text-muted-foreground mb-1 block">Città</label>
+                    <input
+                      type="text"
+                      value={locCity}
+                      onChange={(e) => setLocCity(e.target.value)}
+                      placeholder="Es: Milano, Roma..."
+                      className="w-full px-4 py-3 rounded-xl bg-muted border border-border text-foreground text-sm mb-3
+                        focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                        transition-all duration-300 placeholder:text-muted-foreground/50"
+                    />
+                  </>
+                )}
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setUser({ region: locRegion, province: locProvince, city: locCity });
+                      saveProfile();
+                      setEditingField(null);
+                    }}
+                    disabled={!locRegion}
+                    className="flex-1 py-3 rounded-xl gradient-primary text-primary-foreground text-sm font-medium disabled:opacity-40"
+                  >
+                    Salva
+                  </button>
+                  <button
+                    onClick={() => setEditingField(null)}
+                    className="px-4 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium"
+                  >
+                    Annulla
+                  </button>
+                </div>
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       ))}

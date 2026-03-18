@@ -108,6 +108,24 @@ const fieldConfigs: FieldConfig[] = [
       { label: 'Preferisco non dirlo', icon: '🤍' },
     ],
   },
+  {
+    key: 'bloodPressureSystolic',
+    label: 'Pressione massima (sistolica)',
+    type: 'number',
+    unit: 'mmHg',
+    placeholder: 'Es: 120',
+    min: '70',
+    max: '220',
+  },
+  {
+    key: 'bloodPressureDiastolic',
+    label: 'Pressione minima (diastolica)',
+    type: 'number',
+    unit: 'mmHg',
+    placeholder: 'Es: 80',
+    min: '40',
+    max: '140',
+  },
 ];
 
 const ProfileFieldEditor = () => {

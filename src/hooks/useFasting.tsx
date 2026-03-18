@@ -231,21 +231,41 @@ export const useFasting = () => {
         }, 0) / completed.length
       : 0;
 
-    // Streak — group completed sessions by completion date (ended_at), then count consecutive days
+    // Streak — count consecutive calendar days with fasting activity (completed or active)
     let streak = 0;
-    const completedDates = new Set(
-      completed.map(s => {
-        const d = new Date(s.ended_at || s.started_at);
-        d.setHours(0, 0, 0, 0);
-        return d.getTime();
-      })
-    );
+    const fastingDates = new Set<number>();
+
+    const addDateRangeToSet = (startISO: string, endISO: string) => {
+      const start = new Date(startISO);
+      const end = new Date(endISO);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(0, 0, 0, 0);
+
+      const cursor = new Date(start);
+      while (cursor.getTime() <= end.getTime()) {
+        fastingDates.add(cursor.getTime());
+        cursor.setDate(cursor.getDate() + 1);
+      }
+    };
+
+    completed.forEach((s) => {
+      if (s.ended_at) {
+        addDateRangeToSet(s.started_at, s.ended_at);
+      } else {
+        addDateRangeToSet(s.started_at, s.started_at);
+      }
+    });
+
+    if (activeSession) {
+      addDateRangeToSet(activeSession.started_at, new Date().toISOString());
+    }
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     // Start from today and go backwards
     for (let i = 0; i < 60; i++) {
       const checkDate = new Date(today.getTime() - i * 86400000);
-      if (completedDates.has(checkDate.getTime())) {
+      if (fastingDates.has(checkDate.getTime())) {
         streak++;
       } else {
         break;
@@ -260,7 +280,7 @@ export const useFasting = () => {
       currentStreak: streak,
       sessions,
     };
-  }, [sessions]);
+  }, [sessions, activeSession]);
 
   return {
     config,

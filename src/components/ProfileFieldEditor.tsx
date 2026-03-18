@@ -187,8 +187,11 @@ const ProfileFieldEditor = () => {
     if (config.type === 'number') {
       setInputValue(val);
     } else if (config.type === 'multiSelect') {
-      // Split comma-separated values back into array
       setMultiSelections(val ? val.split(', ').filter(Boolean) : []);
+    } else if (config.type === 'location') {
+      setLocRegion(user.region || '');
+      setLocProvince(user.province || '');
+      setLocCity(user.city || '');
     }
     setEditingField(config.key);
   };

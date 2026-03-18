@@ -382,11 +382,11 @@ const HomePage = () => {
             {/* CTA chat — visually distinct, always visible */}
             <Link
               to="/coach"
-              className="flex items-center justify-center gap-2 py-3 px-4 bg-primary/10 hover:bg-primary/15 transition-colors border-t border-border/50"
+              className="flex items-center justify-center gap-2 py-3.5 px-4 mx-3 mb-3 mt-1 rounded-xl gradient-primary shadow-glow hover:opacity-90 transition-opacity"
             >
-              <MessageCircle className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold text-primary">Chatta con il tuo Coach</span>
-              <ChevronRight className="w-4 h-4 text-primary" />
+              <MessageCircle className="w-4 h-4 text-primary-foreground" />
+              <span className="text-sm font-semibold text-primary-foreground">Chatta con il tuo Coach</span>
+              <ChevronRight className="w-4 h-4 text-primary-foreground" />
             </Link>
           </div>
         </motion.div>

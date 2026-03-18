@@ -31,6 +31,25 @@ interface WeeklyData {
 }
 
 /**
+ * Groups weekly data into 2-week (biweekly) periods and averages them.
+ */
+const groupBiweekly = (data: WeeklyData[]): { weight: number | null; bloating: number; energy: number }[] => {
+  const sorted = [...data].sort((a, b) => a.week_number - b.week_number);
+  const periods: { weight: number | null; bloating: number; energy: number }[] = [];
+
+  for (let i = 0; i < sorted.length; i += 2) {
+    const chunk = sorted.slice(i, i + 2);
+    const weights = chunk.filter(c => c.weight !== null).map(c => c.weight!);
+    periods.push({
+      weight: weights.length > 0 ? weights[weights.length - 1] : null, // use latest weight in the period
+      bloating: Math.round(chunk.reduce((s, c) => s + c.bloating, 0) / chunk.length),
+      energy: Math.round(chunk.reduce((s, c) => s + c.energy, 0) / chunk.length),
+    });
+  }
+  return periods;
+};
+
+/**
  * Compares last 2 weeks of data and generates adjustments.
  */
 export const analyzeProgress = (

@@ -133,7 +133,7 @@ export const analyzeProgress = (
           type: 'nutrition',
           icon: '⚖️',
           title: 'Peso in aumento — adattiamo il piano',
-          description: `Hai preso ${diff.toFixed(1)} kg questa settimana. Il piano alimentare verrà reso più leggero: porzioni ridotte a cena, meno carboidrati serali e più verdure. Non ti preoccupare, ci ricalibriamo.`,
+          description: `Hai preso ${diff.toFixed(1)} kg nelle ultime 2 settimane. Il piano alimentare verrà reso più leggero: porzioni ridotte a cena, meno carboidrati serali e più verdure.`,
           applied: true,
         });
       } else if (diff >= 0 && diff <= 0.5 && weeksOfData >= 3) {

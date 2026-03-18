@@ -47,6 +47,14 @@ export const useProfile = () => {
           city: (data as any).city || '',
           onboarded: !!(data.objective && data.name),
         });
+        // Load streak from DB
+        const store = useAppStore.getState();
+        if (data.current_streak != null) {
+          useAppStore.setState({
+            currentStreak: data.current_streak,
+            lastCheckInDate: data.last_check_in_date || null,
+          });
+        }
         setTimeout(() => refreshWeeklyHabits(), 0);
       }
       setProfileLoading(false);

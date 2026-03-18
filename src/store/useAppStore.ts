@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { getWeeklyHabitsForUser } from '@/data/weeklyHabits';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserProfile {
   name: string;
@@ -159,11 +160,22 @@ export const useAppStore = create<AppState>((set, get) => {
     addCheckIn: (data) =>
       set((s) => {
         const newStreak = calcStreak(s.lastCheckInDate, s.currentStreak);
+        const newDate = getDateStr(new Date());
+        // Persist streak to DB asynchronously
+        supabase.auth.getUser().then(({ data: authData }) => {
+          if (authData?.user) {
+            supabase
+              .from('profiles')
+              .update({ current_streak: newStreak, last_check_in_date: newDate } as any)
+              .eq('user_id', authData.user.id)
+              .then(() => {});
+          }
+        });
         return {
           checkIns: [...s.checkIns, data],
           todayCheckedIn: true,
           currentStreak: newStreak,
-          lastCheckInDate: getDateStr(new Date()),
+          lastCheckInDate: newDate,
         };
       }),
     getStreakMilestone: () => {
@@ -173,14 +185,21 @@ export const useAppStore = create<AppState>((set, get) => {
     },
     setWeeklyHabits: (habits) => set({ weeklyHabits: habits }),
     refreshWeeklyHabits: (signals) => {
-      const { user } = get();
+      const { user, weeklyHabits: currentHabits } = get();
       const startDate = undefined;
       const result = getInitialHabits(user.objective, startDate, signals);
       const savedIds = getSavedCompletedHabits();
+      // Also preserve completed state from current in-memory habits
+      const currentCompletedIds = currentHabits.filter(h => h.completed).map(h => h.id);
+      const allCompletedIds = [...new Set([...savedIds, ...currentCompletedIds])];
+      // Re-save to localStorage to keep in sync
+      if (allCompletedIds.length > 0) {
+        saveCompletedHabits(allCompletedIds);
+      }
       set({
         weeklyHabits: result.habits.map(h => ({
           ...h,
-          completed: savedIds.includes(h.id),
+          completed: allCompletedIds.includes(h.id),
         })),
         weekLabel: result.weekLabel,
         weekNumber: result.weekNumber,

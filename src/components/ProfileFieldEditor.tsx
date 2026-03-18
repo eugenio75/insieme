@@ -56,6 +56,16 @@ const fieldConfigs: FieldConfig[] = [
     step: '0.1',
   },
   {
+    key: 'bodyFrame',
+    label: 'Struttura corporea',
+    type: 'select',
+    options: [
+      { label: 'Esile', icon: '🦴', value: 'esile' },
+      { label: 'Media', icon: '🧍', value: 'media' },
+      { label: 'Robusta', icon: '💪', value: 'robusta' },
+    ],
+  },
+  {
     key: 'age',
     label: 'Età',
     type: 'number',

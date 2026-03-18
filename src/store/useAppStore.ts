@@ -19,6 +19,7 @@ interface UserProfile {
   workType?: string;
   bloodPressureSystolic?: string;
   bloodPressureDiastolic?: string;
+  bodyFrame?: string;
 }
 
 interface Habit {

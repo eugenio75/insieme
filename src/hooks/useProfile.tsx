@@ -38,6 +38,8 @@ export const useProfile = () => {
           partnerName: data.partner_name || '',
           weight: (data as any).weight ? String((data as any).weight) : '',
           workType: (data as any).work_type || '',
+          bloodPressureSystolic: (data as any).blood_pressure_systolic ? String((data as any).blood_pressure_systolic) : '',
+          bloodPressureDiastolic: (data as any).blood_pressure_diastolic ? String((data as any).blood_pressure_diastolic) : '',
           onboarded: !!(data.objective && data.name),
         });
         setTimeout(() => refreshWeeklyHabits(), 0);
@@ -69,6 +71,8 @@ export const useProfile = () => {
         partner_name: state.partnerName || '',
         weight: state.weight ? parseFloat(state.weight) : null,
         work_type: state.workType || '',
+        blood_pressure_systolic: state.bloodPressureSystolic ? parseInt(state.bloodPressureSystolic) : null,
+        blood_pressure_diastolic: state.bloodPressureDiastolic ? parseInt(state.bloodPressureDiastolic) : null,
       } as any)
       .eq('user_id', user.id);
   };

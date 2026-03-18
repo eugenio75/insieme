@@ -333,6 +333,8 @@ export interface HealthConstraints {
   foodsToIncrease: string[];
   hasGlycemicRisk: boolean;
   hasCholesterolRisk: boolean;
+  hasHypertension?: boolean;
+  hasHypotension?: boolean;
 }
 
 /**

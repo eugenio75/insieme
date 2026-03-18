@@ -270,12 +270,27 @@ const NutritionPage = () => {
     };
   })();
 
+  // Blood pressure classification
+  const systolic = user.bloodPressureSystolic ? parseInt(user.bloodPressureSystolic) : null;
+  const diastolic = user.bloodPressureDiastolic ? parseInt(user.bloodPressureDiastolic) : null;
+  const hasHypertension = !!(systolic && systolic >= 140) || !!(diastolic && diastolic >= 90);
+  const hasHypotension = !!(systolic && systolic <= 90) || !!(diastolic && diastolic <= 60);
+
   // Build health constraints for meal plan
-  const healthConstraints: HealthConstraints | undefined = (healthData.hasGlycemicRisk || healthData.hasCholesterolRisk) ? {
-    foodsToReduce: healthData.foodsToReduce,
-    foodsToIncrease: healthData.foodsToIncrease,
+  const healthConstraints: HealthConstraints | undefined = (healthData.hasGlycemicRisk || healthData.hasCholesterolRisk || hasHypertension || hasHypotension) ? {
+    foodsToReduce: [
+      ...healthData.foodsToReduce,
+      ...(hasHypertension ? ['sale', 'insaccati', 'cibi conservati', 'formaggi stagionati'] : []),
+    ],
+    foodsToIncrease: [
+      ...healthData.foodsToIncrease,
+      ...(hasHypertension ? ['verdure a foglia verde', 'banane', 'patate dolci', 'legumi'] : []),
+      ...(hasHypotension ? ['liquidi', 'cibi leggermente salati'] : []),
+    ],
     hasGlycemicRisk: healthData.hasGlycemicRisk,
     hasCholesterolRisk: healthData.hasCholesterolRisk,
+    hasHypertension,
+    hasHypotension,
   } : undefined;
 
   // Load patterns when component mounts

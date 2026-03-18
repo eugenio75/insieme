@@ -161,10 +161,7 @@ const MealCard = ({ meal, delay = 0, warning, dimmed, healthConstraints, onMealS
       <div className="flex-1 min-w-0">
         <h4 className="text-sm font-medium text-foreground mb-1">{meal.title}</h4>
         <p className="text-sm text-muted-foreground">{meal.description}</p>
-        {meal.simpleVariant && <SimpleVariantBadge variant={meal.simpleVariant} />}
-        {meal.ingredients && meal.ingredients.length > 0 && (
-          <SubstitutionPanel ingredients={meal.ingredients} />
-        )}
+        {/* Static substitution panels removed - MealActions provides AI-powered alternatives */}
         {!dimmed && onMealSwap && (
           <MealActions
             meal={meal}

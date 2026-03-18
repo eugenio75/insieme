@@ -255,6 +255,18 @@ const Onboarding = () => {
     }
   };
 
+  const handleHeightSubmit = async () => {
+    if (!heightInput.trim()) return;
+    setUser({ height: heightInput.trim() });
+    if (step < steps.length - 1) {
+      setStep(step + 1);
+    } else {
+      completeOnboarding();
+      await saveProfile();
+      navigate('/home');
+    }
+  };
+
   const handleWeightSubmit = async () => {
     setUser({ weight: weightInput || undefined });
     if (step < steps.length - 1) {

@@ -4,13 +4,16 @@ import { useAppStore } from '../store/useAppStore';
 import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } from '../data/foodTips';
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan, HealthConstraints } from '../data/mealPlans';
 import BottomNav from '../components/BottomNav';
-import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer, Sparkles, Stethoscope } from 'lucide-react';
+import { ChevronDown, RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, Timer, Sparkles, Stethoscope, TrendingDown, TrendingUp } from 'lucide-react';
 import MealActions from '@/components/MealActions';
 import AppHeader from '../components/AppHeader';
 import { useFoodFindings } from '@/hooks/useFoodFindings';
 import { usePatternAnalysis } from '@/hooks/useFoodFindings';
 import { useFasting } from '@/hooks/useFasting';
 import { useHealthDocuments } from '@/hooks/useHealthDocuments';
+import { getDietAdaptation, DietAdaptation } from '@/data/adaptationLogic';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'react-router-dom';
 
 type Tab = 'piano' | 'consigli' | 'ricette' | 'gonfiore';

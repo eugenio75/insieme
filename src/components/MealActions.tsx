@@ -206,12 +206,12 @@ const MealActions = ({ meal, healthConstraints, onMealSwap }: MealActionsProps) 
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-accent/60 text-[11px] font-medium text-accent-foreground
             hover:bg-accent transition-colors disabled:opacity-50"
         >
-          {loading === 'not_available' ? (
+          {loading === 'not_available' || loading === 'not_available_ingredient' ? (
             <Loader2 className="w-3 h-3 animate-spin" />
           ) : (
             <ShoppingBag className="w-3 h-3" />
           )}
-          Non ce l'ho
+          {expandedIngredient ? 'Non ho neanche queste' : 'Non ce l\'ho'}
         </button>
 
         <button

@@ -149,11 +149,13 @@ export const useAppStore = create<AppState>((set, get) => {
       get().refreshWeeklyHabits();
     },
     toggleHabit: (id) =>
-      set((s) => ({
-        weeklyHabits: s.weeklyHabits.map((h) =>
+      set((s) => {
+        const updated = s.weeklyHabits.map((h) =>
           h.id === id ? { ...h, completed: !h.completed } : h
-        ),
-      })),
+        );
+        saveCompletedHabits(updated.filter(h => h.completed).map(h => h.id));
+        return { weeklyHabits: updated };
+      }),
     addCheckIn: (data) =>
       set((s) => {
         const newStreak = calcStreak(s.lastCheckInDate, s.currentStreak);

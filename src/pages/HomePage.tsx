@@ -301,22 +301,15 @@ const HomePage = () => {
               </div>
             </div>
 
-            {/* Check-in status / CTA */}
-            {!checkedInToday ? (
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/checkin')}
-                className="p-3.5 rounded-2xl gradient-warm shadow-soft flex flex-col items-center justify-center gap-1 min-w-[90px]"
-              >
-                <PenLine className="w-5 h-5 text-secondary-foreground" />
-                <span className="text-[10px] btn-text text-secondary-foreground">CHECK-IN</span>
-              </motion.button>
-            ) : (
-              <div className="p-3.5 rounded-2xl glass glass-border flex flex-col items-center justify-center gap-1 min-w-[90px]">
-                <span className="text-lg">✅</span>
-                <span className="text-[10px] btn-text text-muted-foreground">FATTO OGGI</span>
-              </div>
-            )}
+            {/* Check-in CTA — sempre attivo */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/checkin')}
+              className="p-3.5 rounded-2xl gradient-warm shadow-soft flex flex-col items-center justify-center gap-1 min-w-[90px]"
+            >
+              <PenLine className="w-5 h-5 text-secondary-foreground" />
+              <span className="text-[10px] btn-text text-secondary-foreground">CHECK-IN</span>
+            </motion.button>
           </div>
 
           {/* Status indicators from last check-in */}

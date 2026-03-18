@@ -224,19 +224,21 @@ export const useFasting = () => {
         }, 0) / completed.length
       : 0;
 
-    // Streak
+    // Streak — group completed sessions by date, then count consecutive days
     let streak = 0;
-    const sortedByDate = [...sessions].sort((a, b) => 
-      new Date(b.started_at).getTime() - new Date(a.started_at).getTime()
+    const completedDates = new Set(
+      completed.map(s => {
+        const d = new Date(s.started_at);
+        d.setHours(0, 0, 0, 0);
+        return d.getTime();
+      })
     );
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    for (let i = 0; i < sortedByDate.length; i++) {
-      const sessionDate = new Date(sortedByDate[i].started_at);
-      sessionDate.setHours(0, 0, 0, 0);
-      const expectedDate = new Date(today.getTime() - i * 86400000);
-      expectedDate.setHours(0, 0, 0, 0);
-      if (sessionDate.getTime() === expectedDate.getTime() && sortedByDate[i].completed) {
+    // Start from today and go backwards
+    for (let i = 0; i < 60; i++) {
+      const checkDate = new Date(today.getTime() - i * 86400000);
+      if (completedDates.has(checkDate.getTime())) {
         streak++;
       } else {
         break;

@@ -73,18 +73,22 @@ serve(async (req) => {
     });
 
     // Prepare data for AI
-    const dataForAI = checkins.map(c => ({
-      date: c.created_at,
-      foods: c.foods_eaten,
-      plan_adherence: c.plan_adherence,
-      plan_foods_followed: c.plan_foods_followed,
-      off_plan_foods: c.off_plan_foods,
-      bloating: c.bloating,
-      energy: c.energy,
-      mood: c.mood,
-      sleep_hours: c.sleep_hours,
-      stress: c.stress,
-    }));
+    const dataForAI = checkins.map(c => {
+      const checkinDate = c.created_at.split('T')[0];
+      return {
+        date: c.created_at,
+        foods: c.foods_eaten,
+        plan_adherence: c.plan_adherence,
+        plan_foods_followed: c.plan_foods_followed,
+        off_plan_foods: c.off_plan_foods,
+        habits_completed: habitsByDate[checkinDate] || [],
+        bloating: c.bloating,
+        energy: c.energy,
+        mood: c.mood,
+        sleep_hours: c.sleep_hours,
+        stress: c.stress,
+      };
+    });
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

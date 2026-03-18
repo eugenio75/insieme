@@ -381,7 +381,7 @@ const FoodPhase = ({
     )}
 
     <p className="text-[10px] text-muted-foreground/70 btn-text mb-2">🍽️ CIBI COMUNI</p>
-    <div className="flex flex-wrap gap-2 mb-6">
+    <div className="flex flex-wrap gap-2 mb-4">
       {commonFoods.map((food) => (
         <button
           key={food.label}
@@ -397,6 +397,9 @@ const FoodPhase = ({
         </button>
       ))}
     </div>
+
+    {/* Custom food input */}
+    <CustomFoodInput onAdd={toggleFood} selectedFoods={selectedFoods} />
 
     {selectedFoods.length > 0 && (
       <p className="text-xs text-primary mb-4">

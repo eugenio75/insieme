@@ -41,9 +41,9 @@ const FastingTimer = () => {
           <Timer className="w-5 h-5 text-primary" />
           <span className="text-xs text-muted-foreground btn-text">DIGIUNO INTERMITTENTE</span>
           <div className="ml-auto flex items-center gap-2">
-            {stats.completedSessions > 0 && (
+            {stats.currentStreak > 0 && (
               <span className="text-xs font-medium text-secondary/80 bg-secondary/10 px-2 py-0.5 rounded-full">
-                🔥 {stats.completedSessions} {stats.completedSessions === 1 ? 'giorno' : 'giorni'}
+                🔥 {stats.currentStreak} {stats.currentStreak === 1 ? 'giorno' : 'giorni'}
               </span>
             )}
             <span className="text-xs font-medium text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full">{config.protocol}</span>
@@ -129,7 +129,7 @@ const FastingTimer = () => {
                     className="flex gap-2"
                   >
                     <button
-                      onClick={() => { endSession(status.progress >= 1); setShowConfirmEnd(false); }}
+                      onClick={() => { endSession(); setShowConfirmEnd(false); }}
                       className="px-3 py-2 rounded-xl gradient-primary text-primary-foreground text-xs font-medium"
                     >
                       Conferma

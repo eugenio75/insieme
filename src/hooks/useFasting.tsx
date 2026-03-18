@@ -128,11 +128,18 @@ export const useFasting = () => {
     if (data) setActiveSession(data as any);
   }, [authUser, config]);
 
-  const endSession = useCallback(async (completed: boolean) => {
+  const endSession = useCallback(async (forcedCompleted?: boolean) => {
     if (!authUser || !activeSession) return;
+
+    const endedAt = new Date();
+    const startedAt = new Date(activeSession.started_at);
+    const elapsedHours = (endedAt.getTime() - startedAt.getTime()) / 3600000;
+    const meetsTarget = elapsedHours >= activeSession.target_hours;
+    const completed = typeof forcedCompleted === 'boolean' ? forcedCompleted : meetsTarget;
+
     await supabase
       .from('fasting_sessions')
-      .update({ ended_at: new Date().toISOString(), completed } as any)
+      .update({ ended_at: endedAt.toISOString(), completed } as any)
       .eq('id', activeSession.id);
     setActiveSession(null);
     // Refresh sessions
@@ -224,21 +231,35 @@ export const useFasting = () => {
         }, 0) / completed.length
       : 0;
 
-    // Streak — group completed sessions by date, then count consecutive days
+    // Streak — count consecutive days based on completion days + active session elapsed days
     let streak = 0;
-    const completedDates = new Set(
-      completed.map(s => {
-        const d = new Date(s.started_at);
-        d.setHours(0, 0, 0, 0);
-        return d.getTime();
-      })
-    );
+    const fastingDates = new Set<number>();
+
+    completed.forEach((s) => {
+      const completionDate = new Date(s.ended_at || s.started_at);
+      completionDate.setHours(0, 0, 0, 0);
+      fastingDates.add(completionDate.getTime());
+    });
+
+    if (activeSession) {
+      const started = new Date(activeSession.started_at);
+      const now = new Date();
+      const activeDays = Math.max(1, Math.floor((now.getTime() - started.getTime()) / 86400000) + 1);
+      const today = new Date(now);
+      today.setHours(0, 0, 0, 0);
+
+      for (let i = 0; i < Math.min(activeDays, 60); i++) {
+        const activeDay = new Date(today.getTime() - i * 86400000);
+        fastingDates.add(activeDay.getTime());
+      }
+    }
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     // Start from today and go backwards
     for (let i = 0; i < 60; i++) {
       const checkDate = new Date(today.getTime() - i * 86400000);
-      if (completedDates.has(checkDate.getTime())) {
+      if (fastingDates.has(checkDate.getTime())) {
         streak++;
       } else {
         break;
@@ -253,7 +274,7 @@ export const useFasting = () => {
       currentStreak: streak,
       sessions,
     };
-  }, [sessions]);
+  }, [sessions, activeSession]);
 
   return {
     config,

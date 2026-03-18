@@ -362,7 +362,7 @@ const HomePage = () => {
                   {proactiveCoach ? (
                     <>
                       <p className="text-sm font-medium text-foreground leading-snug">{proactiveCoach.title}</p>
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{proactiveCoach.message}</p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{proactiveCoach.message}</p>
                     </>
                   ) : smartInsight ? (
                     <>

@@ -158,6 +158,10 @@ const ProfileFieldEditor = () => {
     const val = (user as any)[config.key];
     if (!val) return '—';
     if (config.key === 'mode') return val === 'together' ? 'Insieme' : 'Da sola';
+    if (config.key === 'bodyFrame') {
+      const map: Record<string, string> = { esile: 'Esile', media: 'Media', robusta: 'Robusta' };
+      return map[val] || val;
+    }
     if (config.key === 'height') return `${val} cm`;
     if (config.key === 'weight') return `${val} kg`;
     if (config.key === 'age') return `${val} anni`;

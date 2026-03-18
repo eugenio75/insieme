@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { getWeeklyHabitsForUser } from '@/data/weeklyHabits';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserProfile {
   name: string;

@@ -204,9 +204,11 @@ export const getDietAdaptation = (
 
   if (data.length < 2) return defaults;
 
-  const sorted = [...data].sort((a, b) => a.week_number - b.week_number);
-  const current = sorted[sorted.length - 1];
-  const previous = sorted[sorted.length - 2];
+  const periods = groupBiweekly(data);
+  if (periods.length < 2) return defaults;
+
+  const current = periods[periods.length - 1];
+  const previous = periods[periods.length - 2];
 
   const lower = objective.toLowerCase();
   const wantsWeightLoss = lower.includes('peso') || lower.includes('legger') || lower.includes('sgonfi') || lower.includes('dimagr');
@@ -223,11 +225,11 @@ export const getDietAdaptation = (
         adaptation.lighterDinners = true;
         adaptation.lessCarbsDinner = true;
         adaptation.moreVegetables = true;
-        adaptation.summary = `Peso +${diff.toFixed(1)}kg: piano reso più leggero con porzioni ridotte e cene proteiche.`;
+        adaptation.summary = `Peso +${diff.toFixed(1)}kg in 2 settimane: piano reso più leggero con porzioni ridotte e cene proteiche.`;
       } else if (diff >= -0.2 && diff <= 0.3) {
-        // Check if stalling across multiple weeks
-        if (sorted.length >= 3) {
-          const thirdLast = sorted[sorted.length - 3];
+        // Check if stalling across multiple periods
+        if (periods.length >= 3) {
+          const thirdLast = periods[periods.length - 3];
           if (thirdLast.weight !== null && current.weight - thirdLast.weight >= 0) {
             adaptation.weeklyTrend = 'stalling';
             adaptation.reducePortions = true;

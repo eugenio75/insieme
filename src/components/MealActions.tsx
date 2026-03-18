@@ -5,14 +5,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from 'sonner';
 import type { Meal, HealthConstraints } from '@/data/mealPlans';
+import type { DietAdaptation } from '@/data/adaptationLogic';
 
 interface MealActionsProps {
   meal: Meal;
   healthConstraints?: HealthConstraints;
+  dietAdaptation?: DietAdaptation | null;
   onMealSwap: (newMeal: Partial<Meal>) => void;
 }
 
-const MealActions = ({ meal, healthConstraints, onMealSwap }: MealActionsProps) => {
+const MealActions = ({ meal, healthConstraints, dietAdaptation, onMealSwap }: MealActionsProps) => {
   const { user } = useAppStore();
   const [loading, setLoading] = useState<string | null>(null); // action type being loaded
   const [showChat, setShowChat] = useState(false);

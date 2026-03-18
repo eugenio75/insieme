@@ -561,6 +561,7 @@ const NutritionPage = () => {
                         warning={warning}
                         dimmed={outsideWindow}
                         healthConstraints={healthConstraints}
+                        dietAdaptation={dietAdaptation}
                         onMealSwap={(mealType, newMeal) => handleMealSwap(selectedDay, mealType, newMeal)}
                       />
                     );

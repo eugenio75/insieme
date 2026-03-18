@@ -434,7 +434,46 @@ const FoodPhase = ({
   </motion.div>
 );
 
-const DonePhase = ({
+const CustomFoodInput = ({ onAdd, selectedFoods }: { onAdd: (f: string) => void; selectedFoods: string[] }) => {
+  const [customFood, setCustomFood] = useState('');
+
+  const handleAdd = () => {
+    const trimmed = customFood.trim();
+    if (trimmed && !selectedFoods.includes(trimmed)) {
+      onAdd(trimmed);
+      setCustomFood('');
+    }
+  };
+
+  return (
+    <div className="mb-4">
+      <p className="text-[10px] text-muted-foreground/70 btn-text mb-2">✏️ ALTRO CIBO</p>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={customFood}
+          onChange={(e) => setCustomFood(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+          placeholder="Es: insalata di quinoa..."
+          className="flex-1 px-4 py-2.5 rounded-xl bg-muted border border-border text-foreground text-sm
+            focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+            transition-all duration-300 placeholder:text-muted-foreground/50"
+        />
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={handleAdd}
+          disabled={!customFood.trim()}
+          className="px-4 py-2.5 rounded-xl gradient-primary text-primary-foreground text-sm font-medium
+            shadow-glow disabled:opacity-40 disabled:shadow-none transition-opacity"
+        >
+          +
+        </motion.button>
+      </div>
+    </div>
+  );
+};
+
+
   currentStreak,
   coachMessage,
   coachLoading,

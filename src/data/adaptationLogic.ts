@@ -12,6 +12,17 @@ export interface Adjustment {
   applied: boolean;
 }
 
+export interface DietAdaptation {
+  reducePortions: boolean;
+  lighterDinners: boolean;
+  moreProtein: boolean;
+  lessCarbsDinner: boolean;
+  moreVegetables: boolean;
+  moreHydration: boolean;
+  weeklyTrend: 'improving' | 'stalling' | 'worsening' | 'neutral';
+  summary: string;
+}
+
 interface WeeklyData {
   week_number: number;
   weight: number | null;
@@ -33,6 +44,8 @@ export const analyzeProgress = (
   const previous = sorted[sorted.length - 2];
 
   const adjustments: Adjustment[] = [];
+  const lower = objective.toLowerCase();
+  const wantsWeightLoss = lower.includes('peso') || lower.includes('legger') || lower.includes('sgonfi') || lower.includes('dimagr');
 
   // --- Bloating analysis ---
   if (current.bloating >= 4 && previous.bloating >= 4) {
@@ -91,25 +104,39 @@ export const analyzeProgress = (
   // --- Weight analysis (if tracked) ---
   if (current.weight !== null && previous.weight !== null) {
     const diff = current.weight - previous.weight;
-    const lower = objective.toLowerCase();
-    const wantsWeightLoss = lower.includes('peso') || lower.includes('legger') || lower.includes('sgonfi');
+    const weeksOfData = sorted.length;
 
-    if (wantsWeightLoss && diff > 0.5) {
-      adjustments.push({
-        type: 'nutrition',
-        icon: '⚖️',
-        title: 'Peso in leggero aumento',
-        description: 'Il peso è salito leggermente. Niente panico — questa settimana proviamo porzioni un po\' più piccole la sera e più verdure a pranzo.',
-        applied: true,
-      });
-    } else if (wantsWeightLoss && diff < -0.3) {
-      adjustments.push({
-        type: 'general',
-        icon: '🎉',
-        title: 'Ottimo progresso sul peso!',
-        description: `Hai perso ${Math.abs(diff).toFixed(1)} kg questa settimana. Continua con costanza!`,
-        applied: false,
-      });
+    if (wantsWeightLoss) {
+      if (diff > 0.5) {
+        adjustments.push({
+          type: 'nutrition',
+          icon: '⚖️',
+          title: 'Peso in aumento — adattiamo il piano',
+          description: `Hai preso ${diff.toFixed(1)} kg questa settimana. Il piano alimentare verrà reso più leggero: porzioni ridotte a cena, meno carboidrati serali e più verdure. Non ti preoccupare, ci ricalibriamo.`,
+          applied: true,
+        });
+      } else if (diff >= 0 && diff <= 0.5 && weeksOfData >= 3) {
+        // Stalling — weight not moving for multiple weeks
+        const thirdLast = sorted[sorted.length - 3];
+        const longTermDiff = thirdLast.weight !== null ? current.weight - thirdLast.weight : null;
+        if (longTermDiff !== null && longTermDiff >= 0) {
+          adjustments.push({
+            type: 'nutrition',
+            icon: '📉',
+            title: 'Peso fermo — serve un cambio',
+            description: 'Il peso non scende da più settimane. Questa settimana il piano sarà più strutturato: porzioni calibrate, cene leggere a base di proteine e verdure, e spuntini ridotti.',
+            applied: true,
+          });
+        }
+      } else if (diff < -0.3) {
+        adjustments.push({
+          type: 'general',
+          icon: '🎉',
+          title: 'Ottimo progresso sul peso!',
+          description: `Hai perso ${Math.abs(diff).toFixed(1)} kg questa settimana. Il piano funziona, continuiamo così!`,
+          applied: false,
+        });
+      }
     } else if (!wantsWeightLoss && Math.abs(diff) < 0.3) {
       adjustments.push({
         type: 'general',
@@ -136,8 +163,81 @@ export const analyzeProgress = (
 };
 
 /**
+ * Generates concrete diet adaptations based on weekly trends.
+ * These are passed to the meal plan and AI to modify behavior.
+ */
+export const getDietAdaptation = (
+  data: WeeklyData[],
+  objective: string,
+): DietAdaptation => {
+  const defaults: DietAdaptation = {
+    reducePortions: false,
+    lighterDinners: false,
+    moreProtein: false,
+    lessCarbsDinner: false,
+    moreVegetables: false,
+    moreHydration: false,
+    weeklyTrend: 'neutral',
+    summary: '',
+  };
+
+  if (data.length < 2) return defaults;
+
+  const sorted = [...data].sort((a, b) => a.week_number - b.week_number);
+  const current = sorted[sorted.length - 1];
+  const previous = sorted[sorted.length - 2];
+
+  const lower = objective.toLowerCase();
+  const wantsWeightLoss = lower.includes('peso') || lower.includes('legger') || lower.includes('sgonfi') || lower.includes('dimagr');
+
+  const adaptation = { ...defaults };
+
+  // Weight trend
+  if (current.weight !== null && previous.weight !== null) {
+    const diff = current.weight - previous.weight;
+    if (wantsWeightLoss) {
+      if (diff > 0.5) {
+        adaptation.weeklyTrend = 'worsening';
+        adaptation.reducePortions = true;
+        adaptation.lighterDinners = true;
+        adaptation.lessCarbsDinner = true;
+        adaptation.moreVegetables = true;
+        adaptation.summary = `Peso +${diff.toFixed(1)}kg: piano reso più leggero con porzioni ridotte e cene proteiche.`;
+      } else if (diff >= -0.2 && diff <= 0.3) {
+        // Check if stalling across multiple weeks
+        if (sorted.length >= 3) {
+          const thirdLast = sorted[sorted.length - 3];
+          if (thirdLast.weight !== null && current.weight - thirdLast.weight >= 0) {
+            adaptation.weeklyTrend = 'stalling';
+            adaptation.reducePortions = true;
+            adaptation.lessCarbsDinner = true;
+            adaptation.moreProtein = true;
+            adaptation.summary = 'Peso fermo da più settimane: piano ricalibrato con più proteine e cene leggere.';
+          }
+        }
+      } else if (diff < -0.3) {
+        adaptation.weeklyTrend = 'improving';
+        adaptation.summary = `Peso -${Math.abs(diff).toFixed(1)}kg: il piano funziona, continuiamo così.`;
+      }
+    }
+  }
+
+  // Bloating
+  if (current.bloating >= 4) {
+    adaptation.lighterDinners = true;
+    adaptation.moreHydration = true;
+  }
+
+  // Energy
+  if (current.energy <= 2) {
+    adaptation.moreProtein = true;
+  }
+
+  return adaptation;
+};
+
+/**
  * Gets habit adjustment suggestions based on trends.
- * Returns modified habit titles if adaptation is needed.
  */
 export const getHabitAdjustments = (
   data: WeeklyData[],

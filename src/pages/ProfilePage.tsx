@@ -261,6 +261,56 @@ const ProfilePage = () => {
           );
         })()}
 
+        {/* Blood Pressure indicator */}
+        {(() => {
+          const sys = parseInt(user.bloodPressureSystolic || '');
+          const dia = parseInt(user.bloodPressureDiastolic || '');
+          if (!sys || !dia) return null;
+
+          let category: string;
+          let emoji: string;
+          let color: string;
+          let bgColor: string;
+          let desc: string;
+
+          if (sys < 90 || dia < 60) {
+            category = 'Ipotensione'; emoji = '💙'; color = 'text-blue-600 dark:text-blue-400'; bgColor = 'bg-blue-500/10';
+            desc = 'Pressione bassa. Il piano include alimenti che supportano la circolazione.';
+          } else if (sys <= 120 && dia <= 80) {
+            category = 'Ottimale'; emoji = '✅'; color = 'text-green-600 dark:text-green-400'; bgColor = 'bg-green-500/10';
+            desc = 'La tua pressione è nella norma. Continua così!';
+          } else if (sys <= 129 && dia <= 84) {
+            category = 'Normale'; emoji = '👍'; color = 'text-green-600 dark:text-green-400'; bgColor = 'bg-green-500/10';
+            desc = 'Pressione nella norma. Un buon equilibrio alimentare aiuta a mantenerla.';
+          } else if (sys <= 139 || dia <= 89) {
+            category = 'Normale-alta'; emoji = '⚠️'; color = 'text-yellow-600 dark:text-yellow-400'; bgColor = 'bg-yellow-500/10';
+            desc = 'Leggermente alta. Il piano limita il sodio e favorisce potassio e magnesio.';
+          } else if (sys <= 159 || dia <= 99) {
+            category = 'Ipertensione grado 1'; emoji = '🟠'; color = 'text-secondary'; bgColor = 'bg-secondary/10';
+            desc = 'Pressione alta. Il piano riduce sale e cibi processati, aumenta verdure e omega-3.';
+          } else {
+            category = 'Ipertensione grado 2'; emoji = '🔴'; color = 'text-destructive'; bgColor = 'bg-destructive/10';
+            desc = 'Pressione alta. Il piano è calibrato per supportarti, ma consulta il tuo medico.';
+          }
+
+          return (
+            <div className="mt-3 mb-2 p-4 rounded-2xl glass glass-border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Pressione arteriosa</p>
+                  <p className="text-2xl font-bold text-gradient font-body">{sys}/{dia}</p>
+                </div>
+                <div className={`px-3 py-1.5 rounded-xl ${bgColor}`}>
+                  <span className={`text-sm font-medium ${color}`}>
+                    {emoji} {category}
+                  </span>
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-2">{desc}</p>
+            </div>
+          );
+        })()}
+
         {/* Weight Tracker */}
         <WeightTracker />
 

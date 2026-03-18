@@ -124,7 +124,7 @@ REGOLE OUTPUT:
 - Rispondi SOLO con JSON valido
 - Formato: { "patterns": [...], "foodFindings": [...], "dietSuggestions": [...] }
 
-PATTERN: { "type": "sleep_hunger"|"sleep_energy"|"stress_eating"|"food_combo"|"meal_timing"|"stress_bloating", "title": "titolo breve", "description": "spiegazione gentile e pratica", "icon": "emoji", "correlation": 0.0-1.0, "actionTip": "consiglio concreto adattato a sesso/età/attività" }
+PATTERN: { "type": "plan_adherence"|"off_plan_impact"|"sleep_hunger"|"sleep_energy"|"stress_eating"|"food_combo"|"meal_timing"|"stress_bloating", "title": "titolo breve", "description": "spiegazione gentile e pratica", "icon": "emoji", "correlation": 0.0-1.0, "actionTip": "consiglio concreto adattato a sesso/età/attività" }
 
 FOOD FINDINGS: { "food": "nome", "issue": "gonfiore|energia_bassa|umore_basso", "correlation": 0.0-1.0, "description": "breve spiegazione", "icon": "emoji" }
 

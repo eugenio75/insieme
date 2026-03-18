@@ -211,7 +211,9 @@ const lightPlan: DayPlan[] = [
           { name: 'Mozzarella', substitutes: ['Ricotta', 'Formaggio spalmabile', 'Hummus'] },
         ],
       },
-      { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🍫', title: 'Cioccolato fondente', description: '2-3 quadretti con calma. Un piccolo piacere senza sensi di colpa.' },
+      { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🍫', title: 'Cioccolato fondente', description: '2-3 quadretti con calma. Un piccolo piacere senza sensi di colpa.',
+        simpleVariant: { title: 'Alternativa', description: 'Frutta secca mista o uno yogurt con miele. Dolce ma leggero.' },
+      },
       { type: 'cena', typeLabel: 'Cena', icon: '🌙', title: 'Riso con verdure saltate', description: 'Riso basmati con verdure miste saltate in padella.',
         ingredients: [
           { name: 'Riso basmati', substitutes: ['Riso qualsiasi', 'Noodles', 'Cous cous'] },

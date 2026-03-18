@@ -92,6 +92,25 @@ const streakMilestones: StreakMilestone[] = [
 
 const getDateStr = (d: Date) => d.toISOString().split('T')[0];
 
+const COMPLETED_HABITS_KEY = 'completed_habits';
+
+const getSavedCompletedHabits = (): string[] => {
+  try {
+    const raw = localStorage.getItem(COMPLETED_HABITS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (parsed.date === getDateStr(new Date())) {
+      return parsed.ids || [];
+    }
+    localStorage.removeItem(COMPLETED_HABITS_KEY);
+    return [];
+  } catch { return []; }
+};
+
+const saveCompletedHabits = (ids: string[]) => {
+  localStorage.setItem(COMPLETED_HABITS_KEY, JSON.stringify({ date: getDateStr(new Date()), ids }));
+};
+
 const calcStreak = (lastDate: string | null, currentStreak: number): number => {
   if (!lastDate) return 1;
   const today = getDateStr(new Date());

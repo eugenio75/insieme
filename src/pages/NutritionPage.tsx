@@ -518,6 +518,35 @@ const NutritionPage = () => {
               onSelectDay={setSelectedDay}
             />
 
+            {/* Weekly adaptation banner */}
+            {dietAdaptation && dietAdaptation.weeklyTrend !== 'neutral' && dietAdaptation.summary && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`mb-4 p-4 rounded-2xl border ${
+                  dietAdaptation.weeklyTrend === 'improving' 
+                    ? 'bg-green-500/5 border-green-500/20' 
+                    : dietAdaptation.weeklyTrend === 'worsening'
+                      ? 'bg-secondary/5 border-secondary/20'
+                      : 'bg-primary/5 border-primary/15'
+                }`}
+              >
+                <div className="flex items-start gap-2.5">
+                  <span className="text-lg mt-0.5">
+                    {dietAdaptation.weeklyTrend === 'improving' ? '📈' : dietAdaptation.weeklyTrend === 'worsening' ? '📊' : '🔄'}
+                  </span>
+                  <div>
+                    <p className="text-xs font-medium text-foreground mb-0.5">
+                      {dietAdaptation.weeklyTrend === 'improving' ? 'Il piano sta funzionando!' : 
+                       dietAdaptation.weeklyTrend === 'worsening' ? 'Piano adattato ai tuoi risultati' :
+                       'Piano ricalibrato'}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">{dietAdaptation.summary}</p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             {selectedDayPlan && (
               <div className="space-y-3">
                 <h3 className="font-display text-base text-foreground">

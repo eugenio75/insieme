@@ -240,6 +240,7 @@ const Onboarding = () => {
   const isMultiSelect = currentStep?.multiSelect;
   const hasCustomInput = (currentStep as any)?.hasCustomInput;
   const isWeightInput = (currentStep as any)?.isWeightInput;
+  const isHeightInput = (currentStep as any)?.isHeightInput;
   const isAgeInput = (currentStep as any)?.isAgeInput;
 
   const handleAgeSubmit = async () => {

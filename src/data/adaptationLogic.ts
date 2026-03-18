@@ -267,9 +267,11 @@ export const getHabitAdjustments = (
 ): { extraHydration: boolean; moreMovement: boolean; lighterDinner: boolean } => {
   if (data.length < 2) return { extraHydration: false, moreMovement: false, lighterDinner: false };
 
-  const sorted = [...data].sort((a, b) => a.week_number - b.week_number);
-  const current = sorted[sorted.length - 1];
-  const previous = sorted[sorted.length - 2];
+  const periods = groupBiweekly(data);
+  if (periods.length < 2) return { extraHydration: false, moreMovement: false, lighterDinner: false };
+
+  const current = periods[periods.length - 1];
+  const previous = periods[periods.length - 2];
 
   return {
     extraHydration: current.bloating >= 3 && previous.bloating >= 3,

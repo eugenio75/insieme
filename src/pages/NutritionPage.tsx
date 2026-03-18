@@ -170,6 +170,7 @@ const MealCard = ({ meal, delay = 0, warning, dimmed, healthConstraints, dietAda
           <MealActions
             meal={meal}
             healthConstraints={healthConstraints}
+            dietAdaptation={dietAdaptation}
             onMealSwap={(newMeal) => onMealSwap(meal.type, newMeal)}
           />
         )}

@@ -181,7 +181,9 @@ const lightPlan: DayPlan[] = [
         ],
         simpleVariant: { title: 'Versione lampo', description: 'Pasta con ceci in scatola, olio e pepe. Pronta in 15 minuti.' },
       },
-      { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🫖', title: 'Tisana e biscotti', description: 'Un momento di pausa con tisana e 2-3 biscotti.' },
+      { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🫖', title: 'Tisana e biscotti', description: 'Un momento di pausa con tisana e 2-3 biscotti.',
+        simpleVariant: { title: 'Alternativa', description: 'Frutta secca o un quadretto di cioccolato fondente con tè verde.' },
+      },
       { type: 'cena', typeLabel: 'Cena', icon: '🌙', title: 'Petto di pollo con verdure', description: 'Pollo alla piastra con insalata mista. Leggero e veloce.',
         ingredients: [
           { name: 'Petto di pollo', substitutes: ['Tacchino', 'Pesce', 'Uova', 'Tofu'] },

@@ -149,7 +149,9 @@ const lightPlan: DayPlan[] = [
         ],
         simpleVariant: { title: 'Versione base', description: 'Riso con verdure che hai e un filo d\'olio.' },
       },
-      { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🍐', title: 'Un frutto e noci', description: 'Una pera e 4-5 noci. Energia buona.' },
+      { type: 'spuntino_pomeriggio', typeLabel: 'Merenda', icon: '🍐', title: 'Un frutto e noci', description: 'Una pera e 4-5 noci. Energia buona.',
+        simpleVariant: { title: 'Alternativa', description: 'Yogurt bianco o crackers con un pezzetto di formaggio.' },
+      },
       { type: 'cena', typeLabel: 'Cena', icon: '🌙', title: 'Zuppa di legumi', description: 'Lenticchie o ceci con un filo d\'olio e crostini.',
         ingredients: [
           { name: 'Lenticchie', substitutes: ['Ceci', 'Fagioli', 'Piselli', 'Legumi misti in scatola'] },

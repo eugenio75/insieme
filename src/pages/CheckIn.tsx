@@ -217,6 +217,9 @@ const CheckIn = () => {
   // Dynamic phases based on time of day
   const getPhaseConfig = () => {
     // Phase 0: mood, 1: energy, 2: bloating, 3: stress, 4: sleep (optional), 5: food
+    const moods = getMoods(user.sex);
+    const stressLevels = getStressLevels(user.sex);
+    const m = isMale(user.sex);
     const phases = [
       {
         title: 'Come ti senti?',
@@ -237,7 +240,7 @@ const CheckIn = () => {
         onSelect: (v: number) => { setBloating(v); setPhase(3); },
       },
       {
-        title: 'Quanto sei stressata?',
+        title: m ? 'Quanto sei stressato?' : 'Quanto sei stressata?',
         subtitle: 'Lo stress influenza digestione e fame',
         options: stressLevels,
         onSelect: (v: number) => {

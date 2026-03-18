@@ -48,6 +48,7 @@ const lightPlan: DayPlan[] = [
           { name: 'Mandorle', substitutes: ['Noci', 'Nocciole', 'Semi di girasole', 'Arachidi'] },
           { name: 'Cioccolato fondente', substitutes: ['Un frutto', 'Un cucchiaino di miele', 'Biscotti secchi'] },
         ],
+        simpleVariant: { title: 'Alternativa', description: 'Uno yogurt bianco o un frutto con qualche noce.' },
       },
       { type: 'cena', typeLabel: 'Cena', icon: '🌙', title: 'Vellutata di carote', description: 'Carote, patata, un filo d\'olio. Calda e confortante.',
         ingredients: [

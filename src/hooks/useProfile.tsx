@@ -48,12 +48,25 @@ export const useProfile = () => {
           onboarded: !!(data.objective && data.name),
         });
         // Load streak from DB
-        const store = useAppStore.getState();
         if (data.current_streak != null) {
           useAppStore.setState({
             currentStreak: data.current_streak,
             lastCheckInDate: data.last_check_in_date || null,
           });
+        }
+        // Load today's habit completions from DB and merge with localStorage
+        const today = new Date().toISOString().split('T')[0];
+        const { data: dbHabits } = await supabase
+          .from('habit_completions')
+          .select('habit_id')
+          .eq('user_id', user.id)
+          .eq('completed_at', today);
+        if (dbHabits && dbHabits.length > 0) {
+          const dbIds = dbHabits.map((h: any) => h.habit_id);
+          const existing = JSON.parse(localStorage.getItem('completed_habits') || '{}');
+          const existingIds: string[] = existing.date === today ? (existing.ids || []) : [];
+          const merged = [...new Set([...existingIds, ...dbIds])];
+          localStorage.setItem('completed_habits', JSON.stringify({ date: today, ids: merged }));
         }
         setTimeout(() => refreshWeeklyHabits(), 0);
       }

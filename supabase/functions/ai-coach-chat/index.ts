@@ -77,6 +77,15 @@ serve(async (req) => {
       .order("started_at", { ascending: false })
       .limit(10);
 
+    // 6. Habit completions (last 14 days)
+    const twoWeeksAgo = new Date(Date.now() - 14 * 86400000).toISOString().split('T')[0];
+    const { data: habitCompletions } = await supabase
+      .from("habit_completions")
+      .select("habit_title, completed_at")
+      .eq("user_id", user.id)
+      .gte("completed_at", twoWeeksAgo)
+      .order("completed_at", { ascending: false });
+
     // ===== BUILD CONTEXT STRING =====
     const name = profile?.name || "utente";
     const sex = profile?.sex || "";
@@ -123,6 +132,26 @@ serve(async (req) => {
       if (adherenceCheckins.length > 0) {
         context += `\n- Aderenza al piano (${adherenceCheckins.length} giorni): completa ${fullAdherence}, parziale ${partialAdherence}, nessuna ${noAdherence}`;
       }
+      context += "\n";
+    }
+
+    // Habit completions context
+    if (habitCompletions && habitCompletions.length > 0) {
+      const habitsByDate: Record<string, string[]> = {};
+      habitCompletions.forEach((h: any) => {
+        if (!habitsByDate[h.completed_at]) habitsByDate[h.completed_at] = [];
+        habitsByDate[h.completed_at].push(h.habit_title);
+      });
+      const totalDays = Object.keys(habitsByDate).length;
+      const avgPerDay = (habitCompletions.length / totalDays).toFixed(1);
+      context += `\nABITUDINI COMPLETATE (ultimi 14 giorni, ${totalDays} giorni attivi):
+- Media: ${avgPerDay} abitudini/giorno su 4
+- Totale completate: ${habitCompletions.length}`;
+      // Show last 3 days
+      const recentDays = Object.entries(habitsByDate).slice(0, 3);
+      recentDays.forEach(([date, habits]) => {
+        context += `\n- ${date}: ${habits.join(", ")}`;
+      });
       context += "\n";
     }
 

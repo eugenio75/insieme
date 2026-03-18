@@ -116,6 +116,33 @@ export type Database = {
         }
         Relationships: []
       }
+      habit_completions: {
+        Row: {
+          completed_at: string
+          created_at: string
+          habit_id: string
+          habit_title: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          habit_id: string
+          habit_title: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          habit_id?: string
+          habit_title?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       health_documents: {
         Row: {
           ai_analysis: Json | null

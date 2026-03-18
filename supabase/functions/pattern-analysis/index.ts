@@ -41,6 +41,14 @@ serve(async (req) => {
       .eq("user_id", user.id)
       .single();
 
+    // Fetch habit completions
+    const { data: habitCompletions } = await supabase
+      .from("habit_completions")
+      .select("habit_id, habit_title, completed_at")
+      .eq("user_id", user.id)
+      .order("completed_at", { ascending: false })
+      .limit(200);
+
     if (!checkins || checkins.length < 10) {
       return new Response(JSON.stringify({
         patterns: [],
@@ -56,19 +64,31 @@ serve(async (req) => {
     const totalCheckins = checkins.length;
     const confidence = totalCheckins < 20 ? "bassa" : totalCheckins < 40 ? "media" : "alta";
 
+    // Group habits by date
+    const habitsByDate: Record<string, string[]> = {};
+    (habitCompletions || []).forEach((h: any) => {
+      const d = h.completed_at;
+      if (!habitsByDate[d]) habitsByDate[d] = [];
+      habitsByDate[d].push(h.habit_title);
+    });
+
     // Prepare data for AI
-    const dataForAI = checkins.map(c => ({
-      date: c.created_at,
-      foods: c.foods_eaten,
-      plan_adherence: c.plan_adherence,
-      plan_foods_followed: c.plan_foods_followed,
-      off_plan_foods: c.off_plan_foods,
-      bloating: c.bloating,
-      energy: c.energy,
-      mood: c.mood,
-      sleep_hours: c.sleep_hours,
-      stress: c.stress,
-    }));
+    const dataForAI = checkins.map(c => {
+      const checkinDate = c.created_at.split('T')[0];
+      return {
+        date: c.created_at,
+        foods: c.foods_eaten,
+        plan_adherence: c.plan_adherence,
+        plan_foods_followed: c.plan_foods_followed,
+        off_plan_foods: c.off_plan_foods,
+        habits_completed: habitsByDate[checkinDate] || [],
+        bloating: c.bloating,
+        energy: c.energy,
+        mood: c.mood,
+        sleep_hours: c.sleep_hours,
+        stress: c.stress,
+      };
+    });
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -119,12 +139,13 @@ ANALIZZA questi pattern nei check-in:
 - Combinazioni di cibi nello stesso giorno e reazioni
 - Ore di sonno e fame/energia/umore del giorno dopo
 - Stress e scelte alimentari o sintomi
+- ABITUDINI COMPLETATE: correlazione tra habits_completed e benessere. Es: "Nei giorni in cui cammini 15 min, energia +1.2" o "Quando bevi 1.5L acqua, gonfiore -0.8"
 
 REGOLE OUTPUT:
 - Rispondi SOLO con JSON valido
 - Formato: { "patterns": [...], "foodFindings": [...], "dietSuggestions": [...] }
 
-PATTERN: { "type": "plan_adherence"|"off_plan_impact"|"sleep_hunger"|"sleep_energy"|"stress_eating"|"food_combo"|"meal_timing"|"stress_bloating", "title": "titolo breve", "description": "spiegazione gentile e pratica", "icon": "emoji", "correlation": 0.0-1.0, "actionTip": "consiglio concreto adattato a sesso/età/attività" }
+PATTERN: { "type": "plan_adherence"|"off_plan_impact"|"habit_impact"|"sleep_hunger"|"sleep_energy"|"stress_eating"|"food_combo"|"meal_timing"|"stress_bloating", "title": "titolo breve", "description": "spiegazione gentile e pratica", "icon": "emoji", "correlation": 0.0-1.0, "actionTip": "consiglio concreto adattato a sesso/età/attività" }
 
 FOOD FINDINGS: { "food": "nome", "issue": "gonfiore|energia_bassa|umore_basso", "correlation": 0.0-1.0, "description": "breve spiegazione", "icon": "emoji" }
 

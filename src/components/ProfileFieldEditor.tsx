@@ -196,9 +196,26 @@ const ProfileFieldEditor = () => {
     setEditingField(null);
   };
 
+  const calcBMI = () => {
+    const w = parseFloat((user as any).weight || '');
+    const h = parseFloat((user as any).height || '');
+    if (!w || !h || h < 100) return null;
+    const hm = h / 100;
+    const bmi = w / (hm * hm);
+    let category: string;
+    let emoji: string;
+    if (bmi < 18.5) { category = 'Sottopeso'; emoji = '⚠️'; }
+    else if (bmi < 25) { category = 'Normopeso'; emoji = '✅'; }
+    else if (bmi < 30) { category = 'Sovrappeso'; emoji = '⚡'; }
+    else { category = 'Obesità'; emoji = '🔴'; }
+    return { bmi: Math.round(bmi * 10) / 10, category, emoji };
+  };
+
+  const bmiData = calcBMI();
+
   return (
     <div className="space-y-2">
-      {fieldConfigs.map((config) => (
+      {fieldConfigs.map((config, index) => (
         <div key={config.key}>
           <div
             onClick={() => openEditor(config)}
@@ -210,6 +227,16 @@ const ProfileFieldEditor = () => {
               <span className="text-xs text-primary">✏️</span>
             </div>
           </div>
+
+          {/* Show "Struttura corporea" after weight field */}
+          {config.key === 'weight' && bmiData && (
+            <div className="flex items-center justify-between p-4 rounded-2xl glass glass-border mt-2">
+              <span className="text-sm text-muted-foreground">Struttura corporea</span>
+              <span className="text-sm font-medium text-foreground">
+                {bmiData.emoji} {bmiData.category} (BMI {bmiData.bmi})
+              </span>
+            </div>
+          )}
 
           <AnimatePresence>
             {editingField === config.key && config.type === 'number' && (

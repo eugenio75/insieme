@@ -112,6 +112,9 @@ LINEE GUIDA NUTRIZIONALI OBBLIGATORIE:
 - NON contare calorie esplicitamente nei suggerimenti (filosofia non-dieta)
 
 ANALIZZA questi pattern nei check-in:
+- ADERENZA AL PIANO: correlazione tra plan_adherence (full/partial/none) e benessere (umore, energia, gonfiore). Es: "Nei giorni in cui segui il piano, la tua energia è più alta"
+- CIBI FUORI PIANO: quali off_plan_foods si correlano con sintomi negativi
+- CIBI DEL PIANO: quali plan_foods_followed si correlano con benessere positivo
 - Cibi consumati e sintomi (gonfiore, energia bassa, umore)
 - Combinazioni di cibi nello stesso giorno e reazioni
 - Ore di sonno e fame/energia/umore del giorno dopo

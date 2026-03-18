@@ -473,7 +473,7 @@ const CustomFoodInput = ({ onAdd, selectedFoods }: { onAdd: (f: string) => void;
   );
 };
 
-
+const DonePhase = ({
   currentStreak,
   coachMessage,
   coachLoading,

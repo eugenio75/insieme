@@ -85,7 +85,6 @@ const lightPlan: DayPlan[] = [
         ],
         simpleVariant: { title: 'Alternativa', description: 'Un frutto di stagione o qualche biscotto secco con tè.' },
       },
-      },
       { type: 'cena', typeLabel: 'Cena', icon: '🌙', title: 'Frittata di verdure', description: 'Due uova con verdure di stagione. Veloce e nutriente.',
         ingredients: [
           { name: 'Uova', substitutes: ['Ricotta (al forno con verdure)', 'Formaggio fresco e pane'] },

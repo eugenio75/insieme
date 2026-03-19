@@ -89,7 +89,7 @@ serve(async (req) => {
     const { data: habitCompletions } = await supabase
       .from("habit_completions")
       .select("habit_title, completed_at")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("completed_at", twoWeeksAgo)
       .order("completed_at", { ascending: false });
 

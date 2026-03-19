@@ -39,6 +39,7 @@ const FastingTimer = () => {
       <div className="p-6 rounded-2xl glass glass-border">
         <div className="flex items-center gap-2 mb-5">
           <Timer className="w-5 h-5 text-primary" />
+          <span className="text-xs text-muted-foreground btn-text">DIGIUNO INTERMITTENTE</span>
           <div className="ml-auto flex items-center gap-2">
             {stats.currentStreak > 0 && (
               <div className="flex items-center gap-1.5 bg-secondary/10 px-3 py-1 rounded-full">

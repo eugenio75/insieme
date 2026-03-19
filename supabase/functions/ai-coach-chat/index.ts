@@ -46,7 +46,7 @@ serve(async (req) => {
     const { data: profile } = await supabase
       .from("profiles")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .single();
 
     // 2. Recent check-ins (last 7 days)

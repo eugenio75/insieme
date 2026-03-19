@@ -14,18 +14,25 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Missing authorization header");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
     
-    // Auth client for user verification
+    // Auth client for user verification using getClaims
     const authClient = createClient(supabaseUrl, anonKey!, {
       global: { headers: { Authorization: authHeader } },
     });
-    const { data: { user }, error: authError } = await authClient.auth.getUser();
-    if (authError || !user) throw new Error("Unauthorized");
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: authError } = await authClient.auth.getClaims(token);
+    if (authError || !claimsData?.claims?.sub) {
+      console.error("Auth error:", authError);
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const userId = claimsData.claims.sub as string;
 
     // Service client for data fetching
     const supabase = createClient(supabaseUrl, serviceKey);
@@ -39,7 +46,7 @@ serve(async (req) => {
     const { data: profile } = await supabase
       .from("profiles")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .single();
 
     // 2. Recent check-ins (last 7 days)
@@ -47,7 +54,7 @@ serve(async (req) => {
     const { data: checkins } = await supabase
       .from("daily_checkins")
       .select("mood, energy, bloating, stress, sleep_hours, foods_eaten, plan_adherence, plan_foods_followed, off_plan_foods, created_at")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("created_at", weekAgo)
       .order("created_at", { ascending: false })
       .limit(20);
@@ -56,7 +63,7 @@ serve(async (req) => {
     const { data: healthDocs } = await supabase
       .from("health_documents")
       .select("doc_type, ai_analysis, ai_meal_plan, status, created_at")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("status", "completed")
       .order("created_at", { ascending: false })
       .limit(5);
@@ -65,7 +72,7 @@ serve(async (req) => {
     const { data: weeklyCheckins } = await supabase
       .from("weekly_checkins")
       .select("weight, energy, bloating, week_number, notes, created_at")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(8);
 
@@ -73,7 +80,7 @@ serve(async (req) => {
     const { data: fastingSessions } = await supabase
       .from("fasting_sessions")
       .select("started_at, ended_at, completed, target_hours, protocol")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("started_at", { ascending: false })
       .limit(10);
 
@@ -82,7 +89,7 @@ serve(async (req) => {
     const { data: habitCompletions } = await supabase
       .from("habit_completions")
       .select("habit_title, completed_at")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("completed_at", twoWeeksAgo)
       .order("completed_at", { ascending: false });
 

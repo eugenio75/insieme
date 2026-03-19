@@ -80,7 +80,7 @@ serve(async (req) => {
     const { data: fastingSessions } = await supabase
       .from("fasting_sessions")
       .select("started_at, ended_at, completed, target_hours, protocol")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("started_at", { ascending: false })
       .limit(10);
 

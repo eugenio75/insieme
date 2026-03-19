@@ -63,7 +63,7 @@ serve(async (req) => {
     const { data: healthDocs } = await supabase
       .from("health_documents")
       .select("doc_type, ai_analysis, ai_meal_plan, status, created_at")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("status", "completed")
       .order("created_at", { ascending: false })
       .limit(5);

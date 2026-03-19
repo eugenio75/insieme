@@ -50,7 +50,9 @@ const FastingTimer = () => {
                 </span>
               </div>
             )}
-            <span className="text-xs font-medium text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full">{config.protocol}</span>
+            <span className="text-xs font-medium text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full">
+              {config.protocol === 'custom' ? `${config.fastingHours}:${24 - config.fastingHours}` : config.protocol}
+            </span>
           </div>
         </div>
 

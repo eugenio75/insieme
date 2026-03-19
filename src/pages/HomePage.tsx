@@ -277,16 +277,23 @@ const HomePage = () => {
           <div className="mt-4 flex items-center gap-3">
             {/* Streak + Progress compact */}
             <div className="flex-1 p-3.5 rounded-2xl glass glass-border flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
-                <span className="text-lg">{milestone?.icon || '🔥'}</span>
+              <div className="flex flex-col items-center justify-center min-w-[56px]">
+                <motion.span
+                  key={currentStreak}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 12 }}
+                  className="text-3xl font-extrabold text-gradient font-body leading-none"
+                >
+                  {currentStreak}
+                </motion.span>
+                <span className="text-[9px] text-muted-foreground mt-0.5 font-medium">
+                  {currentStreak === 1 ? 'GIORNO' : 'GIORNI'}
+                </span>
+                <span className="text-base mt-0.5">{milestone?.icon || '🔥'}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-xl font-bold text-gradient font-body">{currentStreak}</span>
-                  <span className="text-[11px] text-muted-foreground">
-                    {currentStreak === 1 ? 'giorno' : 'giorni'}
-                  </span>
-                </div>
+                <p className="text-xs font-semibold text-foreground leading-tight">Di percorso</p>
                 {/* Mini progress bar */}
                 <div className="mt-1.5 h-1.5 rounded-full bg-muted overflow-hidden">
                   <motion.div

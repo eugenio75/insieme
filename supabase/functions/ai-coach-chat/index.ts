@@ -72,7 +72,7 @@ serve(async (req) => {
     const { data: weeklyCheckins } = await supabase
       .from("weekly_checkins")
       .select("weight, energy, bloating, week_number, notes, created_at")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(8);
 

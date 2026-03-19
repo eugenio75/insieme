@@ -42,9 +42,13 @@ const FastingTimer = () => {
           <span className="text-xs text-muted-foreground btn-text">DIGIUNO INTERMITTENTE</span>
           <div className="ml-auto flex items-center gap-2">
             {stats.currentStreak > 0 && (
-              <span className="text-xs font-medium text-secondary/80 bg-secondary/10 px-2 py-0.5 rounded-full">
-                🔥 {stats.currentStreak} {stats.currentStreak === 1 ? 'giorno' : 'giorni'}
-              </span>
+              <div className="flex items-center gap-1.5 bg-secondary/10 px-3 py-1 rounded-full">
+                <span className="text-base">🔥</span>
+                <span className="text-lg font-extrabold text-gradient">{stats.currentStreak}</span>
+                <span className="text-[10px] text-muted-foreground font-medium">
+                  {stats.currentStreak === 1 ? 'giorno' : 'giorni'}
+                </span>
+              </div>
             )}
             <span className="text-xs font-medium text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full">{config.protocol}</span>
           </div>

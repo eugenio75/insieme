@@ -17,7 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'react-router-dom';
 
-type Tab = 'piano' | 'consigli' | 'ricette' | 'gonfiore';
+type Tab = 'piano' | 'spesa' | 'consigli' | 'ricette' | 'gonfiore';
 
 const antiBloatingGuide = [
   { title: 'Mangia lentamente', description: 'Posa la forchetta tra un boccone e l\'altro. Aiuta a ridurre l\'aria ingerita.', icon: '🧘‍♀️' },

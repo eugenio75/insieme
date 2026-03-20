@@ -116,6 +116,80 @@ export type Database = {
         }
         Relationships: []
       }
+      grocery_items: {
+        Row: {
+          category: string
+          checked: boolean
+          created_at: string
+          id: string
+          is_manual: boolean
+          list_id: string
+          name: string
+          quantity: string | null
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          checked?: boolean
+          created_at?: string
+          id?: string
+          is_manual?: boolean
+          list_id: string
+          name: string
+          quantity?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          checked?: boolean
+          created_at?: string
+          id?: string
+          is_manual?: boolean
+          list_id?: string
+          name?: string
+          quantity?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grocery_items_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "grocery_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grocery_lists: {
+        Row: {
+          created_at: string
+          id: string
+          meal_plan_snapshot: Json | null
+          title: string
+          updated_at: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meal_plan_snapshot?: Json | null
+          title?: string
+          updated_at?: string
+          user_id: string
+          week_start?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meal_plan_snapshot?: Json | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
       habit_completions: {
         Row: {
           completed_at: string
@@ -182,6 +256,36 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      household_connections: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          from_user_id: string
+          id: string
+          status: string
+          to_email: string
+          to_user_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          from_user_id: string
+          id?: string
+          status?: string
+          to_email: string
+          to_user_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          status?: string
+          to_email?: string
+          to_user_id?: string | null
         }
         Relationships: []
       }

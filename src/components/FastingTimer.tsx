@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Timer, Play, Square, Clock } from 'lucide-react';
+import { Timer, Play, Square, Pause } from 'lucide-react';
 import { useFasting } from '@/hooks/useFasting';
 
 const formatTime = (minutes: number) => {

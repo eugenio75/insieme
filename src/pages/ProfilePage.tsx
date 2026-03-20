@@ -9,6 +9,7 @@ import { Plus, X, LogOut, TrendingDown, TrendingUp, Minus, Scale } from 'lucide-
 import FastingSettings from '@/components/FastingSettings';
 import ProfileFieldEditor from '@/components/ProfileFieldEditor';
 import { useWeightTracking } from '@/hooks/useWeightTracking';
+import HouseholdSection from '@/components/HouseholdSection';
 
 const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
 

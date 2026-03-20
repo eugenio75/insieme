@@ -117,15 +117,25 @@ const FastingTimer = () => {
 
               <AnimatePresence mode="wait">
                 {!showConfirmEnd ? (
-                  <motion.button
-                    key="stop"
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowConfirmEnd(true)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted text-muted-foreground text-xs font-medium"
-                  >
-                    <Square className="w-3 h-3" />
-                    Termina
-                  </motion.button>
+                  <motion.div key="buttons" className="flex gap-2">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => { endSession(false); }}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary/10 text-secondary text-xs font-medium"
+                      title="Salta questo giorno senza perdere i progressi"
+                    >
+                      <Pause className="w-3 h-3" />
+                      Pausa
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setShowConfirmEnd(true)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted text-muted-foreground text-xs font-medium"
+                    >
+                      <Square className="w-3 h-3" />
+                      Termina
+                    </motion.button>
+                  </motion.div>
                 ) : (
                   <motion.div
                     key="confirm"

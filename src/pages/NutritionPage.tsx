@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import GroceryList from '@/components/GroceryList';
 import { useAppStore } from '../store/useAppStore';
 import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } from '../data/foodTips';
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan, HealthConstraints } from '../data/mealPlans';

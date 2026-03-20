@@ -231,7 +231,7 @@ export const useFasting = () => {
         }, 0) / completed.length
       : 0;
 
-    // Streak — count consecutive days based on completion days + active session elapsed days
+    // Streak — count consecutive days, allowing 1-day pauses
     let streak = 0;
     const fastingDates = new Set<number>();
 
@@ -256,13 +256,17 @@ export const useFasting = () => {
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    // Start from today and go backwards
-    for (let i = 0; i < 60; i++) {
+    // Start from today and go backwards, allowing 1-day gaps (pause days)
+    let gapCount = 0;
+    for (let i = 0; i < 90; i++) {
       const checkDate = new Date(today.getTime() - i * 86400000);
       if (fastingDates.has(checkDate.getTime())) {
         streak++;
+        gapCount = 0; // reset gap counter
       } else {
-        break;
+        gapCount++;
+        if (gapCount > 1) break; // more than 1 consecutive gap = streak broken
+        // 1-day gap = pause, don't break streak
       }
     }
 

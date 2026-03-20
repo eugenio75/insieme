@@ -405,6 +405,17 @@ const NutritionPage = () => {
           ))}
         </div>
 
+        {/* Spesa */}
+        {activeTab === 'spesa' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <GroceryList />
+          </motion.div>
+        )}
+
         {/* Piano settimanale */}
         {activeTab === 'piano' && (
           <motion.div

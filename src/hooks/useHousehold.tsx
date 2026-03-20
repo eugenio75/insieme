@@ -23,10 +23,13 @@ export const useHousehold = () => {
     if (!user) return;
     setLoading(true);
     try {
+      const userEmail = user.email?.toLowerCase() || '';
+
+      // Fetch connections where I'm the sender, receiver, or matched by email
       const { data } = await supabase
         .from('household_connections')
         .select('*')
-        .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`) as any;
+        .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id},to_email.eq.${userEmail}`) as any;
 
       if (data) {
         // Enrich with partner names
@@ -46,7 +49,12 @@ export const useHousehold = () => {
         }
 
         setConnections(enriched.filter(c => c.status === 'accepted'));
-        setPendingIncoming(enriched.filter(c => c.status === 'pending' && c.to_user_id === user.id));
+        // Pending incoming: either to_user_id matches me, or to_email matches my email (and I'm not the sender)
+        setPendingIncoming(enriched.filter(c => 
+          c.status === 'pending' && 
+          c.from_user_id !== user.id &&
+          (c.to_user_id === user.id || c.to_email === userEmail)
+        ));
       }
     } catch (e) {
       console.error('Error loading household connections:', e);

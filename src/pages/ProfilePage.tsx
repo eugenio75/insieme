@@ -9,6 +9,7 @@ import { Plus, X, LogOut, TrendingDown, TrendingUp, Minus, Scale } from 'lucide-
 import FastingSettings from '@/components/FastingSettings';
 import ProfileFieldEditor from '@/components/ProfileFieldEditor';
 import { useWeightTracking } from '@/hooks/useWeightTracking';
+import HouseholdSection from '@/components/HouseholdSection';
 
 const allIntolerances = ['Lattosio', 'Glutine', 'Nichel', 'Fruttosio'];
 
@@ -429,6 +430,9 @@ const ProfilePage = () => {
 
         {/* Fasting Settings */}
         <FastingSettings />
+
+        {/* Household / Conviventi */}
+        <HouseholdSection />
 
         {/* Privacy mode */}
         <div className="mt-8 p-6 rounded-2xl bg-accent glass-border">

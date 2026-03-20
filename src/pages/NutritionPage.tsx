@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import GroceryList from '@/components/GroceryList';
 import { useAppStore } from '../store/useAppStore';
 import { getAllRecipes, getIntoleranceTips, getDailyTip, FoodTip, Ingredient } from '../data/foodTips';
 import { getTodayPlan, getWeeklyPlan, Meal, DayPlan, HealthConstraints } from '../data/mealPlans';
@@ -16,7 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'react-router-dom';
 
-type Tab = 'piano' | 'consigli' | 'ricette' | 'gonfiore';
+type Tab = 'piano' | 'spesa' | 'consigli' | 'ricette' | 'gonfiore';
 
 const antiBloatingGuide = [
   { title: 'Mangia lentamente', description: 'Posa la forchetta tra un boccone e l\'altro. Aiuta a ridurre l\'aria ingerita.', icon: '🧘‍♀️' },
@@ -366,6 +367,7 @@ const NutritionPage = () => {
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'piano', label: '📋 Piano' },
+    { key: 'spesa', label: '🛒 Spesa' },
     { key: 'consigli', label: 'Per te' },
     { key: 'ricette', label: 'Idee' },
     { key: 'gonfiore', label: 'Anti-gonfiore' },
@@ -402,6 +404,17 @@ const NutritionPage = () => {
             </button>
           ))}
         </div>
+
+        {/* Spesa */}
+        {activeTab === 'spesa' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <GroceryList />
+          </motion.div>
+        )}
 
         {/* Piano settimanale */}
         {activeTab === 'piano' && (

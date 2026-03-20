@@ -274,7 +274,7 @@ const ProgressPage = () => {
             { key: 'report' as const, label: '📋 Report' },
             { key: 'trend' as const, label: '📈 Andamento' },
             { key: 'scoperte' as const, label: '🔍 Scoperte' },
-            ...(fastingConfig.enabled ? [{ key: 'digiuno' as const, label: '⏱️ Digiuno' }] : []),
+            ...(fastingConfig.enabled || getFastingStats().totalSessions > 0 ? [{ key: 'digiuno' as const, label: '⏱️ Digiuno' }] : []),
           ]).map((tab) => (
             <button
               key={tab.key}

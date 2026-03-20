@@ -431,6 +431,9 @@ const ProfilePage = () => {
         {/* Fasting Settings */}
         <FastingSettings />
 
+        {/* Household / Conviventi */}
+        <HouseholdSection />
+
         {/* Privacy mode */}
         <div className="mt-8 p-6 rounded-2xl bg-accent glass-border">
           <h3 className="font-display text-base text-accent-foreground mb-2">

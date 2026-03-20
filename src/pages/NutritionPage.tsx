@@ -367,6 +367,7 @@ const NutritionPage = () => {
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'piano', label: '📋 Piano' },
+    { key: 'spesa', label: '🛒 Spesa' },
     { key: 'consigli', label: 'Per te' },
     { key: 'ricette', label: 'Idee' },
     { key: 'gonfiore', label: 'Anti-gonfiore' },
